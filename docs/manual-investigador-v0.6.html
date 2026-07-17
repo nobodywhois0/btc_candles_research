@@ -1,0 +1,558 @@
+<title>Manual del investigador cuantitativo — Fase 5</title>
+<style>
+  :root{
+    --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+      --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  }
+  :root[data-theme="dark"]{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+    --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  :root[data-theme="light"]{--paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:56px 32px 40px;}
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.4vw,46px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance;max-width:20ch;}
+  .doc-subtitle{font-size:18px;color:var(--ink-muted);max-width:64ch;margin:0 0 26px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{max-width:1180px;margin:0 auto;padding:0 32px 120px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start;}
+  nav.toc{position:sticky;top:32px;font-family:var(--font-mono);font-size:11px;line-height:1.75;padding-top:44px;max-height:calc(100vh - 64px);overflow-y:auto;}
+  nav.toc a{display:block;color:var(--ink-muted);text-decoration:none;padding:2px 0 2px 12px;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+  nav.toc .toc-group{margin-bottom:10px;}
+  nav.toc .toc-head{color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;font-size:10px;padding-left:12px;margin-bottom:2px;}
+
+  main{min-width:0;padding-top:44px;}
+  section{padding:48px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(23px,2.8vw,29px);font-weight:700;letter-spacing:-.005em;margin:0 0 18px;text-wrap:balance;max-width:32ch;}
+  h3{font-family:var(--font-display);font-size:18px;font-weight:700;margin:26px 0 10px;}
+  h4{font-family:var(--font-body);font-size:15px;font-weight:700;margin:4px 0;color:var(--ink);}
+  p{margin:0 0 14px;max-width:70ch;}
+  p.lead{font-size:18px;color:var(--ink-muted);max-width:62ch;}
+  ul,ol{margin:0 0 15px;padding-left:22px;max-width:68ch;}
+  li{margin-bottom:5px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code, .mono{font-family:var(--font-mono);font-size:.87em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .36em;border-radius:4px;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:15px 19px;border-radius:2px;margin:18px 0;max-width:68ch;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:5px;display:block;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.risk .callout-label{color:var(--red);}
+  .callout.win{border-left-color:var(--green);background:var(--green-wash);}
+  .callout.win .callout-label{color:var(--green);}
+
+  .table-wrap{overflow-x:auto;margin:16px 0 24px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:9px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody tr:last-child td{border-bottom:none;}
+  .vartable tbody td:first-child{color:var(--ink);font-weight:600;}
+
+  .pill{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:20px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block;}
+  .pill--lvl0{color:var(--ink-faint);border-color:var(--line);}
+  .pill--lvl1{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--lvl2{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--lvl3{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);font-weight:700;}
+  .pill--lvl4{color:var(--green);border-color:var(--green);background:var(--green-wash);font-weight:700;}
+  .pill--reject{color:var(--red);border-color:var(--red);background:var(--red-wash);font-weight:700;}
+
+  .rule-card{border:1px solid var(--line);border-radius:10px;padding:18px 20px;margin:14px 0;background:var(--paper-raised);}
+  .rule-card .rule-num{font-family:var(--font-mono);font-size:11px;color:var(--accent-ink);letter-spacing:.05em;}
+  .rule-card .rule-text{font-family:var(--font-display);font-size:16.5px;font-weight:700;margin:4px 0 10px;}
+  .rule-spec{display:grid;grid-template-columns:130px 1fr;gap:5px 14px;font-size:13.5px;}
+  .rule-spec dt{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding-top:1px;}
+  .rule-spec dd{margin:0 0 6px;color:var(--ink-muted);}
+
+  .checklist{list-style:none;padding-left:0;margin:16px 0;max-width:68ch;}
+  .checklist li{position:relative;padding-left:30px;margin-bottom:9px;color:var(--ink-muted);}
+  .checklist li::before{content:"☐";position:absolute;left:0;top:0;color:var(--accent);font-family:var(--font-mono);font-size:15px;}
+
+  .schema-block{border:1px solid var(--line);border-radius:8px;background:var(--paper-raised);padding:18px 20px;margin:16px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.7;overflow-x:auto;white-space:pre-wrap;}
+  .schema-block .c{color:var(--ink-faint);}
+  .schema-block .t{color:var(--accent-ink);font-weight:700;}
+
+  .tree-card{border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:16px 0;background:var(--paper-raised);}
+  .tree-card h4{font-family:var(--font-display);font-size:17px;margin-top:0;}
+  .tree-step{border-top:1px dashed var(--line);padding:12px 0;}
+  .tree-step:first-of-type{border-top:none;}
+  .tree-step .q{font-weight:700;color:var(--ink);}
+  .branch{margin:6px 0 0 18px;font-size:14px;}
+  .branch b{color:var(--accent-ink);}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0;}
+  .card{border:1px solid var(--line);border-radius:8px;padding:16px 18px;background:var(--paper-raised);}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14px;}
+
+  .legacy{border:2px solid var(--accent);border-radius:14px;padding:32px 34px;margin-top:12px;background:var(--accent-wash);}
+  .legacy p{max-width:none;font-size:17px;}
+
+  footer{max-width:1180px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  details.toc-mobile{display:none;}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{display:block;margin:28px 32px 0;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:var(--font-mono);font-size:12.5px;}
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+    .grid-2{grid-template-columns:1fr;}
+    .rule-spec{grid-template-columns:1fr;}
+    .legacy{padding:20px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow"><span>Protocolo obligatorio</span> · <span>Disciplina científica</span> · <span>Fase 5</span></div>
+    <h1 class="doc-title">Manual del investigador — el enemigo somos nosotros</h1>
+    <p class="doc-subtitle">Ningún software de este proyecto puede protegerlo de un investigador que quiere encontrar un edge más de lo que quiere saber la verdad. Este documento existe para eso, y es de lectura obligatoria mientras dure la investigación.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha</dt><dd>2026-07-07</dd></div>
+      <div class="meta-item"><dt>Versión</dt><dd>v0.6 — protocolo del investigador</dd></div>
+      <div class="meta-item"><dt>Ámbito</dt><dd>Obligatorio para todo experimento de v0.1–v0.5</dd></div>
+      <div class="meta-item"><dt>Objetivo único</dt><dd>Evitar que nos engañemos a nosotros mismos</dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice del documento</summary>
+  <nav>
+    <a href="#mandamientos">1 · Mandamientos</a><a href="#pre">2 · Checklist pre-experimento</a>
+    <a href="#post">3 · Checklist post-experimento</a><a href="#registro">4 · Registro obligatorio</a>
+    <a href="#sesgos">5 · Catálogo de sesgos</a><a href="#arboles">6 · Árboles de decisión</a>
+    <a href="#niveles">7 · Niveles de evidencia</a><a href="#abandono">8 · Criterios de abandono</a>
+    <a href="#auditoria">9 · Auditoría mensual</a><a href="#abogado">10 · El abogado del diablo</a>
+    <a href="#lenguaje">11 · Cómo escribir conclusiones</a><a href="#publicacion">12 · Protocolo de publicación</a>
+    <a href="#perfecto">13 · El experimento perfecto</a><a href="#decalogo">14 · Decálogo del investigador</a>
+    <a href="#final">Última pregunta</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <div class="toc-group"><div class="toc-head">Reglas</div>
+      <a href="#mandamientos">1 Mandamientos</a><a href="#pre">2 Pre-experimento</a><a href="#post">3 Post-experimento</a>
+      <a href="#registro">4 Registro</a></div>
+    <div class="toc-group"><div class="toc-head">Diagnóstico</div>
+      <a href="#sesgos">5 Sesgos</a><a href="#arboles">6 Árboles</a><a href="#niveles">7 Niveles</a>
+      <a href="#abandono">8 Abandono</a></div>
+    <div class="toc-group"><div class="toc-head">Disciplina</div>
+      <a href="#auditoria">9 Auditoría</a><a href="#abogado">10 Abogado del diablo</a>
+      <a href="#lenguaje">11 Lenguaje</a><a href="#publicacion">12 Publicación</a></div>
+    <div class="toc-group"><div class="toc-head">Cierre</div>
+      <a href="#perfecto">13 Experimento perfecto</a><a href="#decalogo">14 Decálogo</a><a href="#final">Última pregunta</a></div>
+  </nav>
+
+  <main>
+
+    <section id="mandamientos">
+      <div class="eyebrow">Parte 1 · Mandamientos del proyecto</div>
+      <h2>22 reglas absolutas, sin excepciones discrecionales</h2>
+      <p class="lead">Asumimos que el mayor riesgo de este proyecto no es que el mercado sea eficiente. Es que nosotros, con nuestro optimismo, nuestro cansancio y nuestro deseo de encontrar algo, nos convenzamos de que no lo es cuando en realidad sí lo es.</p>
+
+      <div class="rule-card"><div class="rule-num">01</div><div class="rule-text">Nunca modificar un experimento después de ver resultados parciales.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Cualquier ajuste posterior a ver resultados es sobreajuste manual del investigador, indistinguible de p-hacking.</dd>
+        <dt>Ejemplo</dt><dd>Cambiar el umbral de "vela grande" de 1.5×ATR a 1.2×ATR porque con 1.2× el efecto se vuelve "significativo".</dd>
+        <dt>Consecuencia</dt><dd>El resultado se descarta por completo; se re-registra como experimento nuevo con hipótesis pre-registrada de nuevo.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">02</div><div class="rule-text">Nunca eliminar una hipótesis fallida del registro.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Eliminarla es supervivencia de resultados; el catálogo completo de lo intentado es lo único que permite corregir por comparaciones múltiples honestamente.</dd>
+        <dt>Ejemplo</dt><dd>Borrar <code>006_bollinger</code> del repositorio porque "no encontró nada" y omitirla del resumen final.</dd>
+        <dt>Consecuencia</dt><dd>El conteo de FDR de todo el proyecto queda mal calculado, invalidando la significancia de todo lo demás, no solo de esa hipótesis.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">03</div><div class="rule-text">Nunca reportar únicamente resultados positivos.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Es la forma más común y menos detectable de publication bias interno.</dd>
+        <dt>Ejemplo</dt><dd>El informe mensual solo menciona la hipótesis que mostró algo y omite las tres que no.</dd>
+        <dt>Consecuencia</dt><dd>El tablero de decisión queda falseado; se toman decisiones de continuar/abandonar con información parcial.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">04</div><div class="rule-text">Nunca entrenar un modelo antes de inspeccionar los datos crudos a mano.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Un modelo aprende un artefacto de calidad de datos antes que señal real, y su performance será indistinguible de un hallazgo genuino sin inspección previa.</dd>
+        <dt>Ejemplo</dt><dd>Entrenar LightGBM sin haber graficado a mano al menos 50 velas individuales con sus features superpuestas.</dd>
+        <dt>Consecuencia</dt><dd>Cualquier resultado del modelo se invalida hasta rehacer la inspección manual retroactivamente.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">05</div><div class="rule-text">Nunca mirar el lockbox antes de la validación final.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Mirar aunque sea una vez cambia lo que el investigador "sabe" y contamina decisiones posteriores, aunque el dato no se use explícitamente en ningún modelo.</dd>
+        <dt>Ejemplo</dt><dd>Correr un <code>.describe()</code> "solo para ver" sobre los últimos 6 meses reservados.</dd>
+        <dt>Consecuencia</dt><dd>El lockbox se considera quemado; se reserva uno nuevo y el incidente se documenta en la auditoría (Parte 9).</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">06</div><div class="rule-text">Nunca decidir el criterio de éxito después de ver el resultado.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Mover la meta después de disparar es HARKing (Hypothesizing After Results are Known).</dd>
+        <dt>Ejemplo</dt><dd>"Un AUC de 0.51 es interesante", dicho después de obtenerlo, sin que nadie hubiera fijado ese umbral antes.</dd>
+        <dt>Consecuencia</dt><dd>El resultado retrocede a Nivel 0, sin importar cuán bueno se vea.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">07</div><div class="rule-text">Nunca repetir el mismo experimento esperando otro resultado, sin cambiar la hipótesis.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Re-ejecutar con variaciones de semilla/ventana hasta que "salga" es muestrear el ruido, no confirmarlo.</dd>
+        <dt>Ejemplo</dt><dd>Correr el mismo permutation test 5 veces con distintas semillas y quedarse con la que dio p&lt;0.05.</dd>
+        <dt>Consecuencia</dt><dd>Se reporta la distribución completa de las corridas, no la mejor; se marca como patrón sospechoso.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">08</div><div class="rule-text">Nunca confundir significancia estadística con relevancia económica.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Con suficientes datos casi cualquier efecto no nulo se vuelve "significativo"; la pregunta correcta es si supera el punto de equilibrio económico.</dd>
+        <dt>Ejemplo</dt><dd>Reportar "p=0.001" sin reportar el EV neto de comisión/payout en la misma frase.</dd>
+        <dt>Consecuencia</dt><dd>Ningún resultado se registra como válido sin su cifra de EV neto adjunta.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">09</div><div class="rule-text">Nunca usar el mismo dato para generar una hipótesis y para probarla.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Es circularidad: "descubrir" un patrón mirando un gráfico y "confirmarlo" sobre los mismos datos no es una prueba independiente.</dd>
+        <dt>Ejemplo</dt><dd>Notar visualmente que las velas grandes revierten en un periodo y testear exactamente ese periodo.</dd>
+        <dt>Consecuencia</dt><dd>Toda hipótesis nacida de inspección visual se testea en una ventana temporal distinta a la que la inspiró.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">10</div><div class="rule-text">Nunca declarar un edge confirmado con menos de tres regímenes de mercado distintos.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Un efecto que solo aparece en un régimen es una hipótesis de régimen, no un edge general.</dd>
+        <dt>Ejemplo</dt><dd>Confirmar una hipótesis solo con datos de 2021 (mercado alcista).</dd>
+        <dt>Consecuencia</dt><dd>Nivel máximo alcanzable sin esto: Nivel 3, nunca Nivel 4 (Parte 7).</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">11</div><div class="rule-text">Nunca descartar un resultado incómodo sin auditarlo primero.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>El sesgo de confirmación funciona en ambas direcciones: descartar lo incómodo sin escrutinio es tan peligroso como aceptar lo cómodo sin escrutinio.</dd>
+        <dt>Ejemplo</dt><dd>Obtener continuación donde se esperaba reversión y descartarlo solo porque "no calza con la intuición".</dd>
+        <dt>Consecuencia</dt><dd>Todo resultado inesperado pasa primero por el checklist de leakage (Parte 3) antes de aceptarse o rechazarse por cualquier motivo.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">12</div><div class="rule-text">Nunca seguir ajustando el mismo experimento más de tres horas seguidas.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>El cansancio degrada el rigor silenciosamente; el investigador cansado relaja umbrales sin notarlo.</dd>
+        <dt>Ejemplo</dt><dd>Pasar de la tarde a la madrugada "afinando" un modelo hasta que el número cruza el umbral.</dd>
+        <dt>Consecuencia</dt><dd>Cualquier cambio hecho tras 3+ horas seguidas se marca y se revisa en frío al día siguiente antes de aceptarse.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">13</div><div class="rule-text">Nunca confundir "no rechazamos H0" con "H0 es verdadera".</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Ausencia de evidencia no es evidencia de ausencia, aunque tampoco es evidencia de presencia.</dd>
+        <dt>Ejemplo</dt><dd>"Confirmamos que no hay memoria" en vez de "no encontramos evidencia de memoria con el poder estadístico disponible".</dd>
+        <dt>Consecuencia</dt><dd>Todo reporte pasa por el filtro de lenguaje de la Parte 11 antes de publicarse.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">14</div><div class="rule-text">Nunca usar el mismo umbral de significancia para la hipótesis 1 que para la 20.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Sin corrección por comparaciones múltiples, la probabilidad acumulada de un falso positivo crece con cada hipótesis nueva.</dd>
+        <dt>Ejemplo</dt><dd>Aceptar p&lt;0.05 para la hipótesis #1 y también para la #20 sin ajustar por FDR.</dd>
+        <dt>Consecuencia</dt><dd>El umbral efectivo se recalcula en cada auditoría mensual según el número total de hipótesis probadas.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">15</div><div class="rule-text">Nunca presentar una curva sin su intervalo de confianza.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Una curva sin banda de incertidumbre invita a sobreinterpretar ruido como patrón.</dd>
+        <dt>Ejemplo</dt><dd>Mostrar la curva de supervivencia del color sin bandas de Wilson.</dd>
+        <dt>Consecuencia</dt><dd>El reporte se devuelve sin publicar hasta incluir las bandas.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">16</div><div class="rule-text">Nunca decidir continuar/abandonar sin actualizar el tablero primero.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Decisiones tomadas "de memoria" son exactamente lo que este documento existe para prevenir.</dd>
+        <dt>Ejemplo</dt><dd>Decidir informalmente seguir invirtiendo en una hipótesis sin que <code>board.md</code> refleje su estado real.</dd>
+        <dt>Consecuencia</dt><dd>Cualquier decisión no reflejada en el tablero se considera, formalmente, no tomada.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">17</div><div class="rule-text">Nunca borrar un notebook o script exploratorio, aunque el resultado haya sido negativo.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>El código que "no funcionó" es evidencia tan válida como el que funcionó; su ausencia rompe la reproducibilidad de la auditoría.</dd>
+        <dt>Ejemplo</dt><dd>Borrar <code>exploracion_bollinger.ipynb</code> porque "ya sabemos que no sirve".</dd>
+        <dt>Consecuencia</dt><dd>Se mueve a un archivo de intentos fallidos; nunca se elimina.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">18</div><div class="rule-text">Nunca aceptar un resultado sin haber escrito antes qué resultado lo habría refutado.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Sin una predicción falsable explícita de antemano, cualquier resultado puede racionalizarse como confirmación después del hecho.</dd>
+        <dt>Ejemplo</dt><dd>"Sabíamos que iba a pasar algo así", dicho después de ver el resultado.</dd>
+        <dt>Consecuencia</dt><dd>El checklist pre-experimento (Parte 2) exige este campo; sin él, el experimento no se ejecuta.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">19</div><div class="rule-text">Nunca usar lenguaje causal cuando la evidencia es solo correlacional.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>El lenguaje incorrecto lleva a decisiones de trading incorrectas más adelante.</dd>
+        <dt>Ejemplo</dt><dd>"El volumen causa la reversión" en vez de "la reversión está asociada con volumen alto en la muestra observada".</dd>
+        <dt>Consecuencia</dt><dd>Corrección obligatoria antes de que el hallazgo pueda citarse en otro experimento.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">20</div><div class="rule-text">Nunca dejar pasar una semana sin actualizar el registro obligatorio.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>El silencio es indistinguible, en una auditoría futura, de no haber trabajado o de estar ocultando algo.</dd>
+        <dt>Ejemplo</dt><dd>Tres semanas sin entradas nuevas en ningún <code>README.md</code> de <code>research/</code>.</dd>
+        <dt>Consecuencia</dt><dd>Se marca como alerta en la auditoría mensual.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">21</div><div class="rule-text">Nunca declarar "el mercado es eficiente" sin haber agotado las hipótesis P0 completas.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Abandonar antes de tiempo es tan costoso epistemológicamente como sobreajustar: ambos terminan la investigación sin la evidencia comprometida.</dd>
+        <dt>Ejemplo</dt><dd>Cerrar el proyecto en la semana 8 porque "las primeras dos hipótesis no mostraron nada".</dd>
+        <dt>Consecuencia</dt><dd>Todo cierre anticipado requiere una auditoría formal documentando por qué se considera suficiente evidencia.</dd></dl></div>
+
+      <div class="rule-card"><div class="rule-num">22</div><div class="rule-text">Nunca combinar dos hipótesis en un modelo conjunto antes de evaluarlas por separado.</div>
+        <dl class="rule-spec"><dt>Justificación</dt><dd>Combinar antes de validar individualmente impide saber qué componente aporta qué, y permite que una hipótesis sin señal "se esconda" detrás de otra.</dd>
+        <dt>Ejemplo</dt><dd>Meter todas las features de dos hipótesis juntas en un LightGBM sin haber visto el resultado individual de cada una.</dd>
+        <dt>Consecuencia</dt><dd>Se separan y se re-evalúan por separado antes de continuar con el modelo conjunto.</dd></dl></div>
+    </section>
+
+    <section id="pre">
+      <div class="eyebrow">Parte 2 · Checklist antes de ejecutar un experimento</div>
+      <h2>Si falta un solo ítem, el experimento no se corre</h2>
+      <ul class="checklist">
+        <li>La hipótesis está escrita como una frase falsable, con su mecanismo económico/estadístico esperado — no "vamos a ver qué sale".</li>
+        <li>El criterio de éxito está escrito como número exacto, no como "si se ve bien".</li>
+        <li>El criterio de abandono está escrito con el mismo nivel de precisión que el de éxito.</li>
+        <li>El benchmark está definido explícitamente — nulo, frecuencia base, o simulación de random walk (nunca "cero" por defecto sin justificarlo).</li>
+        <li>El test estadístico específico está elegido y documentado antes de ver ningún dato.</li>
+        <li>El tamaño de efecto mínimo considerado relevante está escrito, no solo el umbral de p-valor.</li>
+        <li>El número de comparaciones que este experimento suma al conteo total del proyecto está registrado, para el cálculo de FDR.</li>
+        <li>La ventana exacta de datos a usar (fechas) está fijada, con confirmación explícita de que no toca el lockbox.</li>
+        <li>El nombre de archivo/carpeta donde vivirá el resultado está fijado de antemano.</li>
+        <li>Se escribió, en una frase, qué resultado concreto refutaría la hipótesis (mandamiento #18).</li>
+      </ul>
+    </section>
+
+    <section id="post">
+      <div class="eyebrow">Parte 3 · Checklist después del experimento</div>
+      <h2>Ningún resultado se acepta sin pasar los diez puntos</h2>
+      <ul class="checklist">
+        <li>¿Hay leakage? — verificar que ninguna feature usa información de t+1 o posterior, y que el lockbox sigue intacto.</li>
+        <li>¿Hay overfitting? — comparar métrica in-sample vs. out-of-sample; ¿la brecha excede el umbral pre-registrado?</li>
+        <li>¿Se corrigió por comparaciones múltiples? — recalcular el p-valor efectivo con el conteo actualizado de hipótesis del proyecto.</li>
+        <li>¿Hay estabilidad temporal? — ¿el efecto se sostiene en ≥3 regímenes/años, o solo en uno?</li>
+        <li>¿El efecto es económicamente relevante? — EV neto del payout real, no solo el p-valor.</li>
+        <li>¿Podría explicarse por azar? — permutation test corrido y documentado, no solo mencionado de palabra.</li>
+        <li>¿El benchmark usado fue el correcto, no uno trivial? (ver Fase 4 §13 — el caso del random walk).</li>
+        <li>¿El resultado sobrevive el checklist del abogado del diablo (Parte 10)?</li>
+        <li>¿Se documentó en el registro obligatorio (Parte 4), sin importar el resultado?</li>
+        <li>¿Se actualizó el tablero de decisión (<code>board.md</code>)?</li>
+      </ul>
+    </section>
+
+    <section id="registro">
+      <div class="eyebrow">Parte 4 · Registro obligatorio</div>
+      <h2>Formato fijo, no libertad de redacción</h2>
+      <p>Cada experimento, sin excepción, produce exactamente esta plantilla — copiada, nunca reinventada:</p>
+      <div class="schema-block"><span class="t">Hipótesis:</span>            [una frase falsable]
+<span class="t">Fecha de pre-registro:</span>  [antes de tocar datos de prueba]
+<span class="t">Fecha de ejecución:</span>     [—]
+<span class="t">Resultado esperado:</span>     [escrito ANTES de ver datos]
+<span class="t">Resultado observado:</span>    [—]
+<span class="t">Benchmark usado:</span>        [—]
+<span class="t">Estadístico y p-valor:</span>   [con corrección FDR aplicada]
+<span class="t">Tamaño del efecto:</span>       [—]
+<span class="t">Interpretación:</span>          [lenguaje obligatorio — Parte 11]
+<span class="t">Problemas encontrados:</span>    [—]
+<span class="t">Limitaciones:</span>              [—]
+<span class="t">Nivel de evidencia:</span>        [0-4 — Parte 7]
+<span class="t">Decisión:</span>                   [continuar / abandonar / requiere más datos / replantear]
+<span class="t">Próximo paso:</span>                [—]
+<span class="t">Responsable:</span>                  [firma, aunque el equipo sea de 1 persona]</div>
+    </section>
+
+    <section id="sesgos">
+      <div class="eyebrow">Parte 5 · Catálogo de sesgos</div>
+      <h2>16 sesgos, cómo aparecen, cómo se cazan</h2>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Sesgo</th><th>Cómo aparece</th><th>Cómo detectarlo</th><th>Cómo evitarlo</th><th>Cómo auditarlo</th></tr></thead>
+        <tbody>
+          <tr><td>Confirmation bias</td><td>Se busca y pondera más la evidencia a favor de la hipótesis favorita.</td><td>¿Se dedicó el mismo esfuerzo a buscar evidencia en contra que a favor?</td><td>Abogado del diablo obligatorio (Parte 10).</td><td>Auditoría mensual revisa esfuerzo dedicado a refutar vs. confirmar.</td></tr>
+          <tr><td>Survivorship bias</td><td>Analizar solo el histórico de un activo/exchange que "sobrevivió".</td><td>¿El universo de datos excluye sistemáticamente algo que falló?</td><td>Documentar y justificar el universo de datos (Fase 2).</td><td>Revisar exclusiones no justificadas en cada experimento.</td></tr>
+          <tr><td>Look-ahead bias</td><td>Feature calculada con información no disponible en el momento t.</td><td>Verificar el timestamp exacto de cada input de cada feature.</td><td>Disciplina de filtración F_t- (v0.1 §03) sin excepción.</td><td>Revisión de código de cada feature nueva.</td></tr>
+          <tr><td>Leakage (general)</td><td>Normalización sobre todo el dataset antes de partir train/test.</td><td>Repetir el experimento con el lockbox intacto y comparar.</td><td>Separación física features/targets; fits de escalado solo por fold.</td><td><code>verify-repro</code> + revisión manual trimestral de una muestra.</td></tr>
+          <tr><td>P-hacking</td><td>Probar variantes de un mismo test hasta obtener significancia.</td><td>Comparar nº de configuraciones probadas vs. reportadas.</td><td>Pre-registro (Parte 2) antes de correr nada.</td><td>La auditoría pregunta "¿cuántas variantes se probaron antes de esta?".</td></tr>
+          <tr><td>Multiple testing</td><td>Acumulación de falsos positivos al probar muchas hipótesis con el mismo umbral.</td><td>Contar el nº total de tests probados desde el inicio.</td><td>FDR (Benjamini-Hochberg) recalculado en cada checkpoint.</td><td>Conteo acumulado oficial en cada auditoría.</td></tr>
+          <tr><td>Publication bias (interno)</td><td>Reportar más lo que "funcionó" que lo que no.</td><td>Comparar entradas del registro vs. carpetas de <code>research/</code>.</td><td>Mandamiento #3 — reportar todo.</td><td>Contar experimentos negativos documentados cada mes.</td></tr>
+          <tr><td>Overfitting</td><td>Modelo ajustado hasta capturar ruido de la muestra de entrenamiento.</td><td>Brecha grande in-sample vs. walk-forward.</td><td>Escalera de complejidad (v0.1 §06).</td><td>Cada modelo reporta su brecha in/out-of-sample.</td></tr>
+          <tr><td>Hindsight bias</td><td>Creer, tras ver el resultado, que "era obvio".</td><td>Comparar contra el resultado esperado escrito antes (mandamiento #18).</td><td>Campo "resultado esperado" sellado con fecha.</td><td>Contrastar cuántas veces "lo sabíamos" fue realmente cierto.</td></tr>
+          <tr><td>Data snooping</td><td>Generar la hipótesis mirando los mismos datos con que se prueba.</td><td>Preguntar de dónde salió la idea.</td><td>Separar ventana de exploración de ventana de prueba formal.</td><td>Cada hipótesis documenta su origen (teoría vs. patrón visto).</td></tr>
+          <tr><td>Optimizer's curse</td><td>La "mejor" de varias configuraciones, elegida en la misma muestra, tiende a estar sobreestimada.</td><td>Comparar métrica del ganador en muestra de selección vs. muestra fresca.</td><td>Nunca reportar la métrica de selección como final.</td><td>Verificar que todo "mejor modelo" tenga evaluación en datos frescos.</td></tr>
+          <tr><td>Selection bias</td><td>Un filtro de datos (outliers, horario, régimen) correlaciona con el resultado buscado.</td><td>¿El filtro se decidió antes o después de ver su efecto?</td><td>Todo filtro se documenta y justifica en Parte 2, nunca ad hoc.</td><td>Revisar que cada filtro tenga justificación no ligada al resultado.</td></tr>
+          <tr><td>Texas sharpshooter</td><td>Encontrar un subgrupo ganador ("funciona mejor los martes") después del hecho.</td><td>¿El subgrupo estaba en la hipótesis pre-registrada?</td><td>Toda segmentación debe estar pre-registrada, no descubierta post-hoc.</td><td>Rechazo automático de hallazgos segmentados no pre-registrados.</td></tr>
+          <tr><td>HARKing</td><td>Presentar un resultado post-hoc como si fuera la hipótesis original.</td><td>Comparar fecha del registro de hipótesis vs. fecha de los datos de prueba.</td><td>Sellado de hipótesis con timestamp antes de tocar datos de prueba.</td><td>Verificación de timestamps en la auditoría mensual.</td></tr>
+          <tr><td>Anchoring bias</td><td>El primer resultado visto se vuelve la vara con la que se juzga todo lo demás.</td><td>¿El criterio de éxito se fijó antes o después del primer número visto?</td><td>Criterio de éxito fijado contra el nulo y el benchmark económico, nunca contra el primer resultado.</td><td>Comparar criterio documentado vs. orden cronológico de resultados.</td></tr>
+          <tr><td>Regime blindness</td><td>Tratar todo el histórico como una sola muestra homogénea.</td><td>Repetir el análisis por sub-periodos y comparar.</td><td>Requisito de estabilidad en ≥3 regímenes (mandamiento #10).</td><td>Todo resultado "confirmado" trae desglose por régimen.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="arboles">
+      <div class="eyebrow">Parte 6 · Árboles de decisión</div>
+      <h2>Qué hacer, exactamente, en los cuatro momentos que más tientan al autoengaño</h2>
+
+      <div class="tree-card"><h4>Cuando aparece una señal interesante</h4>
+        <div class="tree-step"><div class="q">¿Se pre-registró la hipótesis antes de ver esto?</div>
+          <div class="branch"><b>No →</b> se re-registra como hipótesis nueva y se prueba en datos frescos antes de creer nada.</div>
+          <div class="branch"><b>Sí →</b> continuar.</div></div>
+        <div class="tree-step"><div class="q">¿Sobrevive el checklist post-experimento completo (Parte 3)?</div>
+          <div class="branch"><b>No →</b> se documenta como "evidencia débil" o "rechazada" — no se borra el registro.</div>
+          <div class="branch"><b>Sí →</b> continuar.</div></div>
+        <div class="tree-step"><div class="q">¿Sobrevive el abogado del diablo (Parte 10)?</div>
+          <div class="branch"><b>No →</b> se degrada un nivel de evidencia y se investiga la objeción más fuerte antes de seguir.</div>
+          <div class="branch"><b>Sí →</b> continuar.</div></div>
+        <div class="tree-step"><div class="q">¿Es económicamente relevante neto de costes?</div>
+          <div class="branch"><b>No →</b> se documenta como curiosidad estadística sin valor operativo, nivel máximo 2.</div>
+          <div class="branch"><b>Sí →</b> sube de nivel según Parte 7, se actualiza el tablero.</div></div>
+      </div>
+
+      <div class="tree-card"><h4>Cuando la señal desaparece</h4>
+        <div class="tree-step"><div class="q">¿Desapareció en el lockbox o en validación regular?</div>
+          <div class="branch"><b>Lockbox →</b> es la respuesta más honesta posible: se acepta y se degrada a "rechazada" sin excepción.</div>
+          <div class="branch"><b>Validación regular →</b> continuar diagnóstico.</div></div>
+        <div class="tree-step"><div class="q">¿Cambió el régimen de mercado?</div>
+          <div class="branch"><b>Sí →</b> se documenta como "evidencia condicionada a régimen" — nunca sube a Nivel 4.</div>
+          <div class="branch"><b>No →</b> sospechar leakage en el resultado original; re-auditar con Parte 3.</div></div>
+        <div class="tree-step"><div class="q">¿Se puede identificar la causa exacta?</div>
+          <div class="branch"><b>No →</b> se marca "inestable" y queda en observación — no se declara confirmada ni rechazada.</div></div>
+      </div>
+
+      <div class="tree-card"><h4>Cuando la señal es inestable entre folds</h4>
+        <div class="tree-step"><div class="q">¿El tamaño de muestra por fold es suficiente para el test usado?</div>
+          <div class="branch"><b>No →</b> es "requiere más datos" (Nivel 2 en Parte 7), no evidencia en contra ni a favor.</div>
+          <div class="branch"><b>Sí →</b> continuar.</div></div>
+        <div class="tree-step"><div class="q">¿La inestabilidad correlaciona con volatilidad/régimen/liquidez?</div>
+          <div class="branch"><b>Sí →</b> reformular como hipótesis condicional a ese régimen, re-registrar como nueva.</div>
+          <div class="branch"><b>No →</b> tratar como ruido: degradar a "evidencia débil" con fecha de revisión futura, sin abandonar de inmediato.</div></div>
+      </div>
+
+      <div class="tree-card"><h4>Cuando una hipótesis contradice a otra ya aceptada</h4>
+        <div class="tree-step"><div class="q">¿Ambas usan el mismo periodo/definición de datos?</div>
+          <div class="branch"><b>No →</b> no es una contradicción real, es diferencia de muestra — documentar, no forzar reconciliación.</div>
+          <div class="branch"><b>Sí →</b> continuar.</div></div>
+        <div class="tree-step"><div class="q">¿Alguna de las dos no pasó el checklist completo de la Parte 3?</div>
+          <div class="branch"><b>Sí →</b> esa es la sospechosa por defecto; re-auditar primero.</div>
+          <div class="branch"><b>No (ambas pasaron todo) →</b> tratar la contradicción como información real sobre un régimen no identificado — abrir hipótesis nueva sobre por qué contradicen, nunca "resolver" eligiendo la que gusta más.</div></div>
+      </div>
+    </section>
+
+    <section id="niveles">
+      <div class="eyebrow">Parte 7 · Niveles de evidencia</div>
+      <h2>Cinco niveles, ninguno se sube sin cumplir el criterio objetivo</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nivel</th><th>Nombre</th><th>Criterio de entrada objetivo</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill pill--lvl0">Nivel 0</span></td><td>Idea</td><td>Hipótesis existe en <code>hypothesis.md</code>, con mecanismo, criterio de éxito y de abandono definidos. Ningún dato tocado todavía.</td></tr>
+          <tr><td><span class="pill pill--lvl1">Nivel 1</span></td><td>Observación</td><td>Checklist pre-experimento completo (Parte 2); primera corrida documentada (Parte 4); sin corrección FDR ni validación fuera de muestra todavía.</td></tr>
+          <tr><td><span class="pill pill--lvl2">Nivel 2</span></td><td>Hipótesis apoyada</td><td>Sobrevive un test de significancia con FDR preliminar, en una sola ventana/régimen. Checklist post-experimento (Parte 3) aprobado.</td></tr>
+          <tr><td><span class="pill pill--lvl3">Nivel 3</span></td><td>Evidencia robusta</td><td>Estable en ≥3 regímenes/años, sobrevive el abogado del diablo (Parte 10), tamaño de efecto documentado. EV neto todavía no validado o marginal.</td></tr>
+          <tr><td><span class="pill pill--lvl4">Nivel 4</span></td><td>Edge validado</td><td>Todo lo anterior, más EV neto positivo con IC (bootstrap) que excluye cero, validado sobre el lockbox nunca antes tocado.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout risk"><span class="callout-label">Regla de degradación</span><p>Cualquier violación detectada en auditoría (Parte 9) puede bajar una hipótesis de nivel de inmediato, sin importar cuánto tiempo llevaba arriba. El nivel no es una posesión ganada — es un estado que debe seguir siendo verdadero cada vez que se revisa.</p></div>
+    </section>
+
+    <section id="abandono">
+      <div class="eyebrow">Parte 8 · Criterios para abandonar hipótesis</div>
+      <h2>Reglas objetivas, no intuición</h2>
+      <div class="grid-2">
+        <div class="card"><h4>Se abandona (→ <span class="pill pill--reject">Rechazada</span>)</h4><p>El resultado cae en la distribución nula del permutation test corregido por FDR, en ≥2 intentos independientes con datos distintos. O el efecto es económicamente irrelevante en 3 configuraciones razonables de costes/payout. O desapareció al tocar el lockbox — la prueba más dura posible.</p></div>
+        <div class="card"><h4>Se replantea (nueva hipótesis relacionada)</h4><p>El mecanismo sigue siendo teóricamente sólido pero la operacionalización falló — se permite <strong>una</strong> re-formulación documentada explícitamente como tal. O la inestabilidad correlaciona con régimen: se replantea como condicional a ese régimen.</p></div>
+        <div class="card"><h4>Merece otra oportunidad</h4><p>Solo si aparece un dato genuinamente nuevo (fuente externa nueva, más historia acumulada) — nunca "porque se me ocurrió otra forma de calcularlo". Y solo tras al menos 2 checkpoints desde el cierre, para evitar reabrir por frustración de corto plazo.</p></div>
+        <div class="card"><h4>Nunca es motivo válido de abandono ni de continuación</h4><p>El tiempo ya invertido en la hipótesis (falacia de costos hundidos). La incomodidad o comodidad del resultado con la intuición del investigador.</p></div>
+      </div>
+    </section>
+
+    <section id="auditoria">
+      <div class="eyebrow">Parte 9 · Auditoría mensual</div>
+      <h2>Su objetivo es demostrar que estamos equivocados, no que tenemos razón</h2>
+      <ul class="checklist">
+        <li>Recontar el número total de hipótesis/tests probados desde el inicio; recalcular el umbral FDR efectivo; revisar si algún resultado "confirmado" deja de serlo con el umbral actualizado.</li>
+        <li>Elegir al azar dos experimentos del mes y re-ejecutarlos desde cero para confirmar reproducibilidad bit a bit.</li>
+        <li>Revisar <code>board.md</code> contra los README de cada carpeta de <code>research/</code> — ¿coinciden exactamente?</li>
+        <li>Para cada hipótesis en Nivel ≥2, releer su apartado de abogado del diablo — ¿sigue siendo convincente, o el investigador se acostumbró a ignorarlo?</li>
+        <li>Contar cuántos experimentos negativos se documentaron ese mes — si es cero, es una alerta.</li>
+        <li>Revisar si el lockbox sigue intacto.</li>
+        <li>Intentar activamente construir el caso más fuerte posible de que el mejor hallazgo del mes es falso — escribirlo, aunque no cambie la decisión.</li>
+      </ul>
+      <p>Salida: <code>audits/YYYY-MM.md</code> con hallazgos, cualquier degradación de nivel resultante, y el conteo actualizado de comparaciones múltiples del proyecto completo.</p>
+    </section>
+
+    <section id="abogado">
+      <div class="eyebrow">Parte 10 · El abogado del diablo</div>
+      <h2>Obligatorio antes de aceptar cualquier edge</h2>
+      <p>Sección fija en el registro de todo resultado positivo, titulada exactamente: <strong>"Las cinco mejores razones por las que este resultado probablemente sea falso."</strong> Las cinco razones deben ser específicas a ese resultado exacto — copiar objeciones genéricas de otra hipótesis no cuenta.</p>
+      <div class="callout">
+        <span class="callout-label">Ejemplo real — supervivencia del color (Fase 4 §13)</span>
+        <ol style="margin-bottom:0;">
+          <li>La curva ascendente podría ser puramente el artefacto mecánico de random walk descrito en Fase 4 §13, no información real, si el benchmark usado no fue simulado correctamente.</li>
+          <li>El régimen de volatilidad de la muestra usada podría no representar el régimen futuro real del producto.</li>
+          <li>El tamaño de muestra en T=270s es el más pequeño de toda la curva — el extremo más "bonito" del gráfico es también el menos confiable.</li>
+          <li>La definición de "color" podría estar acoplada a una particularidad del feed de datos (spot vs. perp) que no coincide con el feed real del bróker Up/Down.</li>
+          <li>El número total de configuraciones de T probadas (30, 60, 90...270s) es, en sí mismo, una forma de comparación múltiple que podría no estar corregida adecuadamente.</li>
+        </ol>
+      </div>
+    </section>
+
+    <section id="lenguaje">
+      <div class="eyebrow">Parte 11 · Cómo escribir conclusiones</div>
+      <h2>El lenguaje refleja la asimetría entre confirmar y refutar</h2>
+      <p>Nunca se "prueba" una hipótesis — solo se falla en refutarla. El lenguaje debe reflejar esa asimetría siempre, sin excepción estilística.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Prohibido</th><th>Obligatorio</th></tr></thead>
+        <tbody>
+          <tr><td>"El modelo descubrió X."</td><td>"La evidencia observada es consistente con X."</td></tr>
+          <tr><td>"El mercado demuestra X."</td><td>"Los datos disponibles no refutan X."</td></tr>
+          <tr><td>"Existe un patrón."</td><td>"Se observa una regularidad estadística que no ha sido refutada por las pruebas aplicadas."</td></tr>
+          <tr><td>"Esto prueba que hay un edge."</td><td>"La hipótesis de edge no ha sido refutada tras N pruebas; nivel de evidencia: X."</td></tr>
+          <tr><td>"El modelo predice X."</td><td>"El modelo asigna una probabilidad calibrada de X sobre la muestra Y."</td></tr>
+          <tr><td>"Confirmamos que no hay memoria."</td><td>"No encontramos evidencia de memoria con el poder estadístico disponible."</td></tr>
+          <tr><td>"Esto es obvio en retrospectiva."</td><td>Prohibida sin excepción — es la firma verbal del hindsight bias.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="publicacion">
+      <div class="eyebrow">Parte 12 · Protocolo de publicación</div>
+      <h2>Todo se documenta. Nada se esconde. Nada desaparece.</h2>
+      <ol>
+        <li>Al terminar cualquier experimento, éxito o fracaso, se completa el registro obligatorio (Parte 4) el mismo día — no "cuando haya tiempo".</li>
+        <li>Se actualiza <code>board.md</code> de inmediato.</li>
+        <li>Se commitea el resultado completo (código + resultado + config congelada) en git, con mensaje descriptivo, sin excepción para resultados negativos.</li>
+        <li>El experimento aparece en el índice general del proyecto con su nivel de evidencia actual, funcione o no.</li>
+        <li>Ningún experimento se elimina del índice — como mucho se marca "rechazado" (mandamiento #2).</li>
+      </ol>
+    </section>
+
+    <section id="perfecto">
+      <div class="eyebrow">Parte 13 · El experimento perfecto</div>
+      <h2>Un ideal regulador, no un objetivo alcanzable</h2>
+      <p>Imposible de ejecutar con los recursos de este proyecto — y precisamente por eso, útil: cada elemento que falta es una fuente de duda residual que debe reconocerse explícitamente en cada informe, nunca ignorarse por "ser imposible de arreglar".</p>
+      <ul>
+        <li>Hipótesis pre-registrada con timestamp verificable por un tercero, antes de que existiera cualquier posibilidad de haber visto los datos de prueba.</li>
+        <li>Datos de una fuente cuya integridad es verificable independientemente, sin posibilidad física de alteración retroactiva por el investigador.</li>
+        <li>Un lockbox verdaderamente inaccesible: datos que ni siquiera existían en el momento del pre-registro, generados por el mercado después.</li>
+        <li>Múltiples investigadores independientes, sin comunicación entre sí, replicando la misma pregunta y llegando al mismo resultado.</li>
+        <li>Un benchmark nulo simulado de complejidad idéntica a la hipótesis probada — nunca un benchmark trivial.</li>
+        <li>Corrección exacta por el número total de comparaciones realizadas en la historia completa del campo, no solo del proyecto propio.</li>
+        <li>El resultado se mantiene estable indefinidamente en datos futuros generados después de haberlo publicado.</li>
+      </ul>
+    </section>
+
+    <section id="decalogo">
+      <div class="eyebrow">Parte 14 · El decálogo del investigador</div>
+      <h2>Diez principios epistemológicos, léase antes de empezar cada semana</h2>
+      <ol>
+        <li>La ausencia de evidencia de un edge no es evidencia de ausencia — pero tampoco es evidencia de que exista.</li>
+        <li>Todo resultado que no intentaste activamente refutar no ha sido probado, solo ha sido observado.</li>
+        <li>El mercado no te debe un patrón. Que hayas buscado uno durante semanas no cambia la probabilidad de que exista.</li>
+        <li>Un resultado que confirma exactamente lo que esperabas merece más escrutinio, no menos.</li>
+        <li>El número de hipótesis que probaste es tan importante como el resultado de la que "funcionó".</li>
+        <li>Si no puedes explicar por qué un resultado podría ser falso, no lo has entendido lo suficiente como para creerlo.</li>
+        <li>La certeza que sientes sobre un hallazgo no es una medida de su validez.</li>
+        <li>Cada simplificación que hiciste al construir un dataset es una hipótesis implícita adicional que también puede estar mal.</li>
+        <li>El tiempo invertido en una hipótesis no es evidencia a su favor.</li>
+        <li>Preferir una conclusión negativa correcta a una conclusión positiva no verificada, siempre.</li>
+      </ol>
+    </section>
+
+    <section id="final">
+      <div class="eyebrow">Última pregunta</div>
+      <h2>Protegiendo al investigador de dentro de diez años</h2>
+      <div class="legacy">
+        <p>Si de este documento sobreviviera una sola idea dentro de diez años, sería esta: la pregunta que más importa nunca es "¿qué encontramos?", sino "¿qué tuvimos que hacer mal, sin darnos cuenta, para creer que encontramos algo?".</p>
+        <p>Un investigador que solo leyera este manual estaría protegido de: aceptar un resultado sin haber intentado refutarlo primero (Parte 10); confundir un artefacto matemático trivial —una curva que sube porque queda menos tiempo, no porque haya información— con una señal real (Fase 4 §13); reportar solo lo que funcionó y olvidar silenciosamente lo que no (mandamiento #3, Parte 12); mover la meta después de ver el resultado (mandamientos #6 y #18); y, el más humano de todos, seguir invirtiendo en una hipótesis simplemente porque ya invirtió mucho tiempo en ella (Decálogo, principio 9).</p>
+        <p>Ninguno de estos errores requiere mala fe. Todos son exactamente lo que un investigador honesto, cansado y con ganas de encontrar algo, comete por defecto. Este documento no existe para desconfiar del mercado. Existe para desconfiar de nosotros.</p>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>Manual del investigador · Fase 5 · Protocolo obligatorio · No es software, no es arquitectura — es disciplina.</footer>
