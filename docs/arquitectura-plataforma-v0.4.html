@@ -1,0 +1,617 @@
+<title>Arquitectura de la plataforma de investigación — Fase 3</title>
+<style>
+  :root{
+    --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+      --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  }
+  :root[data-theme="dark"]{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+    --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  :root[data-theme="light"]{--paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:56px 32px 40px;}
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.4vw,46px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance;max-width:20ch;}
+  .doc-subtitle{font-size:18px;color:var(--ink-muted);max-width:64ch;margin:0 0 26px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{max-width:1180px;margin:0 auto;padding:0 32px 120px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start;}
+  nav.toc{position:sticky;top:32px;font-family:var(--font-mono);font-size:11.5px;line-height:1.8;padding-top:44px;max-height:calc(100vh - 64px);overflow-y:auto;}
+  nav.toc a{display:block;color:var(--ink-muted);text-decoration:none;padding:2px 0 2px 12px;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+  nav.toc .toc-group{margin-bottom:11px;}
+  nav.toc .toc-head{color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;font-size:10px;padding-left:12px;margin-bottom:2px;}
+
+  main{min-width:0;padding-top:44px;}
+  section{padding:50px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(23px,2.8vw,29px);font-weight:700;letter-spacing:-.005em;margin:0 0 18px;text-wrap:balance;max-width:32ch;}
+  h3{font-family:var(--font-display);font-size:19px;font-weight:700;margin:28px 0 10px;}
+  h4{font-family:var(--font-body);font-size:15.5px;font-weight:700;margin:6px 0 4px;color:var(--ink);}
+  p{margin:0 0 14px;max-width:70ch;}
+  p.lead{font-size:18px;color:var(--ink-muted);max-width:62ch;}
+  ul,ol{margin:0 0 15px;padding-left:22px;max-width:68ch;}
+  li{margin-bottom:5px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code, .mono{font-family:var(--font-mono);font-size:.87em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .36em;border-radius:4px;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:15px 19px;border-radius:2px;margin:18px 0;max-width:68ch;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:5px;display:block;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.risk .callout-label{color:var(--red);}
+  .callout.win{border-left-color:var(--green);background:var(--green-wash);}
+  .callout.win .callout-label{color:var(--green);}
+
+  .table-wrap{overflow-x:auto;margin:16px 0 24px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:9px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody tr:last-child td{border-bottom:none;}
+  .vartable tbody td:first-child{color:var(--ink);font-weight:600;font-family:var(--font-mono);font-size:12.5px;white-space:nowrap;}
+
+  .pill{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:20px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block;}
+  .pill--p0{color:var(--paper);border-color:var(--accent-ink);background:var(--accent-ink);font-weight:700;}
+  .pill--p1{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--p2{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--p3{color:var(--ink-faint);border-color:var(--line);border-style:dashed;}
+  .pill--kill{color:var(--red);border-color:var(--red);background:var(--red-wash);font-weight:700;}
+  .pill--fund{color:var(--green);border-color:var(--green);background:var(--green-wash);font-weight:700;}
+
+  .schema-block{border:1px solid var(--line);border-radius:8px;background:var(--paper-raised);padding:18px 20px;margin:16px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.7;overflow-x:auto;white-space:pre;}
+  .schema-block .c{color:var(--ink-faint);}
+  .schema-block .t{color:var(--accent-ink);font-weight:700;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0;}
+  .grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0;}
+  .card{border:1px solid var(--line);border-radius:8px;padding:16px 18px;background:var(--paper-raised);}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14px;}
+
+  .module-card{border:1px solid var(--line);border-radius:10px;padding:20px 22px;margin:18px 0;background:var(--paper-raised);}
+  .module-card h3{margin-top:0;font-size:19px;}
+  .module-spec{display:grid;grid-template-columns:120px 1fr;gap:6px 16px;font-size:14px;margin:12px 0;}
+  .module-spec dt{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--ink-faint);padding-top:2px;}
+  .module-spec dd{margin:0;color:var(--ink-muted);}
+
+  .kicker-list{list-style:none;padding-left:0;margin:18px 0;}
+  .kicker-list li{padding-left:0;border-top:1px solid var(--line);padding:13px 0;display:grid;grid-template-columns:140px 1fr;gap:18px;max-width:none;}
+  .kicker-list li:first-child{border-top:none;}
+  .kicker-list .kicker{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.04em;}
+
+  .verdict{border:1px solid var(--line-strong);background:var(--paper-raised);border-radius:10px;padding:26px 28px;margin:22px 0;max-width:74ch;}
+  .verdict .verdict-eyebrow{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:10px;}
+  .verdict p{font-size:17px;color:var(--ink);margin-bottom:12px;}
+  .verdict p:last-child{margin-bottom:0;}
+
+  .mvp-section{border:2px solid var(--accent);border-radius:14px;padding:36px;margin-top:12px;background:var(--accent-wash);}
+
+  footer{max-width:1180px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  details.toc-mobile{display:none;}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{display:block;margin:28px 32px 0;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:var(--font-mono);font-size:12.5px;}
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+    .grid-2,.grid-3,.grid-4{grid-template-columns:1fr;}
+    .kicker-list li{grid-template-columns:1fr;gap:4px;}
+    .module-spec{grid-template-columns:1fr;}
+    .mvp-section{padding:22px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow"><span>RFC interno</span> · <span>Arquitectura de plataforma</span> · <span>Fase 3</span></div>
+    <h1 class="doc-title">La plataforma de investigación, no el proyecto</h1>
+    <p class="doc-subtitle">RFC de arquitectura para un sistema modular, reproducible y escalable que soporte cientos de hipótesis sobre la vela de 5 minutos de BTC/USDT — y cualquier investigación cuantitativa futura — sin tocar el núcleo por cada idea nueva.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha</dt><dd>2026-07-07</dd></div>
+      <div class="meta-item"><dt>Versión</dt><dd>v0.4 — RFC de arquitectura</dd></div>
+      <div class="meta-item"><dt>Depende de</dt><dd>v0.1–v0.3</dd></div>
+      <div class="meta-item"><dt>Estado</dt><dd>Cero líneas de código de producción</dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice del documento</summary>
+  <nav>
+    <a href="#resumen">00 · Resumen</a><a href="#filosofia">01 · Filosofía</a><a href="#estructura">02 · Organización</a>
+    <a href="#modulos">03 · Módulos</a><a href="#flujo">04 · Flujo del sistema</a><a href="#datos">05 · Bases de datos</a>
+    <a href="#features">06 · Sistema de features</a><a href="#experimentos">07 · Sistema de experimentos</a>
+    <a href="#versionado">08 · Versionado</a><a href="#testing">09 · Testing</a><a href="#logging">10 · Logging</a>
+    <a href="#escalabilidad">11 · Escalabilidad</a><a href="#documentacion">12 · Documentación</a>
+    <a href="#roadmap">13 · Roadmap</a><a href="#critica">14 · Revisión crítica</a><a href="#inspiracion">15 · Inspiración</a>
+    <a href="#mvp">16 · MVP — la pregunta final</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <div class="toc-group"><div class="toc-head">Marco</div>
+      <a href="#resumen">00 Resumen</a><a href="#filosofia">01 Filosofía</a><a href="#estructura">02 Organización</a></div>
+    <div class="toc-group"><div class="toc-head">Sistema</div>
+      <a href="#modulos">03 Módulos</a><a href="#flujo">04 Flujo</a><a href="#datos">05 Bases de datos</a>
+      <a href="#features">06 Features</a><a href="#experimentos">07 Experimentos</a></div>
+    <div class="toc-group"><div class="toc-head">Disciplina</div>
+      <a href="#versionado">08 Versionado</a><a href="#testing">09 Testing</a><a href="#logging">10 Logging</a>
+      <a href="#escalabilidad">11 Escalabilidad</a><a href="#documentacion">12 Documentación</a></div>
+    <div class="toc-group"><div class="toc-head">Cierre</div>
+      <a href="#roadmap">13 Roadmap</a><a href="#critica">14 Autocrítica</a><a href="#inspiracion">15 Inspiración</a>
+      <a href="#mvp">16 MVP</a></div>
+  </nav>
+
+  <main>
+
+    <section id="resumen">
+      <div class="eyebrow">§00 · Resumen</div>
+      <h2>Una plataforma, no un proyecto</h2>
+      <p class="lead">El objetivo de este RFC es que agregar la hipótesis número 300 cueste lo mismo, en términos de fricción arquitectónica, que agregar la número 3: un archivo nuevo en un directorio de plugins, nunca una modificación del núcleo.</p>
+      <p>El diseño se apoya en un principio simple aplicado con disciplina: <strong>todo lo que puede ser un archivo declarativo (config, registro, metadata) debe serlo</strong>, y todo lo que puede ser una clase descubrible por un registro (feature, experimento, modelo) debe serlo. El núcleo del sistema —ingestión, validación, resolución de dependencias, motor de reportes— no cambia nunca por una hipótesis nueva; solo crece el catálogo de plugins.</p>
+      <p>Este documento no entrena nada ni ejecuta nada. Es, deliberadamente, solo la arquitectura — y termina, por petición explícita, cuestionándose a sí misma: la última sección diseña la versión mínima que un solo ingeniero construiría en seis meses, que es deliberadamente más pequeña que todo lo descrito antes de ella.</p>
+    </section>
+
+    <section id="filosofia">
+      <div class="eyebrow">§01 · Filosofía del sistema</div>
+      <h2>Cuatro principios, sin excepciones silenciosas</h2>
+      <div class="grid-2">
+        <div class="card"><h4>Modularidad</h4><p>Una hipótesis nueva = un archivo nuevo en <code>experiments/library/</code>. Si implementarla exige tocar <code>core/</code>, el core está mal diseñado, no la hipótesis.</p></div>
+        <div class="card"><h4>Reproducibilidad</h4><p>Todo resultado se ata a (commit de git, hash de dataset, hash de config, hash de entorno). Sin las cuatro claves, un resultado no es reproducible — es una anécdota.</p></div>
+        <div class="card"><h4>Escalabilidad</h4><p>El coste marginal de la feature 1000 o el experimento 500 debe ser igual al de la segunda. Si crece, el registro/caché está mal diseñado.</p></div>
+        <div class="card"><h4>Responsabilidad única</h4><p>Ningún módulo decide algo que le corresponde a otro: Model Training nunca decide particionado temporal; Calibration nunca conoce qué modelo generó las probabilidades.</p></div>
+      </div>
+    </section>
+
+    <section id="estructura">
+      <div class="eyebrow">§02 · Organización del proyecto</div>
+      <h2>Separar código, configuración, datos y resultados</h2>
+      <p>La propuesta del enunciado (todo como hermanos de <code>data/</code>) mezcla código con artefactos. Se corrige con una distinción de dos ejes: <strong>código instalable</strong> (<code>src/</code>, versionado en git, sin datos) vs. <strong>datos y resultados</strong> (<code>data/</code>, <code>runs/</code>, <code>reports/</code>, gitignored, versionados por content-hash, no por git). Es la misma disciplina que separa código de infraestructura en cualquier sistema serio: lo que cambia porque alguien programó no debe vivir junto a lo que cambia porque un experimento corrió.</p>
+      <div class="schema-block">research-platform/
+├── src/research_platform/       <span class="c"># único paquete importable — "el core"</span>
+│   ├── <span class="t">ingestion/</span>          <span class="c"># clientes Binance REST/WS, escritores Parquet</span>
+│   ├── <span class="t">cleaning/</span>            <span class="c"># dedupe, forward-fill de contexto, marcado de gaps</span>
+│   ├── <span class="t">validation/</span>           <span class="c"># validadores registrables, ValidationReport</span>
+│   ├── <span class="t">features/</span>
+│   │   ├── core/               <span class="c"># Feature base, registro, resolución de dependencias, cache</span>
+│   │   └── library/             <span class="c"># implementaciones: atr.py, path_efficiency.py, ofi.py...</span>
+│   ├── <span class="t">datasets/</span>              <span class="c"># DatasetBuilder, DatasetSpec, catálogo</span>
+│   ├── <span class="t">experiments/</span>
+│   │   ├── core/                <span class="c"># Experiment base, registro, runner</span>
+│   │   └── library/               <span class="c"># survival.py, markov.py, entropy.py, ofi.py...</span>
+│   ├── <span class="t">statistics/</span>              <span class="c"># tests puros: bootstrap, permutation, ADF, KPSS, BDS, Hurst...</span>
+│   ├── <span class="t">models/</span>
+│   │   ├── adapters/              <span class="c"># wrapper uniforme por librería (sklearn, LightGBM...)</span>
+│   │   └── registry/               <span class="c"># catálogo de modelos entrenados</span>
+│   ├── <span class="t">calibration/</span>              <span class="c"># Platt, Isotonic, reliability diagrams, ECE</span>
+│   ├── <span class="t">meta_labeling/</span>            <span class="c"># independiente — consume predicciones, no modelos</span>
+│   ├── <span class="t">survival/</span>                 <span class="c"># independiente — Kaplan-Meier, Cox, hazard</span>
+│   ├── <span class="t">visualization/</span>             <span class="c"># registro de renderers por tipo de resultado</span>
+│   ├── <span class="t">reporting/</span>                  <span class="c"># motor de templates HTML</span>
+│   ├── <span class="t">versioning/</span>                  <span class="c"># hashing de contenido, run registry (SQLite)</span>
+│   ├── <span class="t">cli/</span>                          <span class="c"># comandos delgados sobre el core</span>
+│   └── <span class="t">common/</span>                        <span class="c"># config loader (Pydantic+YAML), logging, excepciones</span>
+├── config/                        <span class="c"># YAML — activos, experimentos, datasets, plataforma</span>
+├── data/                            <span class="c"># gitignored — raw/ processed/ features/ datasets/ external/</span>
+├── runs/                             <span class="c"># OUTPUT versionado — experiments/&lt;nombre&gt;/&lt;run_id&gt;/, models/…</span>
+├── reports/                          <span class="c"># HTML generado, enlazado desde runs/</span>
+├── tests/                             <span class="c"># unit/ integration/ statistical/ regression/</span>
+├── docs/                               <span class="c"># handwritten + autogenerada desde el registro</span>
+├── scripts/                             <span class="c"># mantenimiento puntual, nunca importado por src/</span>
+└── notebooks/                            <span class="c"># exploración — nunca dependencia del paquete</span></div>
+      <p>Regla dura: <strong>nada dentro de <code>src/research_platform/</code> importa nada de <code>notebooks/</code> o <code>scripts/</code></strong> — la dirección de dependencia es siempre notebooks/scripts → paquete, nunca al revés. Es lo que evita que "un notebook lleno de scripts" sea, en la práctica, el verdadero núcleo del sistema.</p>
+    </section>
+
+    <section id="modulos">
+      <div class="eyebrow">§03 · Arquitectura por módulos</div>
+      <h2>Responsabilidad, interfaz, entradas, salidas, dependencias</h2>
+
+      <div class="module-card">
+        <h3>Data Ingestion</h3>
+        <dl class="module-spec">
+          <dt>Responsabilidad</dt><dd>Obtener datos crudos de Binance (REST klines históricos; WebSocket para aggTrade/forceOrder/funding en vivo) y escribirlos sin transformar.</dd>
+          <dt>Interfaces</dt><dd><code>Ingestor.fetch(symbol, timeframe, start, end) -> RawBatch</code>; <code>Ingestor.stream(symbol, channel) -> Iterator[Event]</code>. Cada fuente es una subclase registrada.</dd>
+          <dt>Entradas</dt><dd>Símbolo, timeframe, rango de fechas, o modo streaming.</dd>
+          <dt>Salidas</dt><dd>Parquet en <code>data/raw/&lt;fuente&gt;/&lt;symbol&gt;/year=/month=/</code>, inmutable, append-only.</dd>
+          <dt>Dependencias</dt><dd>Ninguna interna — es la hoja del árbol de dependencias del sistema.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Cleaning</h3>
+        <dl class="module-spec">
+          <dt>Qué corrige</dt><dd>Solo tres cosas lícitas: elimina duplicados exactos por clave primaria; hace forward-fill de campos de contexto de baja frecuencia (funding, OI) cuando el timestamp de alineación es correcto; marca (nunca interpola) gaps de velas.</dd>
+          <dt>Qué NO hace</dt><dd>Nunca inventa un precio OHLC. Un gap se marca para que Validation y el investigador decidan — interpolar silenciosamente sería fabricar información.</dd>
+          <dt>Detección de errores</dt><dd>Delega enteramente a Validation; actúa solo sobre lo clasificado como "corregible automáticamente".</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Validation</h3>
+        <p>Conjunto fijo de validadores (no un registro plugin — el catálogo de chequeos de calidad de datos no crece al ritmo de las hipótesis):</p>
+        <div class="table-wrap"><table>
+          <thead><tr><th>Validador</th><th>Detecta</th><th>Severidad</th></tr></thead>
+          <tbody>
+            <tr><td>DuplicateTimestampValidator</td><td>Filas con misma clave (symbol, open_time).</td><td>Bloqueante</td></tr>
+            <tr><td>GapValidator</td><td>Velas faltantes respecto a la grilla temporal esperada.</td><td>Warning (embargo, no bloqueo)</td></tr>
+            <tr><td>MonotonicTimeValidator</td><td>Timestamps no estrictamente crecientes dentro de una partición.</td><td>Bloqueante</td></tr>
+            <tr><td>OHLCConsistencyValidator</td><td>high &lt; max(open,close,low), low &gt; min(...), volumen negativo.</td><td>Bloqueante</td></tr>
+            <tr><td>OutlierValidator</td><td>Retorno &gt; N desviaciones robustas de la mediana móvil.</td><td>Warning</td></tr>
+            <tr><td>TimezoneValidator</td><td>Timestamps naive (sin tz) o no normalizados a UTC.</td><td>Bloqueante</td></tr>
+          </tbody>
+        </table></div>
+        <p>Cada corrida produce un <code>ValidationReport</code> escrito en <code>data_quality_log</code> (SQLite, §05). Los issues <em>bloqueantes</em> detienen el pipeline para esa partición; los <em>warning</em> se registran y quedan disponibles para exclusión/embargo por fold en la validación temporal (coherente con v0.1 §08), nunca se silencian.</p>
+      </div>
+
+      <div class="module-card">
+        <h3>Feature Engineering</h3>
+        <dl class="module-spec">
+          <dt>Registro</dt><dd>Decorador <code>@register_feature</code>; auto-descubrimiento al escanear <code>features/library/</code>.</dd>
+          <dt>Dependencias</dt><dd>Cada <code>Feature</code> declara <code>depends_on: list[str]</code> (columnas crudas u otras features); un resolutor calcula el orden de ejecución.</dd>
+          <dt>Evitar recálculo</dt><dd>Se recalcula solo si: no existe en caché, su <code>version</code> cambió, o alguna dependencia cambió de versión — invalidación por hash de versión, no por timestamp de archivo.</dd>
+          <dt>Caché</dt><dd>Cada feature calculada se persiste en <code>data/features/&lt;nombre&gt;/&lt;version&gt;/...parquet</code>; el <em>FeatureStore</em> resuelve qué versión sirve cada solicitud.</dd>
+        </dl>
+        <p>Detalle completo del contrato de clase en §06.</p>
+      </div>
+
+      <div class="module-card">
+        <h3>Dataset Builder</h3>
+        <dl class="module-spec">
+          <dt>Responsabilidad</dt><dd>Combinar features por nombre+versión, según un <code>DatasetSpec</code> declarado en YAML, en un dataset materializado.</dd>
+          <dt>Interfaces</dt><dd><code>DatasetBuilder.build(spec: DatasetSpec) -> Dataset</code>.</dd>
+          <dt>P0 vs. completo</dt><dd>Mismo mecanismo, distinto YAML: <code>config/datasets/p0_core.yaml</code> lista solo las features P0 del diccionario de datos (Fase 2); <code>full.yaml</code> las lista todas. No hay lógica especial para "modo P0".</dd>
+          <dt>Salidas</dt><dd><code>data/datasets/&lt;nombre&gt;/&lt;content_hash&gt;/</code> + metadata (spec usada, nº filas, rango temporal).</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Experiment Engine — el corazón</h3>
+        <p>Arquitectura tipo plugin: <code>Experiment</code> abstracta con lifecycle <code>load_data → execute → analyze → generate_report → save_results</code>. Un experimento concreto solo implementa <code>execute()</code> y <code>analyze()</code>; <code>generate_report()</code> y <code>save_results()</code> tienen implementación por defecto en la base (usan Visualization/Reporting/Versioning automáticamente). Registro vía <code>@register_experiment("survival")</code>, descubierto al arrancar el CLI. Cada experimento declara <code>required_columns</code>; el engine valida esto <em>antes</em> de ejecutar, para fallar rápido en vez de a mitad de un cálculo costoso.</p>
+        <p>Detalle completo del contrato en §07.</p>
+      </div>
+
+      <div class="module-card">
+        <h3>Statistical Engine</h3>
+        <dl class="module-spec">
+          <dt>Contenido</dt><dd>Runs test, variance ratio, BDS, ADF, KPSS, Hurst (R/S y DFA), información mutua, bootstrap (i.i.d. y por bloques), permutation test genérico.</dd>
+          <dt>Diseño</dt><dd>Funciones puras <code>test(data, **params) -> TestResult</code>, sin estado, sin registro plugin — excepción deliberada a la regla general (ver autocrítica §14): el catálogo de tests estadísticos estándar no crece al ritmo de las hipótesis del negocio.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Visualization</h3>
+        <dl class="module-spec">
+          <dt>Mecanismo</dt><dd>No es una librería de gráficas — es un registro de <em>renderers por tipo de resultado</em>. Cada <code>TestResult</code>/<code>Analysis</code> declara un <code>plot_hint</code> (p.ej. <code>"kaplan_meier_curve"</code>, <code>"reliability_diagram"</code>, <code>"heatmap"</code>).</dd>
+          <dt>Consecuencia</dt><dd>Un experimento nuevo obtiene gráficas automáticas si reutiliza tipos de resultado existentes; solo registra un renderer nuevo si introduce un tipo de resultado genuinamente nuevo.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Reporting</h3>
+        <dl class="module-spec">
+          <dt>Mecanismo</dt><dd>Motor de templates HTML que ensambla: hipótesis (metadata del experimento), metodología (config congelada), resultados (tablas de <code>TestResult</code>), gráficas (Visualization).</dd>
+          <dt>Límite honesto</dt><dd>Conclusiones y limitaciones <strong>no se auto-generan</strong> — son responsabilidad del método <code>analyze()</code> del investigador. Interpretar resultados es trabajo científico, no un template.</dd>
+          <dt>Salida</dt><dd><code>reports/&lt;experimento&gt;/&lt;run_id&gt;/index.html</code>, enlazado desde un índice maestro.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Model Training</h3>
+        <dl class="module-spec">
+          <dt>Contrato</dt><dd><code>ModelAdapter</code> uniforme sobre sklearn/XGBoost/LightGBM/CatBoost/PyTorch: <code>fit(X,y)</code>, <code>predict_proba(X)</code>, <code>get_params()</code>, registrado igual que Features/Experiments.</dd>
+          <dt>Frontera estricta</dt><dd>Nunca decide partición temporal (walk-forward/CPCV vive en <code>datasets</code>/<code>experiments</code>) — solo entrena y predice.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Calibration</h3>
+        <dl class="module-spec">
+          <dt>Independencia</dt><dd>Recibe <code>(y_true, y_pred_proba)</code> de cualquier fuente y devuelve un <code>Calibrator</code> (Platt/Isotonic) + diagnósticos (reliability diagram, ECE). No conoce ni le importa qué modelo generó las probabilidades — puede calibrar hasta una tabla de frecuencias histórica.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Meta-labeling</h3>
+        <dl class="module-spec">
+          <dt>Independencia</dt><dd>Consume predicciones + historial de acierto/fallo de un modelo primario + features de confianza (v0.2 §05); entrena el clasificador secundario. Solo conoce la <em>interfaz</em> de predicción del primario, nunca su implementación.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Survival Analysis</h3>
+        <dl class="module-spec">
+          <dt>Independencia</dt><dd>Kaplan-Meier, Cox, curvas de hazard sobre <code>survival_states_5m</code> (Fase 2). No depende de Model Training ni de Experiment Engine — usable standalone desde un notebook, consumido por <code>SurvivalExperiment</code> sin acoplamiento adicional.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>Configuration</h3>
+        <dl class="module-spec">
+          <dt>Mecanismo</dt><dd>Todo parámetro vive en YAML bajo <code>config/</code>, cargado y validado contra un schema (Pydantic) al arrancar.</dd>
+          <dt>Reproducibilidad</dt><dd>Cada run de experimento persiste una copia <em>congelada</em> de la configuración efectiva junto a sus resultados — nunca una referencia a un archivo que puede cambiar después.</dd>
+        </dl>
+      </div>
+
+      <div class="module-card">
+        <h3>CLI</h3>
+        <p>Comandos delgados: resuelven config → llaman al módulo del core correspondiente → nunca contienen lógica de negocio (así el core es testeable sin pasar por CLI).</p>
+        <div class="schema-block">research build-dataset &lt;spec&gt;
+research compute-features [--only &lt;names&gt;] [--force-recompute]
+research validate &lt;dataset&gt;
+research run experiment &lt;name&gt; [--config &lt;path&gt;] [--dry-run]
+research run experiment survival --asset BTCUSDT --from 2020-01-01 --to 2024-01-01
+research train &lt;model&gt; --dataset &lt;name&gt;
+research calibrate &lt;run_id&gt;
+research report latest
+research report &lt;run_id&gt;
+research list experiments|features|models|runs
+research docs build
+research doctor          <span class="c"># salud del sistema: registro vs. archivos, config, caché</span>
+research verify-repro &lt;run_id&gt;   <span class="c"># reproduce un run y compara resultados bit a bit</span></div>
+      </div>
+    </section>
+
+    <section id="flujo">
+      <div class="eyebrow">§04 · Flujo completo del sistema</div>
+      <h2>De la descarga al resultado versionado</h2>
+      <ol class="kicker-list">
+        <li><span class="kicker">Descargar</span><div>Ingestion escribe <code>data/raw/</code>, inmutable, particionado. No transforma nada.</div></li>
+        <li><span class="kicker">Validar</span><div>Validation corre los 6 validadores; issues bloqueantes detienen la partición, warnings se registran en <code>data_quality_log</code> sin detener.</div></li>
+        <li><span class="kicker">Limpiar</span><div>Cleaning aplica solo dedupe/forward-fill de contexto/marcado de gaps sobre lo que pasó validación.</div></li>
+        <li><span class="kicker">Construir features</span><div>Feature Engineering resuelve el grafo de dependencias, calcula solo lo no cacheado, escribe <code>data/features/</code>.</div></li>
+        <li><span class="kicker">Construir datasets</span><div>Dataset Builder combina features según un <code>DatasetSpec</code> YAML, materializa en <code>data/datasets/&lt;hash&gt;/</code>.</div></li>
+        <li><span class="kicker">Ejecutar experimentos</span><div>Experiment Engine carga el dataset, corre <code>execute()</code>/<code>analyze()</code> del plugin, delega gráficas y reporte.</div></li>
+        <li><span class="kicker">Entrenar modelos</span><div>Model Training (cuando corresponda) entrena sobre folds ya definidos por el experimento, nunca decide la partición.</div></li>
+        <li><span class="kicker">Evaluar</span><div>Statistical Engine + Calibration producen métricas y diagnósticos, agnósticos del origen del modelo.</div></li>
+        <li><span class="kicker">Reportar</span><div>Reporting ensambla el HTML final; conclusiones son responsabilidad del investigador, no del template.</div></li>
+        <li><span class="kicker">Versionar</span><div>Versioning ata (commit git, hash dataset, hash config, hash entorno) al <code>run_id</code>, escribe en <code>runs/</code>, inmutable desde entonces.</div></li>
+      </ol>
+      <p>El flujo es lineal en el caso feliz, pero cada paso puede ejecutarse de forma incremental e independiente vía CLI — no hace falta re-descargar ni re-validar todo para correr un experimento nuevo sobre datos ya procesados.</p>
+    </section>
+
+    <section id="datos">
+      <div class="eyebrow">§05 · Bases de datos</div>
+      <h2>Cada motor, justificado por su rol — no por defecto</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Motor</th><th>Qué almacena</th><th>Por qué específicamente este motor</th></tr></thead>
+        <tbody>
+          <tr><td>Parquet</td><td>Fuente de verdad primaria: klines crudos, features, datasets materializados, resultados tabulares de experimentos.</td><td>Columnar, comprime bien, soporta tipos anidados (necesarios para <code>candle_path_5m</code>), formato nativo de DuckDB y Polars. Es la única capa que importa versionar por content-hash.</td></tr>
+          <tr><td>DuckDB</td><td>Nada permanente — motor de consulta embebido que abre los Parquet bajo demanda para joins, agregaciones y ventanas.</td><td>Cero proceso servidor, cero estado propio que pueda desincronizarse de los archivos. Sustituye por completo la necesidad de un warehouse para el volumen de este proyecto (&lt;2 GB, Fase 2 §14.4).</td></tr>
+          <tr><td>SQLite</td><td>Metadata operativa de baja escala y alta necesidad transaccional: catálogo de runs (<code>run_id</code>, config hash, estado, duración), registro de versiones de features/datasets/modelos, <code>data_quality_log</code>.</td><td>Estas tablas son pequeñas (miles de filas) pero se escriben concurrentemente desde varios procesos (experimentos en paralelo) y necesitan ACID simple — algo que Parquet no da sin un motor tipo Delta/Iceberg, que sería sobre-ingeniería aquí. SQLite es correcto por el volumen bajo y la necesidad transaccional real, no por ser "la opción por defecto".</td></tr>
+          <tr><td>Redis</td><td><strong>No incluido en el diseño base.</strong></td><td>Reservado como componente opcional y condicional, solo si se construye ingestión de streaming en vivo que necesite un buffer de baja latencia entre WebSocket y escritura por lotes. Hoy ese rol lo cumple una cola en archivo/proceso simple — no se justifica una pieza de infraestructura con estado propio para investigación por lotes.</td></tr>
+          <tr><td>Memoria (in-process)</td><td>DataFrames Polars/Pandas durante el cálculo de una feature o experimento — nunca como almacén persistente.</td><td>El dataset completo cabe en &lt;2 GB; toda una sesión de investigación vive cómodo en la RAM de una laptop. Es una ventaja de diseño explícita: no hace falta cómputo distribuido durante años de crecimiento razonable.</td></tr>
+          <tr><td>Archivos planos (YAML/JSON/HTML)</td><td>Configuración, metadata de features/experimentos versionada junto a su código, reportes.</td><td>Su unidad natural de cambio es "un commit" o "un run", no "una fila" — no pertenecen a una base de datos.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="features">
+      <div class="eyebrow">§06 · Sistema de features</div>
+      <h2>Cada feature es una clase, nunca una función suelta</h2>
+      <div class="schema-block">class Feature(ABC):
+    name: str
+    version: str                    <span class="c"># bump manual al cambiar la lógica de cómputo</span>
+    family: str                      <span class="c"># una de las 11 familias de la Fase 2</span>
+    depends_on: list[str]             <span class="c"># nombres de columnas crudas u otras features</span>
+    is_cacheable: bool
+    requires_external_data: bool
+    estimated_cost: Literal["low", "medium", "high"]
+    author: str
+
+    def compute(self, df: pl.DataFrame) -> pl.Series: ...</div>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Feature</th><th>Depende de</th><th>Costo</th><th>Cacheable</th><th>Externa</th></tr></thead>
+        <tbody>
+          <tr><td>ATR</td><td>true_range</td><td>low</td><td>Sí</td><td>No</td></tr>
+          <tr><td>PathEfficiency</td><td>subbar_returns</td><td>low</td><td>Sí</td><td>No</td></tr>
+          <tr><td>OccupationTime</td><td>subbar_returns, high, low</td><td>low</td><td>Sí</td><td>No</td></tr>
+          <tr><td>RunLength</td><td>subbar_returns</td><td>low</td><td>Sí</td><td>No</td></tr>
+          <tr><td>HazardProbability</td><td>survival_states_5m, side_at_T</td><td>medium</td><td>Sí, versionado por fold</td><td>No</td></tr>
+          <tr><td>OFI</td><td>taker_buy_base_volume</td><td>low</td><td>Sí</td><td>No</td></tr>
+          <tr><td>VPIN</td><td>taker_buy_base_volume, taker_sell_volume</td><td>low</td><td>Sí</td><td>No</td></tr>
+          <tr><td>LiquidationImbalance</td><td>liquidations_5m_agg</td><td>medium</td><td>Sí</td><td>Sí (stream forceOrder)</td></tr>
+        </tbody>
+      </table></div>
+      <p>El <strong>FeatureGraph</strong> hace topological sort sobre <code>depends_on</code> para determinar orden de ejecución, y solo recalcula un nodo si su hash de versión (o el de alguna dependencia) cambió respecto al caché — el mismo principio de invalidación por contenido que DVC aplica a datos, aplicado aquí a features individuales.</p>
+    </section>
+
+    <section id="experimentos">
+      <div class="eyebrow">§07 · Sistema de experimentos</div>
+      <h2>Agregar una hipótesis debe doler lo menos posible</h2>
+      <div class="schema-block">class Experiment(ABC):
+    name: str
+    hypothesis: str                  <span class="c"># texto humano — va directo al reporte</span>
+    required_columns: list[str]        <span class="c"># valida antes de ejecutar, falla rápido</span>
+
+    def load_data(self, dataset: Dataset) -> pl.DataFrame: ...
+
+    @abstractmethod
+    def execute(self, data: pl.DataFrame) -> ExperimentResult: ...
+
+    @abstractmethod
+    def analyze(self, result: ExperimentResult) -> Analysis: ...
+
+    def generate_report(self, analysis: Analysis) -> Report: ...   <span class="c"># default: usa Visualization+Reporting</span>
+    def save_results(self, analysis: Analysis, report: Report) -> RunRecord: ...  <span class="c"># default: usa Versioning</span></div>
+      <p>Un experimento nuevo (p. ej. <code>EntropyExperiment</code>) hereda de <code>Experiment</code>, implementa solo <code>execute()</code> y <code>analyze()</code>, y se registra con <code>@register_experiment("entropy")</code> en <code>experiments/library/entropy.py</code>. Nada más en el sistema cambia. El CLI lo descubre automáticamente al escanear el directorio; <code>research doctor</code> verifica que el número de archivos coincide con el número de entradas registradas, para atrapar errores de importación silenciosos.</p>
+    </section>
+
+    <section id="versionado">
+      <div class="eyebrow">§08 · Versionado</div>
+      <h2>Reproducibilidad como contrato, no como buena intención</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Artefacto</th><th>Cómo se versiona</th></tr></thead>
+        <tbody>
+          <tr><td>Datasets</td><td>Hash del <code>DatasetSpec</code> YAML + hash de contenido de los Parquet resultantes; el nombre físico incluye el hash, nunca se sobreescribe.</td></tr>
+          <tr><td>Features</td><td><code>version</code> declarada por el autor + hash automático del código fuente de <code>compute()</code> como chequeo de integridad — si el código cambió sin bump de versión, el sistema lo detecta y bloquea el uso silencioso de caché obsoleto.</td></tr>
+          <tr><td>Experimentos</td><td>Cada <code>run_id</code> persiste: config congelada, hash del dataset usado, hashes de versión de cada feature, commit de git del código del experimento, resultados, y hash del lockfile de entorno.</td></tr>
+          <tr><td>Modelos</td><td>Igual que experimentos, más el artefacto binario serializado con su propio hash.</td></tr>
+          <tr><td>Reportes</td><td>Inmutables una vez generados; un reporte nuevo es siempre un <code>run_id</code> nuevo, nunca una regeneración in-place.</td></tr>
+          <tr><td>Configuración</td><td>Versionada en git como código; cada run guarda además una copia congelada, no una referencia mutable.</td></tr>
+          <tr><td>Resultados</td><td>Parquet/JSON dentro de <code>runs/&lt;tipo&gt;/&lt;nombre&gt;/&lt;run_id&gt;/</code>, inmutables.</td></tr>
+        </tbody>
+      </table></div>
+      <p>La unidad última de reproducibilidad es la tupla <code>(git_commit, dataset_hash, config_hash, environment_lockfile_hash)</code>. <code>research verify-repro &lt;run_id&gt;</code> hace checkout del commit registrado, reconstruye el entorno del lockfile, y compara resultados bit a bit — el comando que convierte "reproducibilidad" de aspiración en algo que se puede fallar en CI.</p>
+    </section>
+
+    <section id="testing">
+      <div class="eyebrow">§09 · Testing</div>
+      <h2>Cuatro capas, cada una con un objetivo distinto</h2>
+      <div class="grid-2">
+        <div class="card"><h4>Unitarias</h4><p>Cada <code>Feature.compute()</code> contra inputs sintéticos de casos borde (volumen cero, gap, vela con un solo trade) — nunca contra datos reales, para que fallen por una razón, no por deriva de mercado.</p></div>
+        <div class="card"><h4>Integración</h4><p>Pipeline completo (ingestion→features→dataset→experimento→reporte) sobre un dataset sintético fijo, corre en segundos en CI.</p></div>
+        <div class="card"><h4>Estadísticas</h4><p>Verifican propiedades matemáticas, no solo ausencia de crash: una curva Kaplan-Meier debe ser monótona no creciente; un permutation test sobre ruido puro no debe rechazar H0 más del 5% de las veces (meta-test del propio framework); un modelo sintéticamente bien calibrado debe dar ECE≈0.</p></div>
+        <div class="card"><h4>Regresión</h4><p>Snapshots de resultados de experimentos de referencia (golden datasets); un cambio silencioso de resultado numérico tras un refactor requiere aprobación explícita para actualizar el snapshot.</p></div>
+      </div>
+    </section>
+
+    <section id="logging">
+      <div class="eyebrow">§10 · Logging</div>
+      <h2>Observabilidad operativa, distinta de la reproducibilidad</h2>
+      <p>Logging estructurado (JSON lines) con <code>run_id</code>, <code>module</code>, <code>event</code>, <code>duration_ms</code>, <code>level</code>, <code>metadata</code> — cada cómputo de feature, cada run de experimento, cada build de dataset, cada error emite al mismo stream, agregable después con el mismo DuckDB del resto del sistema (log analytics sin herramienta adicional). Distinción explícita respecto a §08: <strong>versionado es sobre si un resultado es reproducible; logging es sobre si el sistema está sano y qué tan rápido corre.</strong></p>
+    </section>
+
+    <section id="escalabilidad">
+      <div class="eyebrow">§11 · Escalabilidad a 5 años</div>
+      <h2>1000 features, 500 experimentos, 100 modelos, 20 activos, 15 timeframes, 10 TB</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Dimensión</th><th>Por qué no rompe el diseño</th></tr></thead>
+        <tbody>
+          <tr><td>1000 features</td><td>Registro + FeatureGraph: el coste marginal de la feature 1001 es igual al de la segunda.</td></tr>
+          <tr><td>500 experimentos</td><td>Plugin registry: el Experiment Engine no crece en complejidad, solo crece el directorio <code>library/</code>.</td></tr>
+          <tr><td>100 modelos</td><td><code>ModelAdapter</code> uniforme + catálogo en SQLite: comparar 100 modelos es una query, no un ejercicio manual.</td></tr>
+          <tr><td>20 activos / 15 timeframes</td><td>El particionado Hive-style (<code>symbol=/timeframe=/year=/month=</code>) ya anticipa esto desde la Fase 2 — escalar es multiplicar particiones, no rediseñar el esquema.</td></tr>
+          <tr><td>10 TB</td><td>Punto de decisión explícito: mover <code>data/raw</code> y <code>data/features</code> a almacenamiento objeto (S3-compatible), DuckDB leyendo remoto de forma nativa. Elegir Parquet+DuckDB desde el día 1 es lo que hace esa migración "de laptop a bucket" casi gratuita, sin reescribir ningún módulo — no hace falta un motor distribuido.</td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout risk"><span class="callout-label">El riesgo real no es de cómputo</span><p>Con 1000 features y 500 experimentos, el cuello de botella deja de ser técnico y pasa a ser de <strong>descubribilidad</strong>: "¿esto ya existe?". De ahí que Documentación (§12) y un catálogo consultable (<code>research list features --family microstructure</code>) sean tan críticos como el motor de cómputo mismo.</p></div>
+    </section>
+
+    <section id="documentacion">
+      <div class="eyebrow">§12 · Documentación automática</div>
+      <h2>Derivada del registro, nunca escrita a mano por separado</h2>
+      <p>Cada <code>Feature</code>/<code>Experiment</code> expone su propia metadata estructurada (nombre, hipótesis, dependencias, versión, autor); <code>research docs build</code> recorre el registro completo y genera páginas por entidad — mismo patrón que un autodoc de Sphinx, aplicado a features/experimentos en vez de a funciones sueltas. Consecuencia directa: la documentación nunca queda desactualizada respecto al registro real, porque no es un documento aparte, es una vista del código. Los reportes de experimentos (§Reporting) ya son documentación y quedan enlazados automáticamente al catálogo; cada dataset materializado genera una "ficha" (features incluidas, rango temporal, filas, hash) por la misma razón de trazabilidad.</p>
+    </section>
+
+    <section id="roadmap">
+      <div class="eyebrow">§13 · Roadmap de implementación</div>
+      <h2>Construir lo que desbloquea investigación real primero</h2>
+      <ol class="kicker-list">
+        <li><span class="kicker">Semana 1</span><div>Esqueleto del repo (layout <code>src/</code>), config loader (Pydantic+YAML), logging, CI con un smoke test. Cero features todavía.</div></li>
+        <li><span class="kicker">Semana 2</span><div>Data Ingestion (klines 1m/5m) + escritor Parquet particionado.</div></li>
+        <li><span class="kicker">Semana 3</span><div>Validation (los 6 validadores) + <code>data_quality_log</code> (SQLite) + Cleaning mínimo.</div></li>
+        <li><span class="kicker">Semana 4</span><div>Core de Feature Engineering (clase base, registro, grafo, caché) — solo 2-3 features triviales para probar el mecanismo.</div></li>
+        <li><span class="kicker">Semana 5</span><div>Features P0 reales (Fase 2 §02-§06: básica, temporal, volatilidad núcleo, microestructura, trayectoria). Aquí vive la mayor parte del trabajo de contenido.</div></li>
+        <li><span class="kicker">Semana 6</span><div>Dataset Builder + <code>p0_core.yaml</code> + primer dataset materializado.</div></li>
+        <li><span class="kicker">Semana 7</span><div>Statistical Engine + core de Experiment Engine; Visualization/Reporting en versión mínima (2-3 tipos de gráfica, template HTML básico).</div></li>
+        <li><span class="kicker">Semana 8</span><div><strong>SurvivalExperiment</strong> end-to-end: primer corte vertical completo del sistema, sobre la hipótesis de mayor prioridad de v0.2.</div></li>
+        <li><span class="kicker">Semana 9</span><div>Segundo experimento (estructura interna / Markov) — valida que "agregar hipótesis = agregar módulo" realmente se sostiene sin tocar el core; se corrige la fricción que aparezca.</div></li>
+        <li><span class="kicker">Semana 10</span><div>Endurecer Versioning (hashes de contenido, catálogo de runs, <code>verify-repro</code>).</div></li>
+        <li><span class="kicker">Semana 11</span><div>Order flow (§09 Fase 2) + ingestión de funding/OI/liquidaciones + <code>OFIExperiment</code>.</div></li>
+        <li><span class="kicker">Semana 12</span><div>Backfill de testing (las 4 capas) sobre todo lo construido — deliberadamente después de tener contenido real que proteger, no antes.</div></li>
+        <li><span class="kicker">Semana 13</span><div>Model Training (adaptadores logística + un GBM) + Calibration — primera vez que se tocan modelos, coherente con la filosofía "dataset antes que modelo" de las tres fases previas.</div></li>
+        <li><span class="kicker">Semana 14</span><div>Meta-labeling — condicional a que el modelo primario de la semana 13 muestre algo de señal.</div></li>
+        <li><span class="kicker">Semana 15</span><div>Documentación automática + pulido de CLI + <code>research doctor</code>.</div></li>
+        <li><span class="kicker">Semana 16</span><div>Buffer, endurecimiento, primer reporte comparativo entre experimentos, retro del propio roadmap.</div></li>
+      </ol>
+    </section>
+
+    <section id="critica">
+      <div class="eyebrow">§14 · Revisión crítica</div>
+      <h2>Autocrítica de esta misma arquitectura</h2>
+      <div class="grid-2">
+        <div class="card"><h4>Sobre-ingeniería temprana del FeatureGraph</h4><p>Diseñar resolución de dependencias tipo grafo general antes de tener 20 features es trabajo especulativo. Con &lt;50 features, una lista ordenada declarada a mano con chequeo de dependencias ya alcanza. El grafo se justifica solo cuando aparezcan ciclos/dependencias complejas reales.</p></div>
+        <div class="card"><h4>El Statistical Engine "sin registro" es una excepción no anunciada</h4><p>Contradice la promesa de "modularidad total" en §01. Es una excepción deliberada y razonable, pero debe reconocerse explícitamente como tal — no esconderse detrás de "modularidad siempre".</p></div>
+        <div class="card"><h4>Riesgo de fragmentación en Calibration/Meta-labeling/Survival</h4><p>Tres módulos "completamente independientes" pueden derivar en tres micro-frameworks con convenciones distintas si no comparten los mismos tipos base (<code>Result</code>/<code>Analysis</code>) que usa Experiment Engine. Mitigación: forzar esa interfaz común desde el día 1, no como refactor posterior.</p></div>
+        <div class="card"><h4>"Reporte automático" tiene un límite real</h4><p>Conclusiones siguen requiriendo que el investigador escriba texto de interpretación — es honesto decirlo así en vez de prometer que el sistema "genera reportes sin código adicional" sin matices.</p></div>
+        <div class="card"><h4>Versionado exhaustivo es fricción real al principio</h4><p>Con un equipo de 1 persona, atar cada run a 4 hashes distintos es disciplina cara antes de que haya algo que de verdad reproducir. Riesgo concreto de abandono si es demasiado pesado desde el día 1 — ver §16.</p></div>
+        <div class="card"><h4>SQLite como single writer bajo concurrencia real</h4><p>Un batch nocturno de cientos de experimentos en paralelo puede convertir el catálogo de runs en un cuello de botella de escritura. Mitigable con modo WAL; si el equipo crece más allá de 1-2 personas ejecutando intensivamente en paralelo, es el primer componente a reconsiderar (candidato: Postgres liviano — explícitamente pospuesto, no parte de este diseño).</p></div>
+        <div class="card"><h4>15 módulos "independientes" es mucha superficie para 1-3 personas</h4><p>Riesgo real de que la arquitectura completa nunca termine de construirse. Esta tensión es exactamente la que resuelve §16.</p></div>
+        <div class="card"><h4>Auto-descubrimiento por escaneo de archivos puede esconder bugs silenciosos</h4><p>Un experimento con error de sintaxis simplemente no aparece en el registro, sin error claro. Mitigado por <code>research doctor</code>, pero el riesgo es real y debe vigilarse activamente, no darse por resuelto.</p></div>
+      </div>
+    </section>
+
+    <section id="inspiracion">
+      <div class="eyebrow">§15 · Inspiración, sin copiar</div>
+      <h2>Qué se toma de cada uno, qué se rechaza explícitamente</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Referencia</th><th>Se adopta</th><th>Se rechaza explícitamente</th></tr></thead>
+        <tbody>
+          <tr><td>Lean / Zipline / Backtrader</td><td>Patrón de "estrategia como clase descubrible" → base de Feature y Experiment.</td><td>Su motor de ejecución orientado a broker/órdenes en vivo — no hay trading real aquí.</td></tr>
+          <tr><td>MLflow</td><td>Filosofía de tracking (params/métricas/artefactos por run) → base de <code>runs/</code> y Versioning.</td><td>Su servidor de tracking centralizado — aquí es archivos + SQLite local, sin servicio.</td></tr>
+          <tr><td>Kedro</td><td>Catálogo declarativo de datos + pipeline de nodos → inspiración de FeatureGraph y DatasetBuilder.</td><td>Su framework de proyecto completo — demasiada convención/magia para este equipo.</td></tr>
+          <tr><td>DVC</td><td>Versionado de datos por content-hash atado a git → principio directo de §08.</td><td>Nada — podría literalmente usarse como implementación táctica, no solo inspiración.</td></tr>
+          <tr><td>Feast</td><td>Definición de features desacoplada de su cómputo, con metadata rica → filosofía del Feature Store.</td><td>Su feature-serving en tiempo real — no hay serving online en este proyecto.</td></tr>
+          <tr><td>Airflow / Prefect / Dagster</td><td>El <em>pensamiento</em> de dependencias declaradas — especialmente el concepto de Dagster de "software-defined assets".</td><td>Instalar cualquiera de los tres como runtime — peso operativo (scheduler, workers, UI) que 1-3 investigadores no necesitan para trabajo por lotes.</td></tr>
+          <tr><td>DuckDB / Polars</td><td>Stack de ejecución directo, no solo inspiración — motor columnar embebido de todo el sistema.</td><td>—</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="mvp">
+      <div class="eyebrow">§16 · La pregunta final — versión mínima viable</div>
+      <h2>Olvidando todo lo anterior: ¿qué construiría un CTO con 1 ingeniero y 6 meses?</h2>
+
+      <div class="mvp-section">
+        <p class="lead">Todo lo descrito en §01–§15 es correcto como visión a 2-3 años <em>si el edge existe y el equipo crece</em>. Como plan de los primeros seis meses con un solo ingeniero, es la arquitectura equivocada: sería construir la fábrica antes de saber si el producto se vende. La pregunta que de verdad importa en seis meses no es "¿la plataforma escala a 1000 features?" sino "¿hay algo ahí?" — y ese objetivo cambia radicalmente qué se construye primero.</p>
+
+        <div class="grid-2" style="margin-top:28px;">
+          <div class="card kill" style="border-color:var(--red);background:var(--red-wash);">
+            <h4>Eliminar por completo (0 horas en 6 meses)</h4>
+            <p>Registro plugin formal con auto-descubrimiento para Experiment/Feature — con 5-10 experimentos reales posibles en 6 meses, un <code>import</code> directo en un script basta. Soporte multi-modelo (7 adaptadores) — construir solo logística + un GBM, y solo cuando haya señal que lo justifique. Documentación automática — con equipo de 1, el README es la documentación. Meta-labeling como módulo — es una función, no una arquitectura, hasta que el primario muestre señal real. Redis, cualquier orquestador (Airflow/Dagster/Prefect), cualquier base de datos con proceso propio (Postgres). El FeatureGraph tipo DAG — una lista ordenada a mano alcanza con &lt;50 features. Versionado exhaustivo de 4 hashes — sustituido por git commit + un <code>run_manifest.json</code> por experimento.</p>
+          </div>
+          <div class="card fund" style="border-color:var(--green);background:var(--green-wash);">
+            <h4>Construir primero (semanas 1-8)</h4>
+            <p>Ingestion de klines 1m/5m + Validation básica (gaps, duplicados, consistencia OHLC) — sin esto no hay nada. Features P0 de la Fase 2 §05-§08 (microestructura núcleo + supervivencia) — el <em>contenido</em>, no la infraestructura. Un experimento real, de principio a fin: supervivencia del color (Kaplan-Meier + tabla de frecuencias), con reporte aunque sea un notebook exportado a HTML. Segundo experimento: estructura interna / shape clustering. Esto responde, en dos meses, la única pregunta que importa.</p>
+          </div>
+          <div class="card">
+            <h4>Simplificar</h4>
+            <p>15 módulos → 5 paquetes reales: <code>data</code> (ingestion+cleaning+validation juntos, porque en la práctica se tocan a la vez), <code>features</code>, <code>experiments</code> (incluye statistics+visualization+reporting básico), <code>models</code> (incluye calibration cuando llegue el momento), <code>common</code>. CLI de 10+ comandos → 3 reales: <code>build-dataset</code>, <code>run-experiment</code>, <code>report</code>; el resto son funciones de Python llamadas desde notebook durante desarrollo activo. Testing de 4 capas → unitarios solo para cálculos fáciles de equivocar silenciosamente (path efficiency, occupation time, hazard) + un único test de integración end-to-end.</p>
+          </div>
+          <div class="card">
+            <h4>Posponer más allá de los 6 meses</h4>
+            <p>Todo lo anterior, salvo que las semanas 1-8 muestren señal real: model training completo, calibración formal, meta-labeling arquitectónico, y — esto es lo más importante de admitir — el objetivo mismo de "plataforma reutilizable para proyectos futuros". Ese objetivo es precisamente el primero que hay que sacrificar, porque optimiza para un futuro hipotético en vez de para la velocidad de aprendizaje inmediata.</p>
+          </div>
+        </div>
+
+        <div class="verdict" style="margin-top:28px;background:var(--paper);">
+          <div class="verdict-eyebrow">Veredicto del CTO</div>
+          <p>La arquitectura de este documento (§01–§15) es la correcta para un fondo que ya sabe que tiene un edge y necesita sostener la investigación de un equipo durante años. La arquitectura correcta para los primeros seis meses de un equipo de una persona es aproximadamente el 20% de este documento: ingestión, validación, un puñado de features de altísima prioridad, y dos experimentos completos de punta a punta. Todo lo demás —registro de plugins, cuatro capas de versionado, documentación automática, quince módulos independientes— es exactamente el tipo de trabajo que se siente productivo y no mueve la aguja de la única pregunta que importa: <strong>¿existe un edge real, sí o no?</strong> Se construye cuando la respuesta ya es "sí" y hay que sostenerlo — no antes.</p>
+        </div>
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<footer>RFC de arquitectura · Fase 3 · Cero código de producción · Precede a la implementación del MVP definido en §16.</footer>
