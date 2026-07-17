@@ -1,0 +1,14 @@
+{
+  "hipotesis": "001_survival",
+  "estado": "requiere_mas_datos",
+  "nivel_de_evidencia": 1,
+  "T_decision": 240,
+  "p_hat_real": 0.8712,
+  "benchmark_mean": 0.8525,
+  "effect_size": 0.0187,
+  "p_empirico": 0.0,
+  "n_velas_desarrollo": 184318,
+  "n_velas_lockbox_reservadas": 25921,
+  "fecha_ejecucion": "2026-07-17 04:18 UTC",
+  "proximo_paso": "002_shape (estructura interna) si continúa; documentar como rechazada en board.md y pasar directo a 002_shape igualmente si se abandona esta formulación."
+}
