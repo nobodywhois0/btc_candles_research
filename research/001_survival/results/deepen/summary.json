@@ -1,0 +1,38 @@
+{
+  "n_comparaciones_totales": 43,
+  "n_significativas_post_fdr": 4,
+  "veredicto": "dividir_en_hipotesis_mas_especifica",
+  "top_5_efectos": [
+    {
+      "full_label": "001G_interacciones — 001G · tendencia ∩ trayectoria monótona",
+      "n": 10320,
+      "effect_size": 0.12964050387596915,
+      "q_valor": 0.0
+    },
+    {
+      "full_label": "001G_interacciones — 001G · alta_vol ∩ trayectoria monótona",
+      "n": 18892,
+      "effect_size": 0.12807237631448898,
+      "q_valor": 0.0
+    },
+    {
+      "full_label": "001E_forma_interna — 001E · monotona",
+      "n": 61440,
+      "effect_size": 0.11399072265624965,
+      "q_valor": 0.0
+    },
+    {
+      "full_label": "001E_forma_interna — 001E · mixta",
+      "n": 61439,
+      "effect_size": 0.07111856204256817,
+      "q_valor": 0.0
+    },
+    {
+      "full_label": "001B_hora_utc — 001B · 14h UTC",
+      "n": 7680,
+      "effect_size": 0.02906518097972699,
+      "q_valor": 0.0
+    }
+  ],
+  "fecha_ejecucion": "2026-07-17 04:21 UTC"
+}
