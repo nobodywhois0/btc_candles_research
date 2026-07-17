@@ -1,0 +1,501 @@
+<title>Revisión crítica del diseño de investigación — Fase 1.5</title>
+<style>
+  :root{
+    --paper:#EEF0EC;
+    --paper-raised:#F7F8F5;
+    --ink:#14171A;
+    --ink-muted:#4B5259;
+    --ink-faint:#767D80;
+    --line:#D3D7D0;
+    --line-strong:#B7BCB4;
+    --accent:#B5792A;
+    --accent-ink:#7E5218;
+    --accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;
+    --green-wash:rgba(47,122,79,0.10);
+    --red:#B33A3A;
+    --red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#14161A;
+      --paper-raised:#1B1E23;
+      --ink:#E9E7DF;
+      --ink-muted:#A8AEA8;
+      --ink-faint:#767D78;
+      --line:#31352F;
+      --line-strong:#454A42;
+      --accent:#D9A354;
+      --accent-ink:#E9BE84;
+      --accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;
+      --green-wash:rgba(92,174,126,0.13);
+      --red:#D2726A;
+      --red-wash:rgba(210,114,106,0.12);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14161A;
+    --paper-raised:#1B1E23;
+    --ink:#E9E7DF;
+    --ink-muted:#A8AEA8;
+    --ink-faint:#767D78;
+    --line:#31352F;
+    --line-strong:#454A42;
+    --accent:#D9A354;
+    --accent-ink:#E9BE84;
+    --accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;
+    --green-wash:rgba(92,174,126,0.13);
+    --red:#D2726A;
+    --red-wash:rgba(210,114,106,0.12);
+  }
+  :root[data-theme="light"]{
+    --paper:#EEF0EC;
+    --paper-raised:#F7F8F5;
+    --ink:#14171A;
+    --ink-muted:#4B5259;
+    --ink-faint:#767D80;
+    --line:#D3D7D0;
+    --line-strong:#B7BCB4;
+    --accent:#B5792A;
+    --accent-ink:#7E5218;
+    --accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;
+    --green-wash:rgba(47,122,79,0.10);
+    --red:#B33A3A;
+    --red-wash:rgba(179,58,58,0.09);
+  }
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:56px 32px 40px;}
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--red);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.4vw,46px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance;max-width:19ch;}
+  .doc-subtitle{font-size:18px;color:var(--ink-muted);max-width:64ch;margin:0 0 26px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{max-width:1120px;margin:0 auto;padding:0 32px 120px;display:grid;grid-template-columns:236px minmax(0,1fr);gap:56px;align-items:start;}
+  nav.toc{position:sticky;top:32px;font-family:var(--font-mono);font-size:12.5px;line-height:1.9;padding-top:44px;max-height:calc(100vh - 64px);overflow-y:auto;}
+  nav.toc a{display:block;color:var(--ink-muted);text-decoration:none;padding:2px 0 2px 12px;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+  nav.toc .toc-group{margin-bottom:14px;}
+  nav.toc .toc-head{color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;font-size:10.5px;padding-left:12px;margin-bottom:2px;}
+
+  main{min-width:0;padding-top:44px;}
+  section{padding:56px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(24px,3vw,30px);font-weight:700;letter-spacing:-.005em;margin:0 0 20px;text-wrap:balance;max-width:30ch;}
+  h3{font-family:var(--font-display);font-size:20px;font-weight:700;margin:34px 0 12px;}
+  h4{font-family:var(--font-body);font-size:15.5px;font-weight:700;font-style:italic;margin:22px 0 8px;color:var(--ink);}
+  p{margin:0 0 15px;max-width:68ch;}
+  p.lead{font-size:18px;color:var(--ink-muted);max-width:62ch;}
+  ul,ol{margin:0 0 16px;padding-left:22px;max-width:66ch;}
+  li{margin-bottom:6px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code, .mono{font-family:var(--font-mono);font-size:.89em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .38em;border-radius:4px;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:16px 20px;border-radius:2px;margin:20px 0;max-width:66ch;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:6px;display:block;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.risk .callout-label{color:var(--red);}
+  .callout.stop{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.stop .callout-label{color:var(--red);}
+  .callout.win{border-left-color:var(--green);background:var(--green-wash);}
+  .callout.win .callout-label{color:var(--green);}
+
+  .table-wrap{overflow-x:auto;margin:18px 0 26px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:10px 14px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody td:first-child{color:var(--ink);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num, th.num{font-variant-numeric:tabular-nums;text-align:right;}
+
+  .pill{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;padding:2px 9px;border-radius:20px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block;}
+  .pill--high{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--med{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--low{color:var(--ink-faint);border-color:var(--line);}
+  .pill--fund{color:var(--green);border-color:var(--green);background:var(--green-wash);font-weight:700;}
+  .pill--cond{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--kill{color:var(--red);border-color:var(--red);background:var(--red-wash);font-weight:700;}
+
+  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:1px;}
+  .dot.g{background:var(--green);}
+  .dot.r{background:var(--red);}
+  .seq{font-family:var(--font-mono);font-size:13px;color:var(--ink-muted);}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;}
+  .card{border:1px solid var(--line);border-radius:8px;padding:18px 20px;background:var(--paper-raised);}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14.5px;}
+  .card.kill{border-color:var(--red);background:var(--red-wash);}
+  .card.fund{border-color:var(--green);background:var(--green-wash);}
+
+  .kicker-list{list-style:none;padding-left:0;margin:20px 0;}
+  .kicker-list li{padding-left:0;border-top:1px solid var(--line);padding:14px 0;display:grid;grid-template-columns:120px 1fr;gap:18px;max-width:none;}
+  .kicker-list li:first-child{border-top:none;}
+  .kicker-list .kicker{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.04em;}
+
+  .verdict{border:1px solid var(--line-strong);background:var(--paper-raised);border-radius:10px;padding:26px 28px;margin:22px 0;max-width:72ch;}
+  .verdict .verdict-eyebrow{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:10px;}
+  .verdict p{font-size:17px;color:var(--ink);margin-bottom:12px;}
+  .verdict p:last-child{margin-bottom:0;}
+
+  footer{max-width:1120px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  details.toc-mobile{display:none;}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{display:block;margin:28px 32px 0;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:var(--font-mono);font-size:12.5px;}
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+    .grid-2{grid-template-columns:1fr;}
+    .kicker-list li{grid-template-columns:1fr;gap:4px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow">
+      <span>Comité de inversión</span> · <span>Revisión adversarial</span> · <span>Fase 1.5</span>
+    </div>
+    <h1 class="doc-title">Revisión crítica: por qué la mitad de este programa no merece financiación</h1>
+    <p class="doc-subtitle">Segunda pasada sobre el diseño de investigación de la vela de 5 minutos, esta vez desde la silla del director de investigación que tiene que decidir si diez millones de dólares y dos años de un equipo se gastan aquí o en otra cosa.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha</dt><dd>2026-07-07</dd></div>
+      <div class="meta-item"><dt>Versión</dt><dd>v0.2 — revisión crítica</dd></div>
+      <div class="meta-item"><dt>Referencia</dt><dd>revisa v0.1</dd></div>
+      <div class="meta-item"><dt>Postura</dt><dd>Adversarial por diseño</dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice del documento</summary>
+  <nav>
+    <a href="#veredicto">00 · Veredicto ejecutivo</a>
+    <a href="#eliminar">01 · Qué se elimina</a>
+    <a href="#microestructura">02 · Microestructura intra-vela</a>
+    <a href="#interna">03 · Estructura interna 1m→5m</a>
+    <a href="#supervivencia">04 · Supervivencia del color</a>
+    <a href="#metalabeling">05 · Meta-labeling como arquitectura</a>
+    <a href="#variables">06 · Ingeniería de variables avanzada</a>
+    <a href="#reformulaciones">07 · Reformulaciones del problema</a>
+    <a href="#rentech">08 · Pensamiento tipo RenTech</a>
+    <a href="#desdecero">09 · Si empezara desde cero</a>
+    <a href="#priorizacion">10 · Tabla de priorización IC</a>
+    <a href="#roadmap2">11 · Roadmap v0.2</a>
+    <a href="#cierre">12 · Cierre del comité</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <div class="toc-group">
+      <div class="toc-head">Veredicto</div>
+      <a href="#veredicto">00 Ejecutivo</a>
+      <a href="#eliminar">01 Qué se elimina</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-head">Nuevo terreno</div>
+      <a href="#microestructura">02 Microestructura</a>
+      <a href="#interna">03 Estructura interna</a>
+      <a href="#supervivencia">04 Supervivencia</a>
+      <a href="#metalabeling">05 Meta-labeling</a>
+      <a href="#variables">06 Variables avanzadas</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-head">Marco</div>
+      <a href="#reformulaciones">07 Reformulaciones</a>
+      <a href="#rentech">08 RenTech</a>
+      <a href="#desdecero">09 Desde cero</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-head">Decisión</div>
+      <a href="#priorizacion">10 Tabla IC</a>
+      <a href="#roadmap2">11 Roadmap v0.2</a>
+      <a href="#cierre">12 Cierre</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <section id="veredicto">
+      <div class="eyebrow">§00 · Veredicto ejecutivo</div>
+      <h2>El documento v0.1 es metodológicamente sólido y está mal asignado</h2>
+      <div class="verdict">
+        <div class="verdict-eyebrow">Posición del comité</div>
+        <p>La disciplina de validación de v0.1 (purga, embargo, CPCV, deflated Sharpe, permutation tests) se mantiene intacta — no hay nada que corregir ahí. El problema no es de rigor, es de <strong>asignación de esfuerzo</strong>: casi la mitad de las 14 familias de hipótesis originales apunta a territorio que el mercado lleva veinte años arbitrando (indicadores técnicos clásicos, patrones de velas), mientras que el terreno con mayor probabilidad de contener información nueva —la estructura interna de cómo se construye cada vela, minuto a minuto— aparecía como una sub-nota dentro de la familia 05.9, con el mismo peso que un cruce de EMA.</p>
+        <p>Recomendación: <strong>recortar drásticamente</strong> el análisis técnico clásico a variables auxiliares de contexto (coste marginal ≈ 0, ya se calculan de todos modos), <strong>eliminar por completo</strong> los patrones de velas japonesas como línea de investigación, y redirigir el presupuesto liberado hacia tres líneas nuevas: supervivencia del color intra-vela, estructura interna de la secuencia 1m, y meta-labeling como arquitectura central del proyecto, no como técnica opcional de la fase final.</p>
+      </div>
+    </section>
+
+    <section id="eliminar">
+      <div class="eyebrow">§01 · Qué se elimina o se degrada</div>
+      <h2>Sin piedad, con justificación</h2>
+
+      <div class="grid-2">
+        <div class="card kill">
+          <h4>Patrones de velas japonesas — ELIMINAR como línea de investigación</h4>
+          <p>v0.1 ya los marcaba como prioridad baja; este comité va más lejos: no financiar ni un solo sprint dedicado a esto. Docenas de patrones con variantes de umbral no estandarizadas es, por construcción, un generador de falsos positivos bajo test múltiple. La literatura académica (Marshall, Young &amp; Rose 2006; Caginalp &amp; Laurent) lleva dos décadas sin encontrar edge neto de costes. Si algún patrón sobrevive, será como subproducto casual de un GBM entrenado en OHLC crudo — no justifica una fase dedicada.</p>
+        </div>
+        <div class="card kill">
+          <h4>EMA / ATR / Bollinger como predictores directos — DEGRADAR a features auxiliares</h4>
+          <p>Correcto el instinto del usuario: son indicadores públicos desde los años 70-80 (Bollinger, 1980s; ATR, Wilder 1978), replicados por miles de bots, en el par más líquido del exchange más líquido de cripto. Si tuvieran edge direccional simple y estable, ya estaría arbitrado. Se mantienen en el pipeline, pero exclusivamente como <strong>variables de contexto/interacción</strong> (régimen de volatilidad, distancia a media) dentro de modelos no lineales — nunca como hipótesis con fase propia de validación dedicada. Coste marginal de mantenerlos así: prácticamente cero, ya que se calculan en segundos y pueden aportar como moduladores aunque no como señal aislada.</p>
+        </div>
+        <div class="card kill">
+          <h4>Persistencia de Markov orden ≥3 — ELIMINAR en su forma original</h4>
+          <p>El problema de sparsity de estados señalado en v0.1 es real y no tiene arreglo barato vía shrinkage bayesiano puro cuando además se cruza con hora/régimen. Se reemplaza enteramente por §03 (estructura interna de la secuencia 1m), que captura información de secuencia con mucha más resolución y sin explosión combinatoria discreta.</p>
+        </div>
+        <div class="card kill">
+          <h4>Macro / on-chain diario — NO FINANCIAR en esta fase</h4>
+          <p>Ninguna duda aquí: la frecuencia de la señal (días/semanas) está desalineada por dos a tres órdenes de magnitud con el horizonte objetivo (5 minutos). Revisar solo si en fases posteriores se decide extender el producto a horizontes mayores.</p>
+        </div>
+      </div>
+
+      <div class="callout risk">
+        <span class="callout-label">Autocrítica sobre v0.1</span>
+        <p>El documento original dedicaba 4 de sus 14 familias de hipótesis (tendencia, volatilidad clásica, patrones, persistencia de alto orden) a territorio de baja probabilidad de edge nuevo, y solo una sub-viñeta dentro de "microestructura" a lo que probablemente sea el terreno más fértil. Eso es una asignación de esfuerzo invertida respecto a la probabilidad de éxito esperada. Este documento corrige esa asignación.</p>
+      </div>
+    </section>
+
+    <section id="microestructura">
+      <div class="eyebrow">§02 · Microestructura intra-vela</div>
+      <h2>Cómo se construye la vela, no solo cómo termina</h2>
+      <p>Cada vela de 5 minutos reconstruible a partir de 5 velas de 1 minuto (o, mejor, de datos de trade/tick si se consiguen retroactivamente) es en realidad una <strong>trayectoria</strong>, no cuatro números. Tratarla como trayectoria es el cambio de marco más importante de esta revisión.</p>
+
+      <h3>02.1 — Cinemática del precio</h3>
+      <p>Tomando la serie de 5 (o más) sub-precios dentro de la vela como una función <code>P(t)</code>:</p>
+      <ul>
+        <li><strong>Velocidad</strong>: <code>v(t) = ΔP/Δt</code> por sub-barra — ya es simplemente el retorno de cada vela de 1m, pero tratado explícitamente como serie de velocidad instantánea, no como "retorno" aislado.</li>
+        <li><strong>Aceleración</strong>: <code>a(t) = Δv/Δt</code> — segunda diferencia; mide si el impulso se está acelerando o agotando dentro de la propia vela en formación.</li>
+        <li><strong>Jerk</strong>: <code>j(t) = Δa/Δt</code> — tercera diferencia; en física mide "lo brusco" de un cambio de aceleración. Aplicado aquí: capta reversales abruptos de impulso (una vela que va acelerando y de repente frena en seco tiene jerk grande en signo opuesto). Es una variable que casi nunca aparece en proyectos de trading — vale la pena precisamente por eso: bajo riesgo de estar ya arbitrada.</li>
+      </ul>
+
+      <h3>02.2 — Eficiencia del camino (path efficiency)</h3>
+      <p>Ratio entre el desplazamiter neto y la distancia total recorrida: <code>E = |cl − o| / Σ|Δp_i|</code> sobre las sub-barras de 1m. Un <code>E</code> cercano a 1 indica un movimiento "limpio" y monótono; un <code>E</code> cercano a 0 indica una vela que recorrió mucho camino de ida y vuelta para terminar casi donde empezó. Es la versión intra-vela del Efficiency Ratio de Kaufman, pero aplicado a la microestructura de una sola vela en vez de a una serie de velas — un uso no estándar de un concepto estándar.</p>
+
+      <h3>02.3 — Tiempo de ocupación (occupation time)</h3>
+      <p>Fracción del tiempo dentro de la vela que el precio pasó en la mitad superior vs. inferior de su rango eventual. Concepto tomado directamente de la teoría de procesos estocásticos (tiempo de ocupación de un movimiento browniano). Una vela que pasó el 90% del tiempo en la mitad superior y cerró verde es cualitativamente distinta de una que pasó el 50/50 y cerró verde por un estirón final.</p>
+
+      <h3>02.4 — Tiempo de primer paso (first-passage time)</h3>
+      <p>Tiempo que tarda el precio en recorrer por primera vez una distancia fija desde el open (p. ej., 0.1%, 0.25%, 0.5%). Un first-passage rápido sugiere convicción/flujo agresivo; uno lento sugiere indecisión. Se relaciona directamente con §04 (supervivencia del color).</p>
+
+      <h3>02.5 — Varianza realizada del camino vs. estimadores basados en rango</h3>
+      <p>Comparar la varianza realizada calculada con las sub-barras de 1m contra estimadores clásicos basados solo en OHLC de la vela de 5m (Garman-Klass, Parkinson, Rogers-Satchell). La <strong>discrepancia</strong> entre ambos es la señal interesante: indica presencia de saltos/discontinuidades intra-vela que el OHLC agregado no puede ver por construcción.</p>
+
+      <h3>02.6 — Perfil de volumen intra-vela</h3>
+      <p>¿El volumen se concentró al inicio, al final, o distribuido uniformemente dentro de los 5 minutos? Un cierre verde con volumen creciente hacia el final (finalización agresiva) es mecánicamente distinto de uno con volumen decreciente (impulso que se apaga pero el precio no revierte a tiempo).</p>
+
+      <div class="callout win">
+        <span class="callout-label">Por qué esta familia es prioritaria</span>
+        <p>Todas estas variables se derivan de datos que <strong>ya existen</strong> (klines de 1m de Binance), sin necesidad de fuentes externas, sin riesgo de leakage complejo (todas son intra-vela, estrictamente anteriores al cierre que se predice) y sin la carga de "veinte años de arbitraje" que pesa sobre los indicadores clásicos, porque nadie construye sistemáticamente features de cinemática de tercer orden sobre la microestructura de una sola vela. Coste bajo, probabilidad de aportar señal incremental sobre el resto del programa razonablemente alta.</p>
+      </div>
+    </section>
+
+    <section id="interna">
+      <div class="eyebrow">§03 · Estructura interna de la secuencia 1m→5m</div>
+      <h2>Dos velas verdes no son la misma vela verde</h2>
+      <p><span class="seq"><span class="dot r"></span><span class="dot r"></span><span class="dot g"></span><span class="dot g"></span><span class="dot g"></span></span> &nbsp;frente a&nbsp; <span class="seq"><span class="dot g"></span><span class="dot r"></span><span class="dot g"></span><span class="dot r"></span><span class="dot g"></span></span> — ambas cierran verdes a nivel de 5 minutos; representan dinámicas de flujo de órdenes completamente distintas (remontada sostenida vs. lucha bidireccional con victoria por margen mínimo). La pregunta de investigación es si esa diferencia interna predice algo sobre la vela <em>siguiente</em>, no sobre la actual.</p>
+
+      <h3>03.1 — Representaciones propuestas</h3>
+      <ul>
+        <li><strong>Codificación categórica directa</strong>: las 32 combinaciones posibles de 5 sub-velas (2⁵) como variable categórica o target-encoded — factible dado el tamaño de muestra (~105&nbsp;000 velas de 5m/año), a diferencia de la Markov de orden 5 sobre velas de 5m que sí sufre sparsity severa por operar en un espacio temporal 5× más lento.</li>
+        <li><strong>Run-length encoding</strong>: número de "rachas" internas (p. ej. RRGGG = 2 rachas; GRGRG = 5 rachas) como proxy directo de "convicción" vs. "indecisión" — variable continua de baja dimensión, interpretable, barata.</li>
+        <li><strong>Posición del último cambio de color</strong>: ¿la vela "se decidió" en el minuto 1 y se mantuvo, o cambió de signo en el minuto 5? Esto conecta directamente con §04 — es, de hecho, el mismo fenómeno visto desde ángulos distintos.</li>
+        <li><strong>Funcional PCA / clustering de formas (DTW o k-means sobre trayectorias normalizadas)</strong>: en vez de imponer categorías a mano, dejar que el propio dataset histórico revele arquetipos de trayectoria (monótona, V de reversión, pico-y-caída, zigzag simétrico…) vía análisis no supervisado. Es el enfoque más "descubrimiento de estructura, no imposición de reglas" de todo el documento, y encaja directamente con el espíritu de §08 (RenTech).</li>
+      </ul>
+
+      <div class="callout">
+        <span class="callout-label">Hipótesis concreta a testear</span>
+        <p>"Las velas de 5m que cierran verdes con una sola racha interna (monótonas) tienen mayor probabilidad de continuación en la siguiente vela que las que cierran verdes con 3+ cambios de signo internos (ganadas por margen mínimo tras una lucha)." Testeable de inmediato con los datos ya disponibles, sin necesidad de ninguna fuente externa — candidato natural para ser el primer experimento de esta familia.</p>
+      </div>
+    </section>
+
+    <section id="supervivencia">
+      <div class="eyebrow">§04 · Supervivencia del color</div>
+      <h2>Probablemente la idea de mayor valor de todo el programa</h2>
+      <p>Esta familia no es una hipótesis más entre catorce — es, con razonable probabilidad, la que debería redefinir qué es lo que en realidad se está prediciendo. La pregunta "¿cerrará verde la vela?" formulada en <code>t=0</code> desperdicia información que ya existe en <code>t=30s, t=1m, t=2m…</code> dentro de la propia vela.</p>
+
+      <h3>04.1 — Formalización como análisis de supervivencia</h3>
+      <p>Definir el "evento" como el instante en que el color de la vela, una vez alcanzado, ya no vuelve a cambiar hasta el cierre. Para cada marca temporal <code>τ ∈ {30s, 1m, 2m, 3m, 4m, 4:30}</code>, estimar:</p>
+      <ul>
+        <li><strong>Curvas de Kaplan-Meier</strong> de "tiempo hasta que el color se fija" — cuánto tarda, en promedio, una vela en alcanzar el color que finalmente conservará hasta el cierre.</li>
+        <li><strong>Modelo de riesgos proporcionales (Cox)</strong> con covariables: distancia del precio al open en unidades de ATR, velocidad de la sub-barra actual, volumen relativo, régimen de volatilidad — para estimar el "hazard" (tasa instantánea) de que el color cambie, condicionado al contexto.</li>
+        <li><strong>Tabla de supervivencia empírica directa</strong> (la más simple, y el punto de partida obligatorio): <code>P(cierra verde | verde en τ)</code> para cada <code>τ</code>, y por separado, <code>P(cambia de color entre τ y el cierre | color en τ)</code> — frecuencia empírica pura, sin modelo, como primer resultado.</li>
+      </ul>
+
+      <h3>04.2 — Por qué esto puede cambiar el diseño del producto, no solo del modelo</h3>
+      <p>Si el bróker del producto Up/Down permite entrar en cualquier instante dentro de la ventana de 5 minutos (no solo al open), entonces <code>P(cierra verde | verde a los 4:00, contexto)</code> es casi con certeza una probabilidad muchísimo más calibrable y potencialmente más alejada de 0.5 que <code>P(cierra verde | nada, en t=0)</code>. Esto reformula el problema de negocio: la pregunta relevante deja de ser "¿en qué dirección irá la próxima vela?" para convertirse en <strong>"¿en qué momento dentro de la vela conviene entrar, dado el estado observado hasta ese instante?"</strong> — un problema de parada óptima (ver §07), no de clasificación.</p>
+
+      <div class="callout win">
+        <span class="callout-label">Veredicto del comité</span>
+        <p>Financiar de inmediato, con la máxima prioridad del programa completo. Coste de implementación bajo (datos ya disponibles en 1m), riesgo de leakage bajo (todo el análisis es estrictamente causal por construcción de la propia definición de supervivencia), y valor potencial muy alto porque toca directamente la economía del producto, no solo la exactitud de un clasificador.</p>
+      </div>
+    </section>
+
+    <section id="metalabeling">
+      <div class="eyebrow">§05 · Meta-labeling como arquitectura central</div>
+      <h2>No "qué dirección", sino "¿hay algo que decir aquí?"</h2>
+      <p>v0.1 mencionaba meta-labeling como una técnica más dentro de las reformulaciones. Se promueve aquí a <strong>arquitectura central</strong> del proyecto: el modelo final no es un clasificador binario que opina sobre cada vela, sino un sistema de dos etapas donde la primera decide si vale la pena tener una opinión.</p>
+
+      <h3>05.1 — Arquitectura de dos etapas</h3>
+      <ol>
+        <li><strong>Modelo primario</strong> (cualquier peldaño de la escalera de v0.1, p. ej. GBM sobre features de §02–§04): produce <code>p̂</code>, probabilidad direccional cruda.</li>
+        <li><strong>Modelo secundario (meta)</strong>: entrenado no sobre "verde/rojo" sino sobre <strong>"el modelo primario acertó o no"</strong> en cada instancia histórica, usando como features variables de confianza/contexto (no las mismas features direccionales). Su salida es <code>P(acierto del primario | contexto)</code>.</li>
+        <li><strong>Regla de decisión</strong>: operar solo cuando <code>P(acierto) × magnitud del edge</code> supera el punto de equilibrio <code>p*</code> del producto (definido en v0.1 §01). En caso contrario, abstención — no forzar una apuesta.</li>
+      </ol>
+
+      <h3>05.2 — Candidatos concretos para las features del "gate"</h3>
+      <ul>
+        <li><strong>Desacuerdo de ensemble</strong>: entrenar 5-10 modelos primarios ligeramente distintos (bagging, distintas semillas/subconjuntos de features) y usar la dispersión de sus <code>p̂</code> como proxy de incertidumbre epistémica — si todos coinciden, mayor confianza; si discrepan, abstención.</li>
+        <li><strong>Entropía de la secuencia reciente</strong> (§05.12 de v0.1): regímenes de baja entropía = más estructura = mejor candidato para el gate positivo.</li>
+        <li><strong>Magnitud del order flow imbalance</strong>: flujo fuertemente unidireccional es más probable que sea señal genuina que ruido.</li>
+        <li><strong>Racha interna de la vela actual</strong> (§03): velas monótonas (1 racha) generan predicciones de mayor confianza que velas con múltiples cambios internos.</li>
+        <li><strong>Estabilidad de la supervivencia</strong> (§04): si a los 4 minutos el color lleva "fijo" con hazard bajo, el gate se abre con alta confianza incluso sin ningún otro feature.</li>
+        <li><strong>Error de calibración reciente del modelo primario</strong> (ventana rodante): si el modelo lleva N predicciones mal calibradas, reducir la confianza del gate dinámicamente — una forma de meta-aprendizaje sobre la propia salud del modelo.</li>
+      </ul>
+
+      <div class="callout">
+        <span class="callout-label">Implicación de diseño</span>
+        <p>Bajo esta arquitectura, el resultado de éxito del proyecto no es "accuracy direccional del 55% en todas las velas" sino, más probablemente, algo como "el sistema opera solo en el 10-20% de las velas donde el gate se abre, con una tasa de acierto notablemente superior en ese subconjunto". Esto es coherente con la intuición de que el edge, si existe, es raro y localizado — no permanente y ubicuo.</p>
+      </div>
+    </section>
+
+    <section id="variables">
+      <div class="eyebrow">§06 · Ingeniería de variables avanzada</div>
+      <h2>Fuera del manual de indicadores técnicos</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Variable</th><th>Origen disciplinario</th><th>Qué captura</th></tr></thead>
+          <tbody>
+            <tr><td>Innovaciones de un filtro de Kalman (nivel local/tendencia local)</td><td>Procesos estocásticos / control óptimo</td><td>El residuo "sorpresa" en cada paso, blanqueado de la parte predecible por el propio filtro — información genuinamente nueva en cada instante, en sentido literal de teoría de la información.</td></tr>
+            <tr><td>Parámetro de reversión de un proceso Ornstein-Uhlenbeck ajustado a desviaciones de corto plazo</td><td>Física estadística / stat-arb clásico</td><td>Velocidad de reversión a la media estimada dinámicamente — variable de régimen (tendencial vs. mean-reverting) más principiada que un cruce de EMA.</td></tr>
+            <tr><td>Detección de cambio de régimen online (CUSUM, Bayesian Online Changepoint Detection)</td><td>Estadística secuencial</td><td>Probabilidad causal, actualizada en tiempo real, de que un cambio de régimen acaba de ocurrir — distinta y complementaria al estado HMM (que es más lento y retrospectivo).</td></tr>
+            <tr><td>Exponente de Hurst vía DFA (Detrended Fluctuation Analysis)</td><td>Dinámica no lineal</td><td>Más robusto que el R/S clásico; distingue memoria larga de reversión a la media en ventanas cortas.</td></tr>
+            <tr><td>Recurrence Quantification Analysis (tasa de recurrencia, determinismo, laminaridad)</td><td>Sistemas dinámicos no lineales</td><td>Estructura determinista oculta en la serie de retornos que autocorrelación lineal simple no detecta.</td></tr>
+            <tr><td>Path signatures (integrales iteradas de la trayectoria, rough path theory)</td><td>Análisis estocástico / topología del camino</td><td>Representación matemáticamente completa del orden e interacción de los movimientos dentro de la vela — exótico, alto coste computacional, pero potencialmente único porque casi nadie lo aplica en este dominio.</td></tr>
+            <tr><td>VPIN (Volume-Synchronized Probability of Informed Trading)</td><td>Microestructura de mercado</td><td>Proxy de "toxicidad" del flujo de órdenes — usado académicamente para anticipar episodios de estrés/iliquidez; económicamente bien fundamentado y barato de calcular desde volumen agresor.</td></tr>
+            <tr><td>Escalado multifractal de la volatilidad realizada entre timeframes (1m→5m→15m)</td><td>Multifractalidad / econofísica</td><td>Desviaciones de la ley de escala "raíz del tiempo" pueden señalar estructura no browniana explotable — técnica de investigación seria en econofísica cuantitativa.</td></tr>
+            <tr><td>Índice de Hill / teoría de valores extremos sobre retornos recientes</td><td>Estadística de extremos</td><td>Grosor de cola dinámico — régimen de riesgo de cola alto vs. bajo, distinto de la volatilidad estándar.</td></tr>
+            <tr><td>Distancia de Wasserstein entre la distribución de retornos reciente y una de referencia</td><td>Transporte óptimo</td><td>Detector de cambio de régimen basado en toda la forma de la distribución, no solo en media/varianza.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>No todas estas variables merecen el mismo presupuesto: path signatures y multifractalidad son apuestas de alto coste/alto riesgo ("moonshots", ver §10); Kalman, VPIN, OFI y changepoint detection son baratas, bien fundamentadas y deberían entrar en la primera ronda de features junto con §02-§04.</p>
+    </section>
+
+    <section id="reformulaciones">
+      <div class="eyebrow">§07 · Reformulaciones del problema</div>
+      <h2>Más allá de "verde o rojo en t+1"</h2>
+      <h3>07.1 — Parada óptima / tiempo de decisión variable</h3>
+      <p>Consecuencia directa de §04: si el producto lo permite, el problema real es <strong>cuándo</strong> apostar dentro de la ventana, no solo en qué dirección. Formulable como un problema de parada óptima (optimal stopping) o como un test secuencial de razón de probabilidad (SPRT de Wald): acumular evidencia continuamente y decidir "apostar ahora" solo cuando la evidencia cruza un umbral, en vez de forzar una decisión fija en <code>t=0</code>.</p>
+      <h3>07.2 — Diseño de estudio de eventos, no de panel completo</h3>
+      <p>En vez de modelar cada vela como una observación equivalente, identificar primero "eventos" anómalos (picos de OFI, cascadas de liquidación, rupturas de compresión de volatilidad) y estudiar el comportamiento condicional <em>solo</em> alrededor de esos eventos. Coherente con la arquitectura de meta-labeling: la mayoría de las velas puede no contener información alguna, y diluirlas en el análisis agregado esconde el efecto en los pocos eventos donde sí la hay.</p>
+      <h3>07.3 — Pronóstico distribucional completo (se mantiene de v0.1, se refuerza)</h3>
+      <p>Con las nuevas features intra-vela, un modelo de la distribución completa de <code>r_{t+1}</code> (no solo su signo) se vuelve más viable, porque ahora hay variables que informan tanto sobre magnitud esperada (velocidad, aceleración) como sobre incertidumbre (entropía, hazard de supervivencia) — permite derivar <code>P(verde)</code>, EV y tamaño de posición óptimo (Kelly) de un único modelo coherente en vez de tres modelos separados.</p>
+    </section>
+
+    <section id="rentech">
+      <div class="eyebrow">§08 · Pensamiento tipo fondo cuantitativo serio</div>
+      <h2>Muchas señales débiles y ortogonales, no una señal fuerte</h2>
+      <p>La expectativa correcta para este tipo de mercado (el par más líquido, el exchange más líquido, horizonte de 5 minutos) no es encontrar una variable con AUC de 0.75. Es encontrar 10-20 señales débiles, cada una con una ventaja marginal minúscula (piénsese en términos de puntos básicos de information coefficient, no de accuracy), <strong>parcialmente no correlacionadas entre sí</strong>, combinadas mediante un modelo de ensamble o stacking. La correlación entre señales importa más que la fuerza individual de cada una: dos señales con IC=0.02 pero correlación cero entre sí valen más juntas que una sola señal con IC=0.03.</p>
+      <p>Esto tiene una implicación operativa directa: el criterio de éxito de cada línea de investigación individual (§02–§06) no debería ser "¿esta variable sola predice la dirección?" sino <strong>"¿esta variable aporta information coefficient incremental una vez controlado por todas las demás ya aceptadas?"</strong> — evaluado explícitamente vía ablación (remover la variable del ensamble completo y medir la caída de performance), no en aislamiento.</p>
+    </section>
+
+    <section id="desdecero">
+      <div class="eyebrow">§09 · Si empezara esta investigación desde cero</div>
+      <h2>Las primeras cinco cosas que haría, en orden, mañana mismo</h2>
+      <ol class="kicker-list">
+        <li><span class="kicker">Día 1</span><div><strong>Tabla de supervivencia empírica pura (§04.1, sin modelo).</strong> Es una tarde de trabajo con datos ya disponibles y puede, por sí sola, ya sugerir si conviene rediseñar el producto en torno al timing de entrada.</div></li>
+        <li><span class="kicker">Semana 1</span><div><strong>Clustering no supervisado de trayectorias intra-vela (§03.1, funcional PCA / DTW).</strong> Antes de imponer ninguna feature hecha a mano, dejar que los datos revelen cuántos "arquetipos" de vela existen realmente y si esos arquetipos difieren en su vela siguiente.</div></li>
+        <li><span class="kicker">Semana 1-2</span><div><strong>Order flow imbalance y VPIN desde datos ya existentes</strong> (taker buy/sell volume de los klines de Binance) — cero coste de adquisición, fundamento académico sólido, integrable de inmediato al ensamble.</div></li>
+        <li><span class="kicker">Semana 2</span><div><strong>Hipótesis de "efecto de reloj" (clock effect):</strong> ¿existe una anomalía sistemática de volumen/volatilidad/dirección específicamente en los últimos 15-30 segundos de cada vela de 5 minutos, en todo el mercado, más allá de lo explicable por volatilidad normal? Mecanismo especulativo pero barato de probar: si suficientes bots/productos retail operan sobre velas de 5 minutos, podría existir un flujo mecánico recurrente cerca de los límites de vela (análogo al "pinning" de opciones cerca del vencimiento). Coste: una tarde de análisis descriptivo. Si aparece, el valor es alto porque es un efecto de flujo mecánico, no estadístico, y por tanto más persistente.</div></li>
+        <li><span class="kicker">Semana 3-4</span><div><strong>Arquitectura de meta-labeling mínima (§05)</strong> sobre el ensamble de las cuatro líneas anteriores — el primer punto en que el proyecto empieza a parecerse al producto final, mucho antes de tocar un modelo de deep learning.</div></li>
+      </ol>
+      <p>Nótese lo que <em>no</em> aparece en esta lista: EMA, Bollinger, patrones de velas, ni ningún dato macro. No porque sean erróneos de calcular, sino porque no son donde está la probabilidad de descubrir algo que el mercado no sepa ya.</p>
+    </section>
+
+    <section id="priorizacion">
+      <div class="eyebrow">§10 · Tabla de priorización — comité de inversión</div>
+      <h2>Costo, probabilidad, valor, veredicto</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Línea de investigación</th><th>Costo</th><th>P(señal útil)</th><th>Valor si se confirma</th><th>Veredicto</th></tr></thead>
+          <tbody>
+            <tr><td>Supervivencia del color (§04)</td><td>Bajo</td><td>Alta</td><td>Muy alto</td><td><span class="pill pill--fund">Financiar — P1</span></td></tr>
+            <tr><td>Estructura interna / shape clustering (§03)</td><td>Bajo-medio</td><td>Media-alta</td><td>Alto</td><td><span class="pill pill--fund">Financiar — P2</span></td></tr>
+            <tr><td>Meta-labeling, arquitectura de dos etapas (§05)</td><td>Medio</td><td>Alta*</td><td>Muy alto</td><td><span class="pill pill--fund">Financiar — P3</span></td></tr>
+            <tr><td>Order flow imbalance / VPIN (§06)</td><td>Bajo</td><td>Media-alta</td><td>Alto</td><td><span class="pill pill--fund">Financiar — P4</span></td></tr>
+            <tr><td>Cinemática intra-vela: velocidad/aceleración/jerk/eficiencia (§02)</td><td>Bajo</td><td>Media</td><td>Medio-alto</td><td><span class="pill pill--fund">Financiar, empaquetado con P1-P2</span></td></tr>
+            <tr><td>Efecto de reloj / flujo mecánico en cierre de vela (§09)</td><td>Muy bajo</td><td>Incierta (especulativa)</td><td>Alto si existe</td><td><span class="pill pill--fund">Financiar — barato, alto ratio esperado</span></td></tr>
+            <tr><td>Regímenes HMM / changepoint como capa condicionante</td><td>Medio</td><td>Media</td><td>Medio</td><td><span class="pill pill--cond">Condicional — como insumo, no línea propia</span></td></tr>
+            <tr><td>Volatilidad implícita externa (Deribit)</td><td>Medio-alto</td><td>Incierta</td><td>Medio</td><td><span class="pill pill--cond">Condicional — revisar tras señal central</span></td></tr>
+            <tr><td>Liderazgo cross-exchange (Hasbrouck)</td><td>Medio-alto</td><td>Media</td><td>Medio</td><td><span class="pill pill--cond">Condicional — tras agotar Binance intra-vela</span></td></tr>
+            <tr><td>Path signatures (rough path theory)</td><td>Alto</td><td>Incierta</td><td>Alto si funciona</td><td><span class="pill pill--cond">Moonshot — presupuesto acotado, fuera de ruta crítica</span></td></tr>
+            <tr><td>EMA / ATR / Bollinger como línea dedicada</td><td>Bajo (ya hundido)</td><td>Muy baja (edge nuevo)</td><td>Bajo</td><td><span class="pill pill--kill">No financiar — degradar a auxiliar</span></td></tr>
+            <tr><td>Patrones de velas japonesas</td><td>Bajo</td><td>Muy baja</td><td>Bajo</td><td><span class="pill pill--kill">No financiar — eliminar</span></td></tr>
+            <tr><td>Markov orden ≥3 sobre velas de 5m</td><td>Bajo</td><td>Baja</td><td>Bajo</td><td><span class="pill pill--kill">No financiar — sustituido por §03</span></td></tr>
+            <tr><td>Macro / on-chain diario</td><td>Medio</td><td>Muy baja a 5m</td><td>Bajo</td><td><span class="pill pill--kill">No financiar en esta fase</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="font-size:13px;color:var(--ink-faint);max-width:66ch;">*Condicional a que el modelo primario tenga algún grado de señal explotable — el meta-labeling multiplica una señal existente, no la crea de la nada.</p>
+    </section>
+
+    <section id="roadmap2">
+      <div class="eyebrow">§11 · Roadmap v0.2</div>
+      <h2>Reasignación de tiempo respecto a v0.1</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fase</th><th>Contenido</th><th class="num">Duración</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>Datos 1m/5m, validación de calidad (sin cambios respecto a v0.1)</td><td class="num">~1 semana</td></tr>
+            <tr><td>0.5</td><td>Experimento cero de eficiencia de mercado (sin cambios) + tabla de supervivencia empírica (§04.1) + hipótesis de efecto de reloj (§09)</td><td class="num">~1 semana</td></tr>
+            <tr><td>1</td><td>Cinemática intra-vela (§02) + estructura interna/shape clustering (§03)</td><td class="num">2 semanas</td></tr>
+            <tr><td>2</td><td>OFI/VPIN (§06) + modelo de supervivencia con covariables (Cox, §04.1)</td><td class="num">2 semanas</td></tr>
+            <tr><td>3</td><td>Modelo primario (peldaños 0-7 de la escalera de v0.1) sobre el conjunto de features de fases 1-2</td><td class="num">2 semanas</td></tr>
+            <tr><td>4</td><td>Arquitectura de meta-labeling (§05) sobre el modelo primario</td><td class="num">2-3 semanas</td></tr>
+            <tr><td>5</td><td>Calibración + validación robusta (sin cambios respecto a v0.1 §07-§08)</td><td class="num">2 semanas</td></tr>
+            <tr><td>6</td><td>Regímenes/changepoint como capa condicionante adicional al ensamble</td><td class="num">1-2 semanas</td></tr>
+            <tr><td>7</td><td>Simulación económica con payout real (sin cambios respecto a v0.1 §07)</td><td class="num">1-2 semanas</td></tr>
+            <tr><td>8+</td><td>Moonshots condicionales (path signatures, IV externa, cross-exchange) — solo si fases 1-7 muestran señal estable</td><td class="num">Presupuesto acotado aparte</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Comparado con v0.1, esto elimina por completo las fases dedicadas a patrones de velas y a indicadores de tendencia/volatilidad clásicos como líneas independientes, y adelanta la arquitectura de meta-labeling desde "posible extensión final" a fase 4 de 8 — el punto medio del programa, no el epílogo.</p>
+    </section>
+
+    <section id="cierre">
+      <div class="eyebrow">§12 · Cierre del comité</div>
+      <h2>La disciplina se mantiene, el foco cambia</h2>
+      <p>Nada de lo señalado en esta revisión invalida el andamiaje metodológico de v0.1: la validación temporal purgada, el permutation testing, la corrección por comparaciones múltiples y los criterios de abandono siguen siendo, sin excepción, el estándar bajo el cual se evalúa cada una de las líneas nuevas propuestas aquí. Lo que cambia es dónde se apunta ese andamiaje: de "indicadores públicos aplicados con más rigor que el trader promedio" a "estructura intra-vela y arquitectura de decisión que, hasta donde este comité puede verificar, prácticamente nadie más está construyendo de esta forma para este producto específico".</p>
+      <p>Si tras las fases 0-3 del roadmap v0.2 ninguna de las líneas financiadas en §10 supera al modelo nulo con significancia tras corrección, la recomendación de este comité sería la misma que en v0.1: reportar el hallazgo negativo con el mismo rigor que uno positivo, y no perseguir el edge hacia arquitecturas más caras (deep learning, moonshots) sin evidencia previa que lo justifique.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  Revisión crítica · Fase 1.5 · Documento adversarial sobre v0.1 · Sin implementación · Preparado para decisión de asignación de presupuesto.
+</footer>
