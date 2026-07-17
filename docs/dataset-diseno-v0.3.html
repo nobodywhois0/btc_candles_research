@@ -1,0 +1,600 @@
+<title>Diseño del dataset de investigación — Fase 2</title>
+<style>
+  :root{
+    --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+      --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  }
+  :root[data-theme="dark"]{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+    --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  :root[data-theme="light"]{--paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:56px 32px 40px;}
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.4vw,46px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance;max-width:19ch;}
+  .doc-subtitle{font-size:18px;color:var(--ink-muted);max-width:64ch;margin:0 0 26px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{max-width:1180px;margin:0 auto;padding:0 32px 120px;display:grid;grid-template-columns:236px minmax(0,1fr);gap:56px;align-items:start;}
+  nav.toc{position:sticky;top:32px;font-family:var(--font-mono);font-size:12px;line-height:1.85;padding-top:44px;max-height:calc(100vh - 64px);overflow-y:auto;}
+  nav.toc a{display:block;color:var(--ink-muted);text-decoration:none;padding:2px 0 2px 12px;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+  nav.toc .toc-group{margin-bottom:12px;}
+  nav.toc .toc-head{color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;font-size:10.5px;padding-left:12px;margin-bottom:2px;}
+
+  main{min-width:0;padding-top:44px;}
+  section{padding:52px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(23px,2.8vw,29px);font-weight:700;letter-spacing:-.005em;margin:0 0 18px;text-wrap:balance;max-width:32ch;}
+  h3{font-family:var(--font-display);font-size:19px;font-weight:700;margin:30px 0 10px;}
+  h4{font-family:var(--font-body);font-size:15px;font-weight:700;font-style:italic;margin:20px 0 8px;color:var(--ink);}
+  p{margin:0 0 14px;max-width:70ch;}
+  p.lead{font-size:18px;color:var(--ink-muted);max-width:62ch;}
+  ul,ol{margin:0 0 15px;padding-left:22px;max-width:68ch;}
+  li{margin-bottom:5px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code, .mono{font-family:var(--font-mono);font-size:.87em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .36em;border-radius:4px;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:15px 19px;border-radius:2px;margin:18px 0;max-width:68ch;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:5px;display:block;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.risk .callout-label{color:var(--red);}
+  .callout.win{border-left-color:var(--green);background:var(--green-wash);}
+  .callout.win .callout-label{color:var(--green);}
+  .callout.exp{border-left-color:var(--ink-faint);background:var(--paper-raised);}
+  .callout.exp .callout-label{color:var(--ink-faint);}
+
+  .table-wrap{overflow-x:auto;margin:16px 0 24px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:900px;font-size:13.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:9px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody tr:last-child td{border-bottom:none;}
+  .vartable tbody td:first-child{color:var(--ink);font-weight:600;font-family:var(--font-mono);font-size:12.5px;white-space:nowrap;}
+  td.num, th.num{font-variant-numeric:tabular-nums;text-align:right;}
+
+  .pill{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:20px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block;}
+  .pill--p0{color:var(--paper);border-color:var(--accent-ink);background:var(--accent-ink);font-weight:700;}
+  .pill--p1{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--p2{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--p3{color:var(--ink-faint);border-color:var(--line);border-style:dashed;}
+
+  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:1px;}
+  .dot.g{background:var(--green);} .dot.r{background:var(--red);}
+  .seq{font-family:var(--font-mono);font-size:13px;color:var(--ink-muted);}
+
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0;}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin:18px 0;}
+  .card{border:1px solid var(--line);border-radius:8px;padding:16px 18px;background:var(--paper-raised);}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14px;}
+
+  .kicker-list{list-style:none;padding-left:0;margin:18px 0;}
+  .kicker-list li{padding-left:0;border-top:1px solid var(--line);padding:13px 0;display:grid;grid-template-columns:130px 1fr;gap:18px;max-width:none;}
+  .kicker-list li:first-child{border-top:none;}
+  .kicker-list .kicker{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.04em;}
+
+  .schema-block{border:1px solid var(--line);border-radius:8px;background:var(--paper-raised);padding:18px 20px;margin:16px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.75;overflow-x:auto;}
+  .schema-block .tname{color:var(--accent-ink);font-weight:700;}
+  .schema-block .tgrain{color:var(--ink-faint);}
+
+  footer{max-width:1180px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  details.toc-mobile{display:none;}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{display:block;margin:28px 32px 0;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:var(--font-mono);font-size:12.5px;}
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+    .grid-2,.grid-3{grid-template-columns:1fr;}
+    .kicker-list li{grid-template-columns:1fr;gap:4px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow"><span>Quant Research</span> · <span>Data Engineering</span> · <span>Fase 2</span></div>
+    <h1 class="doc-title">El dataset, no el modelo: esquema completo de investigación</h1>
+    <p class="doc-subtitle">Diccionario de datos, familias de variables, experimentos por familia, arquitectura de tablas y priorización P0–P3 para investigar la vela de 5 minutos de BTC/USDT sin comprometerse todavía a ningún modelo.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha</dt><dd>2026-07-07</dd></div>
+      <div class="meta-item"><dt>Versión</dt><dd>v0.3 — esquema de dataset</dd></div>
+      <div class="meta-item"><dt>Depende de</dt><dd>v0.1 diseño · v0.2 revisión</dd></div>
+      <div class="meta-item"><dt>Estado</dt><dd>Sin modelos, sin código de entrenamiento</dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice del documento</summary>
+  <nav>
+    <a href="#resumen">00 · Resumen</a><a href="#principios">01 · Principios de diseño</a>
+    <a href="#f1">02 · F1 Información básica</a><a href="#f2">03 · F2 Temporal</a>
+    <a href="#f3">04 · F3 Tendencia (auxiliar)</a><a href="#f4">05 · F4 Volatilidad</a>
+    <a href="#f5">06 · F5 Microestructura</a><a href="#f6">07 · F6 Trayectoria 1m→5m</a>
+    <a href="#f7">08 · F7 Supervivencia</a><a href="#f8">09 · F8 Flujo de órdenes</a>
+    <a href="#f9">10 · F9 Multi-timeframe</a><a href="#f10">11 · F10 Variables derivadas</a>
+    <a href="#f11">12 · F11 Experimentales</a><a href="#targets">13 · Targets</a>
+    <a href="#estructura">14 · Estructura del dataset</a><a href="#priorizacion">15 · Priorización P0–P3</a>
+    <a href="#top30">16 · Las 30 variables</a><a href="#cierre">17 · Cierre</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <div class="toc-group"><div class="toc-head">Marco</div>
+      <a href="#resumen">00 Resumen</a><a href="#principios">01 Principios</a></div>
+    <div class="toc-group"><div class="toc-head">Familias</div>
+      <a href="#f1">02 Básica</a><a href="#f2">03 Temporal</a><a href="#f3">04 Tendencia</a>
+      <a href="#f4">05 Volatilidad</a><a href="#f5">06 Microestructura</a><a href="#f6">07 Trayectoria</a>
+      <a href="#f7">08 Supervivencia</a><a href="#f8">09 Flujo órdenes</a><a href="#f9">10 MTF</a>
+      <a href="#f10">11 Derivadas</a><a href="#f11">12 Experimentales</a></div>
+    <div class="toc-group"><div class="toc-head">Cierre</div>
+      <a href="#targets">13 Targets</a><a href="#estructura">14 Estructura</a>
+      <a href="#priorizacion">15 P0–P3</a><a href="#top30">16 Top 30</a><a href="#cierre">17 Cierre</a></div>
+  </nav>
+
+  <main>
+
+    <section id="resumen">
+      <div class="eyebrow">§00 · Resumen</div>
+      <h2>El dataset es el producto de esta fase, no un insumo del modelado</h2>
+      <p class="lead">Un modelo mediocre sobre un dataset excelente casi siempre supera a un modelo excelente sobre un dataset mediocre. Esta fase no toca modelos: define qué se mide, cómo se mide, con qué riesgo de fuga de información, y en qué estructura de tablas vive, de forma que el mismo dataset sirva por igual para un histograma en un notebook, una prueba de hipótesis formal, un backtest walk-forward o un clasificador de gradient boosting.</p>
+      <p>El diseño está anclado en las conclusiones de la revisión crítica (v0.2): la mayor densidad de variables e inversión de ingeniería va a microestructura intra-vela, estructura interna de la trayectoria y supervivencia del color; los indicadores técnicos clásicos aparecen, pero deliberadamente empobrecidos a variables auxiliares de contexto.</p>
+    </section>
+
+    <section id="principios">
+      <div class="eyebrow">§01 · Principios de diseño</div>
+      <h2>Reglas que gobiernan cada tabla y cada columna</h2>
+      <ul>
+        <li><strong>Separación features / targets en tablas físicamente distintas.</strong> Nunca deben vivir en el mismo dataframe de trabajo sin un join explícito y revisado — es la barrera más simple contra leakage accidental durante exploración.</li>
+        <li><strong>Separación escalar / trayectoria.</strong> Las variables escalares (una por vela) viven en una tabla ancha optimizada para modelos clásicos; los vectores/secuencias intra-vela (necesarios para análisis funcional o deep learning) viven en una tabla aparte con columnas tipo lista, para no inflar el tamaño de fila de la tabla que se usa el 90% del tiempo.</li>
+        <li><strong>Todo lo modelado se versiona.</strong> Clusters de forma, estados HMM, salidas de hazard/Cox, probabilidades de changepoint — cualquier variable que dependa de un modelo ajustado se guarda con un <code>model_version</code> y la fecha de corte de entrenamiento, porque si no se re-ajustan por fold de validación temporal, son una fuga de información con nombre elegante.</li>
+        <li><strong>Inmutabilidad de particiones cerradas.</strong> Una vez escrita una partición histórica, no se sobreescribe — solo se añade. Esto es lo que hace reproducible un backtest seis meses después.</li>
+        <li><strong>Formato de columna, no de fila, en cada atributo.</strong> Cada variable documentada abajo trae: nombre, descripción (incluye cómo se calcula), tipo, unidad, rango esperado, coste computacional, riesgo de leakage, utilidad esperada y prioridad — comprimidos en una tabla de 9 columnas por legibilidad; los diez atributos solicitados están todos presentes, solo agrupados.</li>
+        <li><strong>Todo dato externo (funding, OI, liquidaciones) se alinea por timestamp de evento real, nunca por índice de fila</strong> — la causa más común de leakage silencioso en datasets multi-fuente.</li>
+      </ul>
+    </section>
+
+    <section id="f1">
+      <div class="eyebrow">§02 · Familia 1 — Información básica</div>
+      <h2>OHLC, volumen, trades, timestamps, duración</h2>
+      <p>La base sobre la que se calcula todo lo demás. Casi toda la familia es P0 por definición: sin esto no hay dataset.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>open_time / close_time</td><td>Timestamp de apertura/cierre real de la vela, reportado por Binance.</td><td>datetime(ms)</td><td>UTC</td><td>—</td><td>Nulo</td><td>Nulo</td><td>Estructural</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>open, high, low, close</td><td>Precios OHLC directos del kline.</td><td>float</td><td>USDT</td><td>~10³–10⁶ según época</td><td>Nulo</td><td>Nulo</td><td>Base de todo</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>volume</td><td>Volumen base negociado en la vela.</td><td>float</td><td>BTC</td><td>0–10³</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>quote_volume</td><td>Volumen en USDT (volume × precio medio ponderado).</td><td>float</td><td>USDT</td><td>0–10⁸</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>num_trades</td><td>Número de trades ejecutados en la vela; proxy grueso de actividad/fragmentación.</td><td>int</td><td>trades</td><td>10–10⁴</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>taker_buy_base_volume</td><td>Volumen agresor comprador; campo directo del kline de Binance — base de todo el flujo de órdenes (§09).</td><td>float</td><td>BTC</td><td>0–volume</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>taker_buy_quote_volume</td><td>Igual que el anterior, en USDT.</td><td>float</td><td>USDT</td><td>0–quote_volume</td><td>Nulo</td><td>Nulo</td><td>Baja (redundante con el anterior salvo por precio medio)</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>market_type</td><td>Flag spot vs. perpetuo — decisión operativa fijada en v0.1 §03; debe coincidir con el feed real del producto Up/Down.</td><td>categorical</td><td>—</td><td>{spot, perp}</td><td>Nulo</td><td>Nulo</td><td>Estructural</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>candle_duration_actual_ms</td><td>close_time − open_time observado; columna de control de calidad, no de señal.</td><td>int</td><td>ms</td><td>≈299 000–301 000</td><td>Nulo</td><td>Nulo</td><td>QA</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>is_gap_flagged</td><td>1 si hay discontinuidad de timestamp respecto a la vela anterior (mantenimiento, caída de feed).</td><td>bool</td><td>—</td><td>{0,1}</td><td>Bajo</td><td>Nulo</td><td>QA</td><td><span class="pill pill--p1">P1</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>Ninguno directo — esta familia no se testea, se audita. El experimento aquí es de calidad de datos: cuantificar % de velas con gaps por año/mes y decidir si se interpolan, se excluyen o se marcan para embargo en la validación temporal.</p></div>
+    </section>
+
+    <section id="f2">
+      <div class="eyebrow">§03 · Familia 2 — Información temporal</div>
+      <h2>Reloj de pared y reloj de la propia vela</h2>
+      <p>Se separan deliberadamente dos relojes: el calendario (hora, día, sesión) y el reloj interno de la vela en formación (minutos desde apertura / hasta cierre), este último indispensable para el dataset de supervivencia de §08.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>hour_utc</td><td>Hora UTC de apertura de la vela.</td><td>int</td><td>hora</td><td>0–23</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>candle_index_in_hour</td><td>Posición de la vela dentro de la hora (0–11); más informativo que minute_of_hour por ser específico a la grilla de 5m.</td><td>int</td><td>—</td><td>0–11</td><td>Nulo</td><td>Nulo</td><td>Baja</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>day_of_week</td><td>Día de la semana ISO.</td><td>categorical</td><td>—</td><td>Lun–Dom</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>is_weekend</td><td>Sábado o domingo — proxy de menor participación institucional.</td><td>bool</td><td>—</td><td>{0,1}</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>session</td><td>Sesión dominante por solapamiento horario: Asia / Europa / América / solapes.</td><td>categorical</td><td>—</td><td>5 clases</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>minutes_to_funding_settlement</td><td>Minutos hasta el próximo settlement de funding (00/08/16 UTC), solo perp.</td><td>int</td><td>min</td><td>0–479</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>minutes_since_funding_settlement</td><td>Complemento del anterior.</td><td>int</td><td>min</td><td>0–479</td><td>Bajo</td><td>Nulo</td><td>Baja (redundante)</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>minutes_since_candle_open</td><td>Reloj interno: tiempo transcurrido desde la apertura de la vela en formación. Columna clave del dataset de supervivencia (§08).</td><td>float</td><td>min</td><td>0–5</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>minutes_to_candle_close</td><td>5 − minutes_since_candle_open; explícito por legibilidad en modelos de hazard.</td><td>float</td><td>min</td><td>0–5</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>is_cme_session_window</td><td>Flag de ventana de apertura/cierre de futuros CME de BTC — asociado al "CME gap" documentado.</td><td>bool</td><td>—</td><td>{0,1}</td><td>Bajo</td><td>Nulo</td><td>Baja-media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>week_of_year / month</td><td>Estacionalidad de baja frecuencia; barata, pero desalineada del horizonte de 5 min.</td><td>int</td><td>—</td><td>1–52 / 1–12</td><td>Nulo</td><td>Nulo</td><td>Muy baja</td><td><span class="pill pill--p3">P3</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿La probabilidad incondicional de verde varía por hora UTC más allá de lo explicable por volatilidad de esa hora?" (controlar por volatilidad antes de atribuir el efecto a la hora). "¿El fin de semana cambia no la dirección promedio sino la <em>varianza</em> de la dirección?" "¿Existe un salto discontinuo de comportamiento en la ventana ±2 min alrededor del settlement de funding?"</p></div>
+    </section>
+
+    <section id="f3">
+      <div class="eyebrow">§04 · Familia 3 — Tendencia (solo auxiliar)</div>
+      <h2>Contexto, no señal — por diseño, tras v0.2</h2>
+      <p>Ningún miembro de esta familia entra al dataset con expectativa de efecto principal. Su único rol es como variable de interacción/condicionamiento dentro de modelos no lineales (regímenes, meta-labeling).</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>ema_20/50/100/200</td><td>Media móvil exponencial sobre cierres de 5m.</td><td>float</td><td>USDT</td><td>≈precio</td><td>Bajo</td><td>Nulo si solo usa cierres pasados</td><td>Baja aislada / media como contexto</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>dist_to_ema_X_atr</td><td>(close − ema_X) / ATR — distancia normalizada, comparable entre regímenes de volatilidad.</td><td>float</td><td>múltiplos de ATR</td><td>-5–5</td><td>Bajo</td><td>Nulo</td><td>Media (como interacción)</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>ema_slope_X</td><td>Pendiente de regresión lineal de EMA_X sobre las últimas N velas.</td><td>float</td><td>USDT/vela</td><td>—</td><td>Bajo</td><td>Nulo</td><td>Baja-media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>ema_alignment_score</td><td>Cuántas EMAs están alineadas en orden ascendente/descendente (0–4).</td><td>int</td><td>—</td><td>0–4</td><td>Bajo</td><td>Nulo</td><td>Baja</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>vwap_session</td><td>VWAP acumulado desde el inicio de la sesión/día UTC.</td><td>float</td><td>USDT</td><td>≈precio</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>dist_to_vwap_atr</td><td>(close − vwap) / ATR.</td><td>float</td><td>múltiplos ATR</td><td>-5–5</td><td>Bajo</td><td>Nulo</td><td>Media-alta (ancla de reversión más creíble que EMA)</td><td><span class="pill pill--p1">P1</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"Controlando por régimen de volatilidad, ¿la distancia a VWAP tiene poder explicativo incremental sobre la dirección más allá del ruido?" — el test relevante no es "¿EMA predice?" sino "¿EMA predice algo que microestructura y supervivencia no capturan ya?" (ablación, coherente con §08 de v0.2).</p></div>
+    </section>
+
+    <section id="f4">
+      <div class="eyebrow">§05 · Familia 4 — Volatilidad</div>
+      <h2>Modula la confianza, no predice la dirección</h2>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>true_range</td><td>max(h−l, |h−cl_prev|, |l−cl_prev|).</td><td>float</td><td>USDT</td><td>0–2% precio</td><td>Nulo</td><td>Nulo</td><td>Alta (insumo de ATR y normalizador)</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>atr_14</td><td>Media móvil de true_range, 14 velas.</td><td>float</td><td>USDT</td><td>—</td><td>Bajo</td><td>Nulo</td><td>Alta (normaliza decenas de otras variables)</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>realized_vol_1m_intracandle</td><td>Desviación estándar de los 5 retornos log de 1m dentro de la vela — volatilidad "vista desde adentro", no desde el OHLC agregado.</td><td>float</td><td>log-retorno</td><td>0–0.02</td><td>Bajo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>parkinson_vol</td><td>Estimador basado en high-low, más eficiente que TR bajo difusión continua.</td><td>float</td><td>—</td><td>0–0.02</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>garman_klass_vol</td><td>Estimador OHLC completo, más eficiente que Parkinson.</td><td>float</td><td>—</td><td>0–0.02</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>rogers_satchell_vol</td><td>Como Garman-Klass pero robusto a drift no nulo.</td><td>float</td><td>—</td><td>0–0.02</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>realized_vs_range_vol_gap</td><td>realized_vol_1m_intracandle vs. estimador basado en rango — la discrepancia delata saltos/discontinuidad intra-vela que el OHLC agregado no puede ver.</td><td>float</td><td>ratio</td><td>0.5–2</td><td>Bajo</td><td>Nulo</td><td>Alta (detector de saltos)</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>bollinger_bandwidth</td><td>(banda sup − banda inf) / media, ventana 20.</td><td>float</td><td>%</td><td>0.1–5%</td><td>Bajo</td><td>Nulo</td><td>Media (regímen de compresión/expansión)</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>bb_percent_b</td><td>Posición del cierre dentro de las bandas.</td><td>float</td><td>—</td><td>-0.2–1.2</td><td>Bajo</td><td>Nulo</td><td>Baja</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>vol_regime_percentile</td><td>Percentil rodante (252 velas) del ATR actual — normaliza el régimen de volatilidad a través del tiempo, más robusto que el valor absoluto.</td><td>float</td><td>percentil</td><td>0–100</td><td>Bajo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿La magnitud del edge de otras familias (order flow, supervivencia) es mayor en régimen de baja volatilidad que en alta?" (interacción, no efecto principal). "¿realized_vs_range_vol_gap identifica velas con mayor probabilidad de reversión en la siguiente vela (sobre-extensión por salto)?"</p></div>
+    </section>
+
+    <section id="f5">
+      <div class="eyebrow">§06 · Familia 5 — Microestructura intra-vela</div>
+      <h2>Cinemática de la propia vela</h2>
+      <p>Tratando los cierres de 1m dentro de la vela como una trayectoria <code>P(t)</code>, t=1..5.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>subbar_returns[5]</td><td>Vector de 5 retornos log de 1m — insumo crudo de toda la familia.</td><td>array[float]</td><td>log-retorno</td><td>±0.01 c/u</td><td>Nulo</td><td>Nulo</td><td>Estructural</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>velocity_mean / velocity_std</td><td>Media y desviación de subbar_returns — "velocidad" media y su dispersión.</td><td>float</td><td>log-retorno</td><td>±0.005</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>acceleration_seq</td><td>Primera diferencia de subbar_returns (4 valores).</td><td>array[float]</td><td>—</td><td>±0.01</td><td>Nulo</td><td>Nulo</td><td>Media-alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>jerk_max_abs</td><td>Máximo valor absoluto de la segunda diferencia (3 valores) — reversales bruscos de impulso.</td><td>float</td><td>—</td><td>0–0.02</td><td>Nulo</td><td>Nulo</td><td>Media (poco explorado)</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>total_path_distance</td><td>Σ|subbar_returns| — distancia total recorrida, ida y vuelta incluida.</td><td>float</td><td>log-retorno</td><td>0–0.03</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>path_efficiency_ratio</td><td>|close−open| / total_path_distance — 1 = movimiento limpio, →0 = ida y vuelta sin avance neto.</td><td>float</td><td>ratio</td><td>0–1</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>occupation_time_upper_half</td><td>Fracción de sub-barras cuyo cierre está en la mitad superior del rango eventual de la vela.</td><td>float</td><td>fracción</td><td>0–1</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>first_passage_time_25/50/100bps</td><td>Nº de sub-barras hasta que el precio se aleja X puntos básicos del open por primera vez (null si no ocurre).</td><td>int/null</td><td>sub-barras</td><td>0–5</td><td>Bajo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>run_length_max</td><td>Racha más larga de sub-barras con el mismo signo.</td><td>int</td><td>—</td><td>1–5</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>num_direction_changes</td><td>Número de cambios de signo entre sub-barras consecutivas.</td><td>int</td><td>—</td><td>0–4</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>intracandle_skewness</td><td>Asimetría de subbar_returns (n=5, estimador con cautela por tamaño de muestra pequeño).</td><td>float</td><td>—</td><td>-3–3</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>intracandle_kurtosis</td><td>Curtosis de subbar_returns — misma advertencia de n pequeño.</td><td>float</td><td>—</td><td>-2–10</td><td>Bajo</td><td>Nulo</td><td>Baja-media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>volume_concentration_early_vs_late</td><td>Volumen del primer minuto y medio vs. últimos — proxy de finalización agresiva vs. impulso que se apaga.</td><td>float</td><td>ratio</td><td>0–5</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿Las velas con alta eficiencia del camino (E&gt;0.7) tienen mayor probabilidad de continuación en la vela siguiente que las de baja eficiencia (E&lt;0.3), controlando por tamaño de vela?" "¿occupation_time_upper_half predice mejor que el color final de la vela por sí solo?" "¿num_direction_changes alto (≥3) es señal de indecisión que se resuelve por reversión en t+1?" "¿Existe interacción entre velocity_mean y occupation_time — un movimiento rápido con alta ocupación de un solo lado es más informativo que cualquiera de los dos por separado?"</p></div>
+    </section>
+
+    <section id="f6">
+      <div class="eyebrow">§07 · Familia 6 — Estructura de la trayectoria 1m→5m</div>
+      <h2>Describir la forma completa, no solo resumirla</h2>
+      <p>Complementa §06 con representaciones orientadas a la <em>forma</em> completa de la vela más que a estadísticos puntuales — el terreno de la promoción de v0.2 §03.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>color_sequence_5tuple</td><td>Secuencia categórica de las 5 sub-velas (p.ej. RRGGG) — 32 valores posibles.</td><td>categorical</td><td>—</td><td>32 clases</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>num_runs</td><td>Número de rachas internas (equivalente a num_direction_changes+1); se documenta aquí porque es la unidad natural de "convicción" en esta familia.</td><td>int</td><td>—</td><td>1–5</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>position_of_last_flip</td><td>Índice (0–4) de la última sub-vela que cambió de signo respecto a la anterior.</td><td>int</td><td>—</td><td>0–4</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>position_of_first_flip</td><td>Complemento del anterior — ¿la vela "se decidió" rápido o tardó?</td><td>int</td><td>—</td><td>0–4</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>close_position_in_range</td><td>(close−low)/(high−low) — dónde cerró dentro de su propio rango.</td><td>float</td><td>—</td><td>0–1</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>open_position_in_range</td><td>(open−low)/(high−low).</td><td>float</td><td>—</td><td>0–1</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>upper_wick_ratio / lower_wick_ratio / body_ratio</td><td>Anatomía continua de la vela: mecha superior, mecha inferior y cuerpo como fracción del rango total.</td><td>float</td><td>ratio</td><td>0–1 (suman 1)</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>second_half_vs_first_half_return</td><td>Retorno de los minutos 3-5 menos el de los minutos 1-3 — momentum intra-vela.</td><td>float</td><td>log-retorno</td><td>±0.01</td><td>Nulo</td><td>Nulo</td><td>Media-alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>normalized_path_vector[K]</td><td>Trayectoria re-muestreada a K puntos y normalizada en [0,1]×[0,1] — insumo crudo para análisis funcional/clustering, vive en tabla de trayectorias (§14).</td><td>array[float]</td><td>—</td><td>K=10–20 puntos</td><td>Medio</td><td>Nulo</td><td>Alta (como insumo)</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>shape_cluster_id</td><td>Arquetipo asignado por clustering no supervisado (k-means/DTW o FPCA+k-means) sobre normalized_path_vector — <strong>modelado, versionado, refit solo dentro de cada fold de entrenamiento</strong>.</td><td>categorical</td><td>—</td><td>k=6–12 clases (a determinar)</td><td>Medio-alto</td><td>Medio si se ajusta con datos futuros — mitigar con refit por fold</td><td>Alta si el clustering es informativo</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>fpc1 / fpc2 / fpc3</td><td>Primeros 3 scores de Functional PCA sobre normalized_path_vector — representación continua de "forma" en vez de cluster discreto.</td><td>float</td><td>—</td><td>—</td><td>Medio-alto</td><td>Medio, misma mitigación que shape_cluster_id</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>monotonicity_score</td><td>Fracción de sub-barras cuyo signo coincide con el signo neto de la vela — altamente correlacionado con path_efficiency_ratio; se mantiene solo como chequeo cruzado, no como feature independiente.</td><td>float</td><td>ratio</td><td>0–1</td><td>Nulo</td><td>Nulo</td><td>Baja (redundante)</td><td><span class="pill pill--p3">P3</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿La posición del último cambio de color importa? — comparar P(verde en t+1) para position_of_last_flip=0 (decidida temprano) vs. =4 (decidida en el último minuto), controlando por color final." "¿Los arquetipos de forma (shape_cluster_id) tienen tasas de continuación significativamente distintas entre sí, más allá de lo que explica el color simple?" "¿fpc1 (probablemente el eje de 'monotonía vs. zigzag') es, por sí solo, mejor predictor que run_length_max?"</p></div>
+    </section>
+
+    <section id="f7">
+      <div class="eyebrow">§08 · Familia 7 — Supervivencia</div>
+      <h2>La familia de mayor prioridad de todo el dataset</h2>
+      <p>Requiere una tabla en <strong>formato largo</strong> (una fila por combinación vela × instante de observación), distinta de la tabla ancha usada por el resto de familias — ver §14.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>elapsed_seconds</td><td>Marca temporal de observación dentro de la vela: {30,60,90,120,150,180,210,240,270}.</td><td>int</td><td>seg</td><td>30–270</td><td>Nulo</td><td>Nulo</td><td>Estructural</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>side_at_T</td><td>Signo de (precio_actual − open) en el instante T: arriba/abajo/plano.</td><td>categorical</td><td>—</td><td>{arriba,abajo,plano}</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>time_to_color_lock_sec</td><td>Instante a partir del cual el signo respecto al open ya no vuelve a cambiar hasta el cierre.</td><td>float</td><td>seg</td><td>0–300</td><td>Bajo</td><td>Nulo (calculado ex-post sobre la vela ya cerrada, es un feature de la vela <em>anterior</em>, no de la que se predice)</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>num_color_changes_total</td><td>Número de veces que el precio cruza el nivel de open dentro de la vela.</td><td>int</td><td>—</td><td>0–4</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>time_above_open_sec / time_below_open_sec</td><td>Tiempo total (suma de sub-intervalos) que el precio pasó por encima/debajo del open.</td><td>float</td><td>seg</td><td>0–300</td><td>Bajo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>last_flip_direction</td><td>Dirección del último cruce del nivel de open (hacia arriba / hacia abajo).</td><td>categorical</td><td>—</td><td>{up,down}</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>hazard_flip_prob_at_T</td><td>Salida de un modelo de riesgos proporcionales (Cox) ajustado sobre el histórico: probabilidad instantánea de cambio de color dado side_at_T y contexto. <strong>Modelado, versionado por fold.</strong></td><td>float</td><td>probabilidad</td><td>0–1</td><td>Medio</td><td>Medio — mitigar con refit por fold, igual que shape_cluster_id</td><td>Muy alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>survival_prob_close_given_state_at_T</td><td>P(color al cierre = side_at_T | estado en T) — tabla de consulta empírica (Kaplan-Meier) o salida del modelo Cox. El producto final de esta familia.</td><td>float</td><td>probabilidad</td><td>0–1</td><td>Medio</td><td>Medio, misma mitigación</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout win"><span class="callout-label">Nota de diseño</span><p>Esta tabla en formato largo permite tanto el análisis de supervivencia propiamente dicho (Kaplan-Meier, Cox) como, mediante un pivot trivial, aportar columnas anchas del tipo <code>side_at_240s</code> a la tabla de features principal para los modelos clásicos. Un mismo dato crudo sirve a ambos propósitos sin duplicar lógica de cálculo.</p></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>Curvas de Kaplan-Meier por régimen de volatilidad (§05) — ¿la velocidad de "fijación" del color es distinta en alta vs. baja volatilidad? Modelo de Cox con covariables de §06 (num_runs, position_of_last_flip) — ¿la estructura interna mejora la predicción de supervivencia más allá del side_at_T solo? Comparación directa: accuracy de predecir la vela completa desde t=0 vs. accuracy de survival_prob_close_given_state_at_T desde T=240s — cuantificar exactamente cuánta información se gana esperando.</p></div>
+    </section>
+
+    <section id="f8">
+      <div class="eyebrow">§09 · Familia 8 — Flujo de órdenes</div>
+      <h2>Lo que Binance da gratis y lo que hay que aproximar</h2>
+      <div class="callout">
+        <span class="callout-label">Qué da Binance directamente vs. qué se aproxima</span>
+        <p><strong>Directo (klines, coste ≈0):</strong> <code>taker_buy_base_volume</code> por vela — de ahí se derivan <code>taker_sell_volume = volume − taker_buy_base_volume</code> y <code>delta</code> sin coste adicional.</p>
+        <p><strong>Aproximado desde klines (sin datos de libro L2):</strong> <em>OFI</em> real requiere profundidad de libro; se aproxima con el cambio de delta entre sub-barras de 1m consecutivas como proxy direccional del flujo agresor — más ruidoso que el OFI de libro completo pero disponible sin infraestructura adicional. <em>VPIN</em> real requiere agrupar por volumen (volume buckets) en vez de por tiempo; se aproxima tratando cada sub-vela de 1m como bucket y calculando <code>|buy−sell|/total</code> promedio — una aproximación temporal, no de volumen constante, que debe documentarse como tal.</p>
+        <p><strong>Requiere ingesta adicional (trade-level, <code>aggTrade</code> stream, coste medio-alto):</strong> tamaño medio de trade, ratio de trades grandes, VPIN "correcto" por bucket de volumen constante — estas dependen de datos que Binance no incluye en los klines y que además pueden no estar disponibles retroactivamente más allá de la ventana de retención del stream, por lo que su historial profundo puede requerir un proveedor de datos de terceros o captura en vivo desde ahora.</p>
+      </div>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>taker_sell_volume</td><td>volume − taker_buy_base_volume.</td><td>float</td><td>BTC</td><td>0–volume</td><td>Nulo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>delta</td><td>taker_buy_base_volume − taker_sell_volume.</td><td>float</td><td>BTC</td><td>±volume</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>taker_buy_ratio</td><td>taker_buy_base_volume / volume — versión normalizada de delta, comparable entre regímenes de volumen.</td><td>float</td><td>ratio</td><td>0–1</td><td>Nulo</td><td>Nulo</td><td>Muy alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>cumulative_delta_session</td><td>Suma acumulada de delta desde el inicio de la sesión/día UTC.</td><td>float</td><td>BTC</td><td>—</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>ofi_approx</td><td>Cambio de delta entre sub-barras de 1m consecutivas dentro de la vela (ver nota arriba).</td><td>float</td><td>BTC</td><td>±volume</td><td>Bajo</td><td>Nulo</td><td>Alta</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>vpin_approx</td><td>Media de |buy−sell|/total por sub-barra de 1m dentro de la vela (aproximación temporal, ver nota).</td><td>float</td><td>ratio</td><td>0–1</td><td>Bajo</td><td>Nulo</td><td>Media-alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>trade_size_avg</td><td>quote_volume / num_trades — proxy grueso de tamaño medio de operación (institucional vs. retail).</td><td>float</td><td>USDT/trade</td><td>10²–10⁵</td><td>Nulo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>large_trade_ratio</td><td>Fracción de volumen proveniente de trades por encima de un percentil alto — <strong>requiere aggTrade</strong>.</td><td>float</td><td>ratio</td><td>0–1</td><td>Alto</td><td>Bajo</td><td>Media-alta</td><td><span class="pill pill--p2">P2</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿taker_buy_ratio extremo (percentil &gt;90 o &lt;10) predice continuación en t+1 mejor que cualquier variable de precio?" "¿ofi_approx tiene poder predictivo incremental sobre delta simple, una vez controlado por volumen total?" "¿vpin_approx elevado coincide con mayor probabilidad de reversión (toxicidad de flujo asociada a informed trading que se agota rápido) o de continuación (informed trading que persiste)? — pregunta abierta, decidible solo con datos."</p></div>
+    </section>
+
+    <section id="f9">
+      <div class="eyebrow">§10 · Familia 9 — Multi-timeframe</div>
+      <h2>Recortada deliberadamente</h2>
+      <p>Coherente con v0.2, se excluyen variables de tendencia MTF (EMAs/pendientes en 15m/1h/4h) por redundancia probable con features de 5m y por ser el territorio más arbitrado. Solo sobreviven variables de <strong>régimen/volatilidad</strong> de timeframes superiores, donde el argumento de "contexto lento que modula" es más defendible que "señal directa".</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>htf_realized_vol_15m/1h/4h</td><td>Volatilidad realizada del timeframe superior, usando solo velas completamente cerradas.</td><td>float</td><td>log-retorno</td><td>—</td><td>Bajo</td><td>Alto si se usa la vela superior aún en formación — mitigar exigiendo close_time estrictamente anterior</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>htf_regime_state_1h</td><td>Estado HMM ajustado sobre 1h (tendencia fuerte/lateral/alta-baja vol).</td><td>categorical</td><td>—</td><td>3–4 clases</td><td>Medio</td><td>Medio — mismo cuidado de versión por fold que shape_cluster_id</td><td>Media-alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>mtf_momentum_agreement</td><td>Fracción de timeframes (1m,5m,15m) cuyo retorno reciente comparte signo — proxy de confluencia direccional.</td><td>float</td><td>fracción</td><td>0–1</td><td>Bajo</td><td>Medio, misma mitigación</td><td>Baja-media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>lower_tf_ofi_1m_leading</td><td>ofi_approx calculado con datos de 1m antes del cierre de la vela de 5m en curso — señal "líder" dentro de la propia ventana; en la práctica se solapa con §06.</td><td>float</td><td>BTC</td><td>—</td><td>Bajo</td><td>Nulo si se respeta el reloj interno</td><td>Media (redundante con F5-F8)</td><td><span class="pill pill--p3">P3</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"Test de razón de verosimilitud anidado: ¿htf_regime_state_1h aporta información una vez que el modelo ya tiene régimen de volatilidad de 5m? (pregunta explícita de v0.1 §05.8, no resuelta a priori)."</p></div>
+    </section>
+
+    <section id="f10">
+      <div class="eyebrow">§11 · Familia 10 — Variables derivadas (cross-disciplinarias)</div>
+      <h2>Series temporales, procesos estocásticos, teoría de la información, física</h2>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Tipo</th><th>Unidad</th><th>Rango</th><th>Costo</th><th>Leakage</th><th>Utilidad</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>kalman_innovation</td><td>Residuo del paso de predicción de un filtro de Kalman de nivel/tendencia local ajustado sobre el precio — la "sorpresa" blanqueada en cada paso.</td><td>float</td><td>USDT</td><td>—</td><td>Medio</td><td>Nulo si el filtro solo usa el pasado</td><td>Media-alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>ou_reversion_speed_theta</td><td>Velocidad de reversión ajustada (ventana rodante) de un proceso Ornstein-Uhlenbeck sobre desviaciones de corto plazo respecto a una referencia móvil.</td><td>float</td><td>1/vela</td><td>0–1</td><td>Medio</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>changepoint_probability_online</td><td>Probabilidad causal (Bayesian Online Changepoint Detection o CUSUM) de que un cambio de régimen acaba de ocurrir.</td><td>float</td><td>probabilidad</td><td>0–1</td><td>Medio</td><td>Nulo (online por construcción)</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>shannon_entropy_sign_sequence</td><td>Entropía de Shannon de la secuencia de signos en ventana rodante (N=20-50 velas).</td><td>float</td><td>bits</td><td>0–1</td><td>Bajo</td><td>Nulo</td><td>Media-alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>lempel_ziv_complexity</td><td>Complejidad de compresión de la secuencia binaria reciente.</td><td>float</td><td>—</td><td>—</td><td>Bajo</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>sample_entropy</td><td>Entropía muestral de la serie de retornos — regularidad/predictibilidad de la dinámica reciente.</td><td>float</td><td>—</td><td>—</td><td>Medio</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>hurst_exponent_dfa_rolling</td><td>Exponente de Hurst vía Detrended Fluctuation Analysis, ventana rodante.</td><td>float</td><td>—</td><td>0–1</td><td>Medio</td><td>Nulo</td><td>Media</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>hill_tail_index</td><td>Índice de cola vía estimador de Hill sobre retornos recientes — grosor de cola dinámico.</td><td>float</td><td>—</td><td>1–10</td><td>Medio</td><td>Nulo</td><td>Baja-media</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>wasserstein_dist_to_reference</td><td>Distancia de Wasserstein entre la distribución de retornos reciente y una de referencia (p. ej. últimos 6 meses) — detector de cambio de régimen basado en forma completa.</td><td>float</td><td>—</td><td>—</td><td>Alto</td><td>Nulo</td><td>Baja-media (exótica)</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>multifractal_scaling_exponent</td><td>Desviación del escalado "raíz del tiempo" de la volatilidad realizada entre 1m→5m→15m.</td><td>float</td><td>—</td><td>—</td><td>Alto</td><td>Nulo</td><td>Baja-media (exótica, alto coste)</td><td><span class="pill pill--p3">P3</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿changepoint_probability_online alto coincide con menor calibración del modelo primario (justificando el gate de meta-labeling cerrado en esos instantes)?" "¿shannon_entropy_sign_sequence bajo (régimen 'ordenado') es un buen filtro previo, más barato que ajustar un HMM completo?"</p></div>
+    </section>
+
+    <section id="f11">
+      <div class="eyebrow">§12 · Familia 11 — Variables experimentales</div>
+      <h2>Exploración de bajo coste, alta varianza de resultado</h2>
+      <p>Aquí se acepta explícitamente una tasa de fracaso alta — el objetivo es cubrir superficie, no acertar todas.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Descripción y cálculo</th><th>Costo</th><th>Utilidad esperada</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>distance_to_round_number</td><td>Distancia normalizada (en ATR) al múltiplo de 1000 USD más cercano.</td><td>Bajo</td><td>Baja-media (efecto imán documentado en FX, no confirmado en cripto)</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>candle_close_clock_effect_flag</td><td>1 si faltan &lt;15s para el cierre de la vela — test directo de la hipótesis de "efecto de reloj" de v0.2 §09.</td><td>Muy bajo</td><td>Incierta pero muy barata de probar</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>funding_rate_zscore</td><td>Funding rate actual normalizado por su media/desviación rodante — proxy de crowding.</td><td>Bajo</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>funding_rate_extreme_flag</td><td>1 si funding_rate_zscore excede ±2.</td><td>Bajo</td><td>Media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>open_interest_change_pct</td><td>Variación % de OI en la ventana de la vela.</td><td>Bajo</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>oi_price_divergence_flag</td><td>1 si el precio sube y OI cae (o viceversa) — divergencia de convicción.</td><td>Bajo</td><td>Media</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>liquidation_volume_5m</td><td>Volumen total liquidado en la ventana (stream <code>forceOrder</code>), agregado.</td><td>Medio</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>liquidation_imbalance</td><td>(liq_largos − liq_cortos) / total liquidado.</td><td>Medio</td><td>Alta</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>cross_exchange_lead_lag_zscore</td><td>Retorno de Binance vs. retorno de Coinbase/OKX en la ventana inmediatamente anterior, normalizado.</td><td>Alto (multi-venue)</td><td>Media (fundamentada, cara)</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>stablecoin_mint_event_flag</td><td>Emisión reciente de USDT/USDC por encima de un umbral — requiere fuente on-chain externa.</td><td>Alto</td><td>Baja a este horizonte (evento de baja frecuencia)</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>weekday_x_hour_interaction</td><td>Interacción explícita día×hora — en la práctica, cualquier modelo de árbol la descubre solo; construirla a mano aporta poco.</td><td>Bajo</td><td>Muy baja (redundante con el modelo)</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>benfords_law_deviation</td><td>Desviación de la distribución del primer dígito significativo de los tamaños de trade respecto a la ley de Benford — curiosidad incluida por completitud, expectativa de valor baja y así se declara.</td><td>Medio</td><td>Muy baja — incluida para no autocensurar exploración, no porque se espere que funcione</td><td><span class="pill pill--p3">P3</span></td></tr>
+          <tr><td>day_since_halving / halving_regime_flag</td><td>Días desde el halving más reciente — variable de agrupación para análisis de robustez por régimen (§10 de v0.1), no pensada como feature predictivo directo.</td><td>Nulo</td><td>Baja como feature, útil como bucket de análisis</td><td><span class="pill pill--p2">P2</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout exp"><span class="callout-label">Experimentos</span><p>"¿candle_close_clock_effect_flag muestra volumen/volatilidad anómalos de forma sistemática y estable a través de años, o es ruido de una muestra particular?" "¿liquidation_imbalance predice mejor la reversión (sobre-extensión mecánica) que la continuación?" "¿Alguna de estas variables sobrevive un permutation test una vez corregido por el número de variables experimentales probadas (FDR)? — se espera honestamente que la mayoría no."</p></div>
+    </section>
+
+    <section id="targets">
+      <div class="eyebrow">§13 · Targets</div>
+      <h2>Múltiples objetivos, una sola fuente de verdad</h2>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Target</th><th>Descripción y cálculo</th><th>Tipo</th><th>Prior.</th></tr></thead>
+        <tbody>
+          <tr><td>y_color_next</td><td>1{close_{t+1} &gt; open_{t+1}} — target base.</td><td>bool</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>y_color_next_cost_adjusted</td><td>1{retorno_{t+1} &gt; c}, con c derivado del punto de equilibrio p* del producto Up/Down (v0.1 §01).</td><td>bool</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>y_return_next</td><td>Retorno log de la vela t+1 completa — permite regresión/distribución en vez de clasificación.</td><td>float</td><td><span class="pill pill--p0">P0</span></td></tr>
+          <tr><td>y_survival_prob_at_horizon</td><td>Probabilidad de supervivencia del color en un horizonte intra-vela dado (target de la arquitectura de §08).</td><td>float</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>y_time_to_next_color_change</td><td>Segundos hasta el siguiente cambio de signo respecto al open — target de estilo supervivencia/hazard.</td><td>float</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>y_direction_confidence_meta</td><td>1 si el modelo primario acertó la dirección — target del clasificador secundario de meta-labeling.</td><td>bool</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>y_ev_given_payout</td><td>Valor esperado neto de la apuesta bajo el payout real del producto — combina y_color_next_cost_adjusted con la estructura de pago.</td><td>float</td><td><span class="pill pill--p1">P1</span></td></tr>
+          <tr><td>y_magnitude_class</td><td>Clase discreta de magnitud del siguiente movimiento (doji/pequeña/media/grande, en múltiplos de ATR).</td><td>categorical</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>y_triple_barrier_label</td><td>Etiqueta de barrera triple (superior/inferior/tiempo) — exploratorio, útil para descubrimiento de horizonte óptimo, no para el producto final de horizonte fijo.</td><td>categorical</td><td><span class="pill pill--p2">P2</span></td></tr>
+          <tr><td>y_max_favorable_excursion / y_max_adverse_excursion</td><td>Máximo movimiento a favor/en contra dentro de la vela t+1 — útil para experimentos de sizing y riesgo.</td><td>float</td><td><span class="pill pill--p2">P2</span></td></tr>
+        </tbody>
+      </table></div>
+      <div class="callout risk"><span class="callout-label">Disciplina de leakage</span><p>Todos los targets se calculan exclusivamente con datos de la vela t+1 (o posteriores, para y_time_to_next_color_change medido dentro de esa misma vela futura) y viven en la tabla <code>targets_5m</code>, físicamente separada de <code>candle_features_5m</code> — ningún notebook de exploración debe cargar ambas sin un join explícito y fechado.</p></div>
+    </section>
+
+    <section id="estructura">
+      <div class="eyebrow">§14 · Estructura final del dataset</div>
+      <h2>Tablas, relaciones, formato, partición, coste</h2>
+
+      <h3>14.1 — Formato recomendado</h3>
+      <p><strong>Parquet particionado + DuckDB como motor de consulta.</strong> Se descarta SQLite: no maneja bien columnas de tipo lista (necesarias para trayectorias) ni analítica columnar a este volumen. Se descarta un warehouse distribuido (Spark/BigQuery): el tamaño total del dataset (§14.4) es pequeño para estándares de big data — añadiría complejidad operativa sin beneficio. DuckDB sobre Parquet da rendimiento columnar, soporte nativo de tipos anidados, y opera embebido sin servidor, ideal para investigación individual o de equipo pequeño.</p>
+
+      <h3>14.2 — Tablas</h3>
+      <div class="schema-block">
+<span class="tname">raw_klines_1m</span> <span class="tgrain">· grano: 1 fila / vela de 1m / símbolo</span>
+  PK (symbol, open_time)
+  Fuente de verdad atómica. Todo lo demás deriva de aquí.
+
+<span class="tname">raw_klines_5m</span> <span class="tgrain">· grano: 1 fila / vela de 5m / símbolo</span>
+  PK (symbol, open_time)
+  Se obtiene tanto directo de Binance como por agregación de raw_klines_1m,
+  y se cruzan ambas fuentes como control de calidad (QA).
+
+<span class="tname">candle_features_5m</span> <span class="tgrain">· grano: 1 fila / vela de 5m</span>
+  PK (symbol, open_time) · FK → raw_klines_5m
+  Tabla ancha: familias 1-6 (escalares), 9, 10, 11. La tabla de trabajo
+  principal para modelos clásicos y análisis tabular.
+
+<span class="tname">candle_path_5m</span> <span class="tgrain">· grano: 1 fila / vela de 5m</span>
+  PK (symbol, open_time) · FK → candle_features_5m
+  Columnas tipo lista: subbar_returns, acceleration_seq,
+  normalized_path_vector. Separada para no inflar el tamaño de fila
+  de la tabla ancha.
+
+<span class="tname">survival_states_5m</span> <span class="tgrain">· grano: 1 fila / (vela, instante T) — FORMATO LARGO</span>
+  PK (symbol, open_time, elapsed_seconds)
+  Familia 7 completa. Pivotable a columnas anchas para join en
+  candle_features_5m cuando se necesite forma tabular clásica.
+
+<span class="tname">order_flow_5m</span> <span class="tgrain">· grano: 1 fila / vela de 5m</span>
+  PK (symbol, open_time) · FK → candle_features_5m
+  Familia 8. Separada porque su pipeline de ingesta (aggTrade stream
+  para las variables P2) es distinto y más costoso que el de klines.
+
+<span class="tname">funding_rate_8h</span> <span class="tgrain">· grano: 1 fila / evento de funding</span>
+  PK (symbol, funding_time)
+
+<span class="tname">open_interest_5m</span> <span class="tgrain">· grano: 1 fila / snapshot de 5m</span>
+  PK (symbol, snapshot_time)
+
+<span class="tname">liquidations_5m_agg</span> <span class="tgrain">· grano: 1 fila / vela de 5m</span>
+  PK (symbol, open_time)
+  Derivada de liquidations_events (grano: 1 fila / evento crudo,
+  capturado en vivo desde el stream forceOrder — no reconstruible
+  retroactivamente más allá de lo que ofrezca un proveedor externo).
+
+<span class="tname">targets_5m</span> <span class="tgrain">· grano: 1 fila / vela de 5m</span>
+  PK (symbol, open_time) · FK → candle_features_5m
+  Físicamente separada de candle_features_5m por disciplina anti-leakage.
+
+<span class="tname">shape_archetypes</span> <span class="tgrain">· grano: 1 fila / (cluster_id, model_version)</span>
+  PK (model_version, cluster_id)
+  Metadata de los arquetipos de forma — centroid, tamaño de cluster,
+  ventana de entrenamiento. Versionada por fold de validación temporal.
+
+<span class="tname">data_quality_log</span> <span class="tgrain">· grano: 1 fila / anomalía detectada</span>
+  Gaps, timestamps duplicados, datos fuera de orden. Tabla de auditoría,
+  estándar en un pipeline de investigación serio y casi siempre omitida
+  en proyectos informales.
+      </div>
+
+      <h3>14.3 — Partición y actualización</h3>
+      <ul>
+        <li><strong>Partición Hive-style</strong>: <code>symbol=BTCUSDT/year=2024/month=03/*.parquet</code> — permite pruning eficiente por rango de fechas sin índices explícitos (DuckDB usa min/max zone-maps de Parquet). <code>survival_states_5m</code> y <code>candle_path_5m</code>, al ser más pesadas, se particionan igual pero pueden beneficiarse de sub-partición mensual más fina si el volumen crece con más símbolos.</li>
+        <li><strong>Backfill histórico</strong>: job batch contra la API REST de klines de Binance (rate-limited, sin sorpresas), escritura append-only por partición.</li>
+        <li><strong>Actualización incremental</strong>: job programado (cron, cadencia horaria es suficiente dado el horizonte de 5m) que solo añade velas ya cerradas — nunca se reescribe una partición histórica, por reproducibilidad de backtests.</li>
+        <li><strong>Streams en vivo</strong> (aggTrade, forceOrder, funding/OI): proceso siempre activo con cola durable antes de agregación a 5m, porque su historial profundo puede no ser reconstruible retroactivamente.</li>
+      </ul>
+
+      <h3>14.4 — Tamaño y coste estimados</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Tabla</th><th class="num">Filas (≈9 años)</th><th class="num">Tamaño Parquet estimado</th></tr></thead>
+        <tbody>
+          <tr><td>raw_klines_1m</td><td class="num">≈4.7M</td><td class="num">15–25 MB</td></tr>
+          <tr><td>raw_klines_5m</td><td class="num">≈950K</td><td class="num">5–8 MB</td></tr>
+          <tr><td>candle_features_5m</td><td class="num">≈950K × ~150 cols</td><td class="num">200–400 MB</td></tr>
+          <tr><td>candle_path_5m</td><td class="num">≈950K</td><td class="num">100–200 MB</td></tr>
+          <tr><td>survival_states_5m</td><td class="num">≈8.5M (formato largo)</td><td class="num">150–300 MB</td></tr>
+          <tr><td>order_flow_5m + externas</td><td class="num">≈950K</td><td class="num">&lt;100 MB</td></tr>
+        </tbody>
+      </table></div>
+      <p>Total estimado: <strong>bien por debajo de 2 GB</strong> para el histórico completo de un símbolo — cabe cómodo en memoria en cualquier laptop moderno. No hay justificación para infraestructura distribuida en esta fase; el coste dominante no es de almacenamiento sino de horas de ingeniería para construir correctamente el pipeline de reconstrucción intra-vela y los modelos versionados (hazard, clustering).</p>
+    </section>
+
+    <section id="priorizacion">
+      <div class="eyebrow">§15 · Priorización P0–P3 — resumen</div>
+      <h2>Qué se construye primero y por qué</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nivel</th><th>Criterio</th><th>Contenido dominante</th></tr></thead>
+        <tbody>
+          <tr><td><span class="pill pill--p0">P0</span></td><td>Coste ≈0, leakage nulo, insumo estructural de otras variables, o pertenece directamente a las líneas de mayor prioridad de v0.2 (supervivencia, microestructura intra-vela, order flow básico).</td><td>OHLCV crudo, reloj interno de vela, cinemática intra-vela núcleo (eficiencia, ocupación, runs), estado de supervivencia y su target, delta/taker_buy_ratio, targets base.</td></tr>
+          <tr><td><span class="pill pill--p1">P1</span></td><td>Coste bajo-medio, mecanismo razonablemente fundamentado, necesario para la arquitectura de meta-labeling o para la capa de contexto/régimen.</td><td>Estimadores de volatilidad, EMA/VWAP como contexto, forma de trayectoria (FPCA/clustering), hazard model, VPIN aprox., funding/OI/liquidaciones, targets extendidos.</td></tr>
+          <tr><td><span class="pill pill--p2">P2</span></td><td>Payoff incierto, coste moderado, vale la pena probar pero no bloquea el resto del programa.</td><td>Entropía/complejidad, MTF de régimen, distance_to_round_number, triple-barrier, large_trade_ratio.</td></tr>
+          <tr><td><span class="pill pill--p3">P3</span></td><td>Alto coste y/o alta incertidumbre de payoff — presupuesto acotado aparte, no en ruta crítica.</td><td>Path signatures (nivel superior), multifractalidad, Hill index, Wasserstein, cross-exchange lead-lag, eventos on-chain, Benford.</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="top30">
+      <div class="eyebrow">§16 · Las 30 variables que salvaría</div>
+      <h2>Si el resto se perdiera para siempre</h2>
+      <p>Se excluyen deliberadamente OHLCV crudo y timestamps: son infraestructura de la que todo lo demás se deriva, no "variables" compitiendo por contener información direccional. Esta es la lista de lo que, con la evidencia conceptual reunida en tres fases, más probablemente contiene señal incremental real.</p>
+      <ol>
+        <li><code>taker_buy_ratio</code> — dirección del flujo agresor, la variable de microestructura más barata y mejor fundamentada.</li>
+        <li><code>ofi_approx</code> — desequilibrio de flujo, complementa a la anterior con dinámica intra-vela.</li>
+        <li><code>path_efficiency_ratio</code> — limpieza del movimiento; distingue convicción de ruido.</li>
+        <li><code>occupation_time_upper_half</code> — asimetría temporal del recorrido, no capturada por OHLC agregado.</li>
+        <li><code>num_direction_changes</code> — proxy directo de indecisión intra-vela.</li>
+        <li><code>run_length_max</code> — proxy directo de convicción sostenida.</li>
+        <li><code>position_of_last_flip</code> — timing del último cambio de opinión del mercado dentro de la vela.</li>
+        <li><code>side_at_240s</code> (estado de supervivencia a 4 min) — el punto de observación individual más informativo de todo el dataset.</li>
+        <li><code>time_to_color_lock_sec</code> — resumen escalar de toda la dinámica de supervivencia.</li>
+        <li><code>time_above_open_sec</code> — ocupación direccional acumulada, complementaria a la anterior.</li>
+        <li><code>total_path_distance</code> — magnitud de actividad, denominador de path_efficiency_ratio y señal de "ruido" por sí sola.</li>
+        <li><code>realized_vol_1m_intracandle</code> — volatilidad "vista desde adentro", ancla de normalización y de régimen.</li>
+        <li><code>atr_14</code> — normalizador imprescindible para decenas de otras variables.</li>
+        <li><code>bollinger_bandwidth</code> — régimen de compresión/expansión, contexto de mayor payoff esperado que cualquier señal aislada.</li>
+        <li><code>close_position_in_range</code> — resumen barato y potente de la forma de la vela.</li>
+        <li><code>intracandle_skewness</code> — forma de la distribución de movimiento dentro de la vela.</li>
+        <li><code>volume_concentration_early_vs_late</code> — cómo se completó el movimiento, no solo cuánto.</li>
+        <li><code>funding_rate_zscore</code> — crowding de posicionamiento apalancado, mecanismo económico distinto de todo lo anterior.</li>
+        <li><code>open_interest_change_pct</code> — convicción agregada del mercado en la ventana.</li>
+        <li><code>liquidation_imbalance</code> — eventos de pánico/cascada, mecanismo de flujo forzado.</li>
+        <li><code>hazard_flip_prob_at_T</code> — la síntesis modelada de toda la familia de supervivencia.</li>
+        <li><code>shannon_entropy_sign_sequence</code> — mide si el régimen actual es, en principio, predecible en absoluto.</li>
+        <li><code>hurst_exponent_dfa_rolling</code> — distingue régimen tendencial de reversión a la media.</li>
+        <li><code>changepoint_probability_online</code> — detector causal de que el régimen acaba de cambiar.</li>
+        <li><code>ensemble_disagreement</code> — incertidumbre epistémica del propio modelo; feature central del gate de meta-labeling.</li>
+        <li><code>session</code> (hora UTC / sesión combinadas) — el único contexto puramente temporal que sobrevive al recorte.</li>
+        <li><code>minutes_since_candle_open</code> — indispensable si el producto permite entrada intra-vela; redefine el problema entero.</li>
+        <li><code>dist_to_vwap_atr</code> — el único anclaje de "tendencia" que se conserva, por ser ancla de reversión más creíble que una EMA.</li>
+        <li><code>first_passage_time_50bps</code> — velocidad de convicción del movimiento inicial.</li>
+        <li><code>trade_size_avg</code> — única aproximación barata a "quién está operando" sin necesitar datos de trade completos.</li>
+      </ol>
+      <div class="callout win"><span class="callout-label">Patrón detrás de la lista</span><p>De las 30, ninguna es un indicador técnico clásico en su forma pura (ni una sola EMA, ni un patrón de velas, ni un cruce). Diecinueve provienen de microestructura/trayectoria/supervivencia intra-vela (familias 5-8), cinco de flujo de órdenes y posicionamiento externo, cinco de teoría de la información/procesos estocásticos, y solo una de contexto temporal puro. Es la confirmación cuantitativa, en forma de lista forzada, de la reasignación de prioridades hecha en v0.2.</p></div>
+    </section>
+
+    <section id="cierre">
+      <div class="eyebrow">§17 · Cierre</div>
+      <h2>Estado: esquema cerrado, cero líneas de modelado</h2>
+      <p>Este documento no entrena nada ni decide arquitectura de modelo alguna — es, deliberadamente, solo el contrato de datos. El siguiente paso natural es la implementación de <code>raw_klines_1m/5m</code> y <code>candle_features_5m</code> para las variables P0, seguido de inmediato por <code>survival_states_5m</code>, dado que es la familia que este documento y la revisión previa coinciden en señalar como la de mayor valor esperado por unidad de esfuerzo.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>Esquema de dataset · Fase 2 · Sin modelos, sin entrenamiento · Precede a la implementación del pipeline de datos.</footer>
