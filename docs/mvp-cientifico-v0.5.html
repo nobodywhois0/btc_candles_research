@@ -1,0 +1,463 @@
+<title>MVP de investigación — velocidad sobre arquitectura — Fase 4</title>
+<style>
+  :root{
+    --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+      --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  }
+  :root[data-theme="dark"]{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+    --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  :root[data-theme="light"]{--paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:56px 32px 40px;}
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--red);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.4vw,46px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance;max-width:20ch;}
+  .doc-subtitle{font-size:18px;color:var(--ink-muted);max-width:64ch;margin:0 0 26px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{max-width:1180px;margin:0 auto;padding:0 32px 120px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start;}
+  nav.toc{position:sticky;top:32px;font-family:var(--font-mono);font-size:11.5px;line-height:1.8;padding-top:44px;max-height:calc(100vh - 64px);overflow-y:auto;}
+  nav.toc a{display:block;color:var(--ink-muted);text-decoration:none;padding:2px 0 2px 12px;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+  nav.toc .toc-group{margin-bottom:11px;}
+  nav.toc .toc-head{color:var(--ink-faint);text-transform:uppercase;letter-spacing:.07em;font-size:10px;padding-left:12px;margin-bottom:2px;}
+
+  main{min-width:0;padding-top:44px;}
+  section{padding:50px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(23px,2.8vw,29px);font-weight:700;letter-spacing:-.005em;margin:0 0 18px;text-wrap:balance;max-width:32ch;}
+  h3{font-family:var(--font-display);font-size:19px;font-weight:700;margin:28px 0 10px;}
+  h4{font-family:var(--font-body);font-size:15.5px;font-weight:700;margin:6px 0 4px;color:var(--ink);}
+  p{margin:0 0 14px;max-width:70ch;}
+  p.lead{font-size:18px;color:var(--ink-muted);max-width:62ch;}
+  ul,ol{margin:0 0 15px;padding-left:22px;max-width:68ch;}
+  li{margin-bottom:5px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code, .mono{font-family:var(--font-mono);font-size:.87em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .36em;border-radius:4px;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:15px 19px;border-radius:2px;margin:18px 0;max-width:68ch;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:5px;display:block;}
+  .callout.risk{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.risk .callout-label{color:var(--red);}
+  .callout.win{border-left-color:var(--green);background:var(--green-wash);}
+  .callout.win .callout-label{color:var(--green);}
+
+  .table-wrap{overflow-x:auto;margin:16px 0 24px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:640px;font-size:13.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:9px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody tr:last-child td{border-bottom:none;}
+  .vartable tbody td:first-child{color:var(--ink);font-weight:600;font-family:var(--font-mono);font-size:12.5px;}
+
+  .pill{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:20px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block;}
+  .pill--fund{color:var(--green);border-color:var(--green);background:var(--green-wash);font-weight:700;}
+  .pill--p1{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--p2{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--kill{color:var(--red);border-color:var(--red);background:var(--red-wash);font-weight:700;}
+  .pill--state{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.04em;padding:3px 10px;border-radius:20px;border:1px solid;white-space:nowrap;display:inline-block;}
+  .pill--confirmed{color:var(--green);border-color:var(--green);background:var(--green-wash);font-weight:700;}
+  .pill--weak{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--moredata{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--rejected{color:var(--red);border-color:var(--red);background:var(--red-wash);font-weight:700;}
+
+  .schema-block{border:1px solid var(--line);border-radius:8px;background:var(--paper-raised);padding:18px 20px;margin:16px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.7;overflow-x:auto;white-space:pre;}
+  .schema-block .c{color:var(--ink-faint);}
+  .schema-block .t{color:var(--accent-ink);font-weight:700;}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:18px 0;}
+  .grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:18px 0;}
+  .card{border:1px solid var(--line);border-radius:8px;padding:16px 18px;background:var(--paper-raised);}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14px;}
+
+  .kicker-list{list-style:none;padding-left:0;margin:18px 0;}
+  .kicker-list li{padding-left:0;border-top:1px solid var(--line);padding:13px 0;display:grid;grid-template-columns:150px 1fr;gap:18px;max-width:none;}
+  .kicker-list li:first-child{border-top:none;}
+  .kicker-list .kicker{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.04em;}
+
+  .verdict{border:1px solid var(--line-strong);background:var(--paper-raised);border-radius:10px;padding:26px 28px;margin:22px 0;max-width:74ch;}
+  .verdict .verdict-eyebrow{font-family:var(--font-mono);font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--red);margin-bottom:10px;}
+  .verdict p{font-size:17px;color:var(--ink);margin-bottom:12px;}
+  .verdict p:last-child{margin-bottom:0;}
+
+  .postmortem{border:2px solid var(--red);border-radius:14px;padding:32px 34px;margin-top:12px;background:var(--red-wash);}
+  .postmortem p{max-width:none;}
+
+  footer{max-width:1180px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  details.toc-mobile{display:none;}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{display:block;margin:28px 32px 0;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:var(--font-mono);font-size:12.5px;}
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+    .grid-2,.grid-3{grid-template-columns:1fr;}
+    .kicker-list li{grid-template-columns:1fr;gap:4px;}
+    .postmortem{padding:20px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow"><span>Speed over architecture</span> · <span>MVP científico</span> · <span>Fase 4</span></div>
+    <h1 class="doc-title">Una máquina para aprender, no una plataforma</h1>
+    <p class="doc-subtitle">Un ingeniero, una laptop, seis meses. El camino más corto para responder si existe un edge real en la vela de 5 minutos de BTC/USDT — destruyendo deliberadamente todo lo que no acelera esa respuesta.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha</dt><dd>2026-07-07</dd></div>
+      <div class="meta-item"><dt>Versión</dt><dd>v0.5 — MVP científico</dd></div>
+      <div class="meta-item"><dt>Reemplaza</dt><dd>§01–§15 de v0.4 como plan de ejecución</dd></div>
+      <div class="meta-item"><dt>Regla rectora</dt><dd>Cada semana se aprende algo del mercado</dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice del documento</summary>
+  <nav>
+    <a href="#destruccion">01 · Destrucción de la arquitectura</a><a href="#organizacion">02 · Organización mínima</a>
+    <a href="#hipotesis">03 · Guiado por hipótesis</a><a href="#roadmap">04 · Roadmap científico</a>
+    <a href="#features">05 · Features mínimas</a><a href="#experimentos">06 · Experimentos permitidos</a>
+    <a href="#modelos">07 · Modelos permitidos</a><a href="#exito">08 · Métrica de éxito</a>
+    <a href="#mvpsw">09 · MVP del software</a><a href="#noconstruir">10 · Qué NO construir</a>
+    <a href="#irreversibles">11 · Decisiones irreversibles</a><a href="#riesgos">12 · Riesgos</a>
+    <a href="#experimento1">13 · El experimento más importante</a><a href="#tablero">14 · Tablero de decisión</a>
+    <a href="#postmortem">15 · Postmortem</a><a href="#cierre">16 · Cierre</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <div class="toc-group"><div class="toc-head">Demolición</div>
+      <a href="#destruccion">01 Destrucción</a><a href="#organizacion">02 Organización</a><a href="#hipotesis">03 Hipótesis</a></div>
+    <div class="toc-group"><div class="toc-head">Plan</div>
+      <a href="#roadmap">04 Roadmap</a><a href="#features">05 Features</a><a href="#experimentos">06 Experimentos</a>
+      <a href="#modelos">07 Modelos</a><a href="#exito">08 Éxito</a></div>
+    <div class="toc-group"><div class="toc-head">Software</div>
+      <a href="#mvpsw">09 MVP software</a><a href="#noconstruir">10 No construir</a><a href="#irreversibles">11 Irreversibles</a></div>
+    <div class="toc-group"><div class="toc-head">Honestidad</div>
+      <a href="#riesgos">12 Riesgos</a><a href="#experimento1">13 El experimento</a><a href="#tablero">14 Tablero</a>
+      <a href="#postmortem">15 Postmortem</a><a href="#cierre">16 Cierre</a></div>
+  </nav>
+
+  <main>
+
+    <section id="destruccion">
+      <div class="eyebrow">§01 · Destrucción deliberada de la arquitectura v0.4</div>
+      <h2>Cada módulo, sometido a cuatro preguntas</h2>
+      <p>Costo relativo, valor científico esperado en los primeros seis meses, y veredicto: <span class="pill pill--fund">INDISPENSABLE</span> <span class="pill pill--p1">SIMPLIFICAR</span> <span class="pill pill--p2">POSPONER</span> <span class="pill pill--kill">ELIMINAR</span>.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Componente</th><th>Costo de construir</th><th>Valor científico (6 meses)</th><th>Veredicto</th></tr></thead>
+        <tbody>
+          <tr><td>Ingestion klines 1m/5m</td><td>Bajo</td><td>Muy alto — sin esto no hay nada</td><td><span class="pill pill--fund">INDISPENSABLE</span></td></tr>
+          <tr><td>Ingestion streaming (aggTrade/forceOrder/funding)</td><td>Medio-alto</td><td>Medio — no lo pide ninguna hipótesis de los primeros 3 meses</td><td><span class="pill pill--p2">POSPONER</span></td></tr>
+          <tr><td>Cleaning (dedupe, forward-fill, marcado de gaps)</td><td>Bajo</td><td>Alto — evita basura silenciosa</td><td><span class="pill pill--p1">SIMPLIFICAR a 3 reglas</span></td></tr>
+          <tr><td>Validation (6 validadores completos)</td><td>Medio</td><td>Alto</td><td><span class="pill pill--p1">SIMPLIFICAR a 3</span></td></tr>
+          <tr><td>Feature Engineering (clase base + registro + grafo de dependencias)</td><td>Alto</td><td>Bajo con &lt;20 features</td><td><span class="pill pill--kill">ELIMINAR</span></td></tr>
+          <tr><td>Caché de features versionado por hash</td><td>Medio</td><td>Bajo — recalcular todo es más barato que el sistema</td><td><span class="pill pill--p2">POSPONER</span></td></tr>
+          <tr><td>Dataset Builder declarativo (YAML)</td><td>Medio</td><td>Bajo</td><td><span class="pill pill--p1">SIMPLIFICAR a 1 función</span></td></tr>
+          <tr><td>Experiment Engine (clase abstracta + plugin registry + auto-discovery)</td><td>Alto</td><td>Bajo con 5 hipótesis</td><td><span class="pill pill--kill">ELIMINAR</span></td></tr>
+          <tr><td>Statistical Engine (tests estándar)</td><td>Bajo-medio</td><td>Muy alto</td><td><span class="pill pill--fund">INDISPENSABLE</span> (como funciones de scipy/statsmodels, no reimplementadas)</td></tr>
+          <tr><td>Visualization con registro de renderers</td><td>Medio</td><td>Bajo</td><td><span class="pill pill--kill">ELIMINAR</span></td></tr>
+          <tr><td>Reporting con motor de templates genérico</td><td>Medio-alto</td><td>Medio</td><td><span class="pill pill--p1">SIMPLIFICAR a 1 función</span></td></tr>
+          <tr><td>Model Training multi-adaptador (7 librerías)</td><td>Alto</td><td>Bajo sin señal previa</td><td><span class="pill pill--p2">POSPONER</span></td></tr>
+          <tr><td>Calibration (Platt/Isotonic/reliability)</td><td>Medio</td><td>Bajo sin modelo</td><td><span class="pill pill--p2">POSPONER</span></td></tr>
+          <tr><td>Meta-labeling como módulo</td><td>Alto</td><td>Nulo sin primario con señal</td><td><span class="pill pill--kill">ELIMINAR por ahora</span></td></tr>
+          <tr><td>Survival Analysis (Kaplan-Meier, Cox)</td><td>Bajo-medio (librería <code>lifelines</code>)</td><td>Muy alto — es la hipótesis #1</td><td><span class="pill pill--fund">INDISPENSABLE</span></td></tr>
+          <tr><td>Configuration (YAML + validación de schema)</td><td>Medio</td><td>Bajo</td><td><span class="pill pill--p1">SIMPLIFICAR a 1 archivo</span></td></tr>
+          <tr><td>CLI completo (10+ comandos)</td><td>Medio</td><td>Bajo</td><td><span class="pill pill--kill">ELIMINAR</span></td></tr>
+          <tr><td>Versionado de 4 hashes (git+dataset+config+entorno)</td><td>Alto</td><td>Medio — importa, pero no todavía</td><td><span class="pill pill--p1">SIMPLIFICAR a git+config congelada</span></td></tr>
+          <tr><td>Testing (4 capas)</td><td>Medio-alto</td><td>Medio</td><td><span class="pill pill--p1">SIMPLIFICAR a unitarios de cálculo</span></td></tr>
+          <tr><td>Logging estructurado (JSON + agregación)</td><td>Bajo-medio</td><td>Bajo</td><td><span class="pill pill--p2">POSPONER</span></td></tr>
+          <tr><td>Documentación automática</td><td>Medio</td><td>Bajo</td><td><span class="pill pill--kill">ELIMINAR</span></td></tr>
+          <tr><td>DuckDB como motor de consulta</td><td>Bajo</td><td>Alto — gratis, ya viene con Parquet</td><td><span class="pill pill--fund">INDISPENSABLE</span></td></tr>
+          <tr><td>SQLite para catálogo de runs</td><td>Bajo</td><td>Bajo con &lt;20 runs</td><td><span class="pill pill--p2">POSPONER — un JSON alcanza</span></td></tr>
+          <tr><td>Redis / Airflow / Kubernetes / arquitectura distribuida</td><td>Alto</td><td>Nulo</td><td><span class="pill pill--kill">ELIMINAR</span></td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="organizacion">
+      <div class="eyebrow">§02 · Organización mínima</div>
+      <h2>Cinco carpetas, no quince módulos</h2>
+      <div class="schema-block">edge-research/
+├── <span class="t">data/</span>          <span class="c"># raw + processed + features + datasets, particionado por fecha — sin subdividir en 5 carpetas separadas</span>
+├── <span class="t">lib/</span>            <span class="c"># código compartido: ingestion, validation, features P0, stats, report — funciones puras, sin clases abstractas</span>
+├── <span class="t">research/</span>        <span class="c"># una carpeta por hipótesis — ver §03</span>
+├── <span class="t">runs/</span>             <span class="c"># resultados versionados de cada ejecución (JSON + HTML + figuras)</span>
+└── <span class="t">notebooks/</span>          <span class="c"># exploración libre — nunca dependencia de lib/ ni de research/</span></div>
+      <p>Lo que desaparece respecto a v0.4: <code>config/</code> (vive dentro de cada <code>run.py</code> o en un único <code>lib/config.py</code>), <code>tests/</code> como directorio propio (los tests viven junto a la función que prueban), <code>docs/</code> (el README de cada hipótesis es la documentación), <code>cli/</code> (se ejecuta <code>python research/001_survival/run.py</code> directo), <code>scripts/</code> como categoría separada de <code>notebooks/</code>.</p>
+    </section>
+
+    <section id="hipotesis">
+      <div class="eyebrow">§03 · Desarrollo guiado por hipótesis</div>
+      <h2>Una carpeta, una pregunta, una respuesta</h2>
+      <div class="schema-block">research/
+├── 001_survival/
+│   ├── hypothesis.md      <span class="c"># 1 página: pregunta, mecanismo esperado, predicción falsable, criterio de decisión</span>
+│   ├── run.py               <span class="c"># único script: carga → calcula → testea → guarda</span>
+│   ├── results/
+│   │   ├── report.html         <span class="c"># generado por lib/report.py</span>
+│   │   ├── figures/               <span class="c"># PNG/HTML de las gráficas de §13</span>
+│   │   └── summary.json            <span class="c"># métricas clave + estado — alimenta el tablero de §14</span>
+│   └── README.md                    <span class="c"># notas del investigador: qué se encontró, dudas, próximo paso</span>
+├── 002_shape/            <span class="c"># misma estructura exacta</span>
+├── 003_microstructure/
+├── 004_orderflow/
+└── 005_entropy/</div>
+      <p>Regla dura de independencia: <strong>ninguna carpeta de <code>research/</code> importa de otra</strong> — solo de <code>lib/</code> (funciones puras) y de <code>data/</code> (solo lectura). Agregar la hipótesis 006 es copiar la carpeta 001 como plantilla y cambiar tres cosas: la pregunta, el cálculo específico, el test estadístico. Nunca toca <code>lib/</code> salvo que necesite una función genuinamente nueva y reutilizable.</p>
+    </section>
+
+    <section id="roadmap">
+      <div class="eyebrow">§04 · Roadmap científico</div>
+      <h2>Cada semana termina con una pregunta respondida, no con código escrito</h2>
+      <p>La infraestructura de una semana (p. ej. el script de ingestión de la semana 1) <strong>es</strong> la respuesta a la pregunta de esa semana, no un prerrequisito separado. Ninguna semana existe solo para "construir algo".</p>
+      <ol class="kicker-list">
+        <li><span class="kicker">Semana 1</span><div><strong>¿Son confiables los datos?</strong> Ingestion de klines 1m/5m (2-3 años) + validación de 3 reglas + reporte de calidad: % gaps, duplicados, inconsistencias OHLC.</div></li>
+        <li><span class="kicker">Semana 2</span><div><strong>¿Es el mercado, a 5 minutos, indistinguible de un paseo aleatorio?</strong> Experimento cero: runs test, variance ratio, BDS sobre la serie de signos. Gate real, no trámite — ver §15.</div></li>
+        <li><span class="kicker">Semana 3</span><div><strong>¿Existe memoria simple entre velas?</strong> Autocorrelación de signos, cadenas de Markov orden 1-2.</div></li>
+        <li><span class="kicker">Semanas 4-5</span><div><strong>¿La supervivencia del color contiene información?</strong> <code>001_survival</code> completo — el experimento más importante del proyecto, ver §13.</div></li>
+        <li><span class="kicker">Semanas 6-7</span><div><strong>¿La forma interna de la vela (1m→5m) predice la siguiente?</strong> <code>002_shape</code>: run-length, posición del último flip, clustering simple de trayectorias.</div></li>
+        <li><span class="kicker">Semana 8</span><div><strong>Checkpoint de decisión #1.</strong> Con lo aprendido en semanas 1-7, ¿hay base para seguir? Se actualiza el tablero completo (§14).</div></li>
+        <li><span class="kicker">Semanas 9-10</span><div><strong>¿La cinemática intra-vela aporta señal incremental?</strong> <code>003_microstructure</code>: eficiencia del camino, tiempo de ocupación, velocidad/aceleración.</div></li>
+        <li><span class="kicker">Semanas 11-12</span><div><strong>¿El flujo de órdenes predice dirección?</strong> <code>004_orderflow</code>: taker buy ratio, delta, OFI aproximado.</div></li>
+        <li><span class="kicker">Semana 13</span><div><strong>¿El régimen modula la señal de las hipótesis anteriores?</strong> <code>005_entropy</code>: entropía de Shannon, Hurst, changepoint — como variable de interacción, no como hipótesis aislada.</div></li>
+        <li><span class="kicker">Semana 14</span><div><strong>Checkpoint de decisión #2.</strong> ¿Hay evidencia suficiente acumulada para pasar a un modelo combinado? Aplicar §08 con rigor.</div></li>
+        <li><span class="kicker">Semanas 15-16</span><div><strong>¿Un modelo combinado supera a la mejor hipótesis individual?</strong> Regresión logística sobre las features validadas — solo si semana 14 dice "sí".</div></li>
+        <li><span class="kicker">Semanas 17-18</span><div><strong>¿La señal sobrevive validación walk-forward y calibración honesta?</strong></div></li>
+        <li><span class="kicker">Semana 19</span><div><strong>¿LightGBM supera significativamente a la regresión logística?</strong> Solo si 15-18 mostró algo que valga la pena capturar de forma no lineal.</div></li>
+        <li><span class="kicker">Semana 20</span><div><strong>¿El EV neto del payout real del producto Up/Down es positivo con significancia?</strong> Simulación económica final.</div></li>
+        <li><span class="kicker">Semana 21</span><div><strong>Checkpoint de decisión final — go/no-go.</strong></div></li>
+        <li><span class="kicker">Semanas 22-24</span><div>Buffer. Si hay señal: profundizar la línea ganadora. Si no: escribir el postmortem honesto (§15), no maquillarlo.</div></li>
+      </ol>
+    </section>
+
+    <section id="features">
+      <div class="eyebrow">§05 · Features mínimas</div>
+      <h2>Doce variables derivadas, no doscientas</h2>
+      <p>Subconjunto reducido incluso respecto al P0 de la Fase 2: solo lo que las hipótesis de las semanas 2-13 necesitan de verdad. Todo se deriva de klines 1m/5m — <strong>ninguna requiere ingestión adicional de streaming</strong>, lo que mantiene la semana 1 autosuficiente.</p>
+      <div class="table-wrap"><table class="vartable">
+        <thead><tr><th>Variable</th><th>Alimenta</th></tr></thead>
+        <tbody>
+          <tr><td>subbar_returns[5]</td><td>Base de casi todo lo demás</td></tr>
+          <tr><td>path_efficiency_ratio</td><td>003_microstructure</td></tr>
+          <tr><td>occupation_time_upper_half</td><td>003_microstructure, 001_survival</td></tr>
+          <tr><td>num_direction_changes / run_length_max</td><td>002_shape</td></tr>
+          <tr><td>color_sequence_5tuple</td><td>002_shape</td></tr>
+          <tr><td>side_at_T (30-270s)</td><td>001_survival — la tabla en formato largo</td></tr>
+          <tr><td>time_to_color_lock_sec</td><td>001_survival</td></tr>
+          <tr><td>time_above_open_sec</td><td>001_survival</td></tr>
+          <tr><td>taker_buy_ratio</td><td>004_orderflow</td></tr>
+          <tr><td>atr_14</td><td>Normalizador — bucketing de régimen para todas</td></tr>
+          <tr><td>realized_vol_1m_intracandle</td><td>Bucketing de régimen, 005_entropy</td></tr>
+          <tr><td>close_position_in_range</td><td>002_shape</td></tr>
+        </tbody>
+      </table></div>
+      <p>Explícitamente fuera hasta que una hipótesis concreta lo pida: EMA/VWAP (no las necesita ninguna de las 5 hipótesis), funding/OI/liquidaciones (requieren ingestión adicional, se posponen aunque figuraran P0/P1 en la Fase 2), Hurst/changepoint completos (se aproximan primero con entropía simple en la semana 13, se profundiza solo si hay algo que profundizar).</p>
+    </section>
+
+    <section id="experimentos">
+      <div class="eyebrow">§06 · Experimentos permitidos</div>
+      <h2>El filtro: ¿puede cambiar la decisión?</h2>
+      <p>Un experimento entra a la lista solo si es posible escribir <em>de antemano</em> qué resultado numérico llevaría a abandonar y cuál a continuar. Si no se puede escribir esa frase antes de correrlo, se elimina.</p>
+      <div class="grid-2">
+        <div class="card"><h4>Entran</h4><p>Experimento cero (eficiencia de mercado), tabla de supervivencia + Kaplan-Meier, estructura interna/shape, taker buy ratio direccional, modelo combinado walk-forward (AUC/Brier vs. nulo), simulación de EV económico final.</p></div>
+        <div class="card"><h4>No entran</h4><p>Patrones de velas japonesas (ya se sabe, desde v0.2, que no van a mover la aguja — no hace falta gastar una semana en redescubrirlo). Indicadores técnicos clásicos como prueba aislada (mismo argumento). Macro/on-chain (horizonte desalineado, ya descartado en v0.1-v0.2). Cualquier variante "por curiosidad" sin criterio de decisión escrito de antemano.</p></div>
+      </div>
+    </section>
+
+    <section id="modelos">
+      <div class="eyebrow">§07 · Modelos permitidos</div>
+      <h2>Tablas de frecuencia → regresión logística → LightGBM. Nada más, todavía.</h2>
+      <ul>
+        <li><strong>Tablas de frecuencia / Kaplan-Meier</strong>: riesgo de sobreajuste esencialmente nulo, máxima interpretabilidad, responden la forma más cruda posible de la pregunta.</li>
+        <li><strong>Tests estadísticos</strong>: formalizan significancia, controlan la tasa de falsos positivos con corrección por comparaciones múltiples.</li>
+        <li><strong>Regresión logística</strong>: el modelo multivariante más barato que existe, coeficientes interpretables. Regla de la escalera (v0.1 §06): si esto no supera al nulo, es muy improbable que algo más complejo lo haga — es la inversión de mayor valor por hora de las primeras 16 semanas.</li>
+        <li><strong>LightGBM, y solo LightGBM</strong>: la única concesión a no-linealidad permitida, y solo después de que la regresión logística muestre algo. Entrena en segundos con este volumen de datos, buena regularización por defecto, sin necesidad de GPU. No se prueban XGBoost/CatBoost/Random Forest en paralelo — son marginalmente redundantes entre sí y comparar tres para elegir uno es tiempo de ingeniero que no responde una pregunta nueva de mercado.</li>
+      </ul>
+      <div class="callout risk"><span class="callout-label">Explícitamente prohibido en 6 meses</span><p>LSTM, Transformer, TFT, cualquier red neuronal secuencial: infraestructura pesada, sin justificación previa de no-linealidad/efecto de secuencia que logística+LightGBM no puedan ya capturar. Se reconsideran solo si semanas 15-19 muestran evidencia específica de que la insuficiencia está en la forma funcional, no en la ausencia de señal.</p></div>
+    </section>
+
+    <section id="exito">
+      <div class="eyebrow">§08 · Métrica de éxito del proyecto</div>
+      <h2>Criterios cuantitativos, fijados antes de ver resultados</h2>
+      <div class="callout win">
+        <span class="callout-label">Continuar (tras checkpoint semana 14 o 21) si TODO lo siguiente se cumple</span>
+        <ul style="margin-bottom:0;">
+          <li>Al menos una hipótesis individual sobrevive un permutation test con p&lt;0.01 tras corrección FDR por el número total de hipótesis probadas.</li>
+          <li>El tamaño del efecto es económicamente relevante, no solo estadístico: mejora relativa de Brier Score &gt;2% sobre el modelo nulo, sostenida en ≥70% de los folds walk-forward.</li>
+          <li>El EV neto del payout real del producto Up/Down es positivo con un intervalo de confianza (bootstrap) que excluye cero.</li>
+          <li>La señal es estable en al menos 3 años/regímenes distintos — no es un artefacto de un solo periodo.</li>
+        </ul>
+      </div>
+      <div class="callout risk">
+        <span class="callout-label">Abandonar si CUALQUIERA de lo siguiente ocurre</span>
+        <ul style="margin-bottom:0;">
+          <li>Ninguna hipótesis sobrevive el permutation test corregido por FDR.</li>
+          <li>Sobrevive pero el efecto es económicamente irrelevante (mejora de Brier &lt;0.5%, o EV neto no distinguible de cero incluso en el mejor caso).</li>
+          <li>La señal es inestable entre folds/regímenes — aparece en un año y desaparece en validación.</li>
+        </ul>
+      </div>
+      <div class="callout"><span class="callout-label">Estado intermedio — no se fuerza una decisión prematura</span><p><strong>Requiere más datos</strong>: alguna hipótesis muestra p&lt;0.05 sin sobrevivir la corrección estricta, y el subconjunto relevante (p. ej. un régimen específico de volatilidad) no tiene tamaño de muestra suficiente para un test con potencia adecuada. Se documenta como abierto, se define qué dato adicional resolvería la ambigüedad, y se agenda — no se decide con datos insuficientes solo por presión de calendario.</p></div>
+    </section>
+
+    <section id="mvpsw">
+      <div class="eyebrow">§09 · MVP del software</div>
+      <h2>Seis piezas, cada una menor a 200 líneas</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Pieza</th><th>Hace</th></tr></thead>
+        <tbody>
+          <tr><td><code>lib/ingest.py</code></td><td><code>download_klines(symbol, interval, start, end) → Parquet</code>.</td></tr>
+          <tr><td><code>lib/validate.py</code></td><td><code>validate(df) → ValidationReport</code> — 3 chequeos: gaps, duplicados, consistencia OHLC.</td></tr>
+          <tr><td><code>lib/features.py</code></td><td>12 funciones puras, una por variable de §05, cada una <code>DataFrame → Series</code>.</td></tr>
+          <tr><td><code>research/00X/run.py</code></td><td>Orquesta: carga → valida → calcula features → corre el test específico → guarda.</td></tr>
+          <tr><td><code>lib/stats.py</code></td><td>Wrappers delgados sobre scipy/statsmodels/lifelines para tests que se repiten entre hipótesis (permutation test genérico, bootstrap).</td></tr>
+          <tr><td><code>lib/report.py</code></td><td>Una función <code>make_report(title, hypothesis, stats, figures) → html</code>. Sin motor de templates complejo.</td></tr>
+        </tbody>
+      </table></div>
+      <p>Sin clases abstractas, sin registro, sin framework de CLI. La interfaz completa del sistema es <code>python research/001_survival/run.py</code>.</p>
+    </section>
+
+    <section id="noconstruir">
+      <div class="eyebrow">§10 · Qué NO construir todavía</div>
+      <h2>Cada renglón, con la razón exacta por la que retrasa el aprendizaje</h2>
+      <ul>
+        <li><strong>Plugin registry / auto-discovery</strong> — resuelve un problema (descubrir 500 hipótesis) que no existe con 5. Tiempo de ingeniería que no responde ninguna pregunta de mercado.</li>
+        <li><strong>Airflow / Prefect / Dagster</strong> — orquestan un pipeline que, en 6 meses, un humano ejecuta a mano una vez por semana. El scheduler es el propio investigador.</li>
+        <li><strong>Redis</strong> — no hay streaming en tiempo real que lo justifique en este horizonte.</li>
+        <li><strong>Kubernetes / arquitectura distribuida</strong> — el dataset completo cabe en RAM de una laptop (Fase 2 §14.4). El cuello de botella es entender el mercado, no escalar cómputo.</li>
+        <li><strong>Dashboards</strong> — resuelven "¿cómo va todo, en vivo?"; un <code>board.md</code> actualizado una vez por semana (§14) cumple la misma función a coste cero.</li>
+        <li><strong>APIs / interfaces web</strong> — no hay un segundo usuario en 6 meses. Construir una API es diseñar para alguien que no existe todavía.</li>
+        <li><strong>Optimización prematura</strong> (caching sofisticado, paralelización, GPU) — el cómputo completo toma minutos; cada hora aquí es una hora no dedicada a una hipótesis.</li>
+        <li><strong>Versionado exhaustivo de 4 hashes</strong> — se sustituye por git commit + copia de config (§11), suficiente hasta que haya algo valioso que proteger de irreproducibilidad.</li>
+        <li><strong>Multi-modelo (7 librerías)</strong> — ver §07; fragmenta esfuerzo comparando alternativas que rendirán de forma similar.</li>
+        <li><strong>Documentación automática</strong> — el <code>research/</code> folder y su README ES la documentación.</li>
+        <li><strong>Testing de 4 capas</strong> — solo unitarios de las funciones de cálculo más fáciles de equivocar silenciosamente; nada de regression suite hasta que haya resultados que valga la pena proteger.</li>
+        <li><strong>Meta-labeling arquitectónico</strong> — es una función condicional cuando exista un modelo primario con señal, no un módulo de antemano.</li>
+      </ul>
+    </section>
+
+    <section id="irreversibles">
+      <div class="eyebrow">§11 · Decisiones irreversibles</div>
+      <h2>Una decisión es irreversible si cambiarla exige reprocesar histórico o invalida resultados ya obtenidos</h2>
+      <div class="grid-2">
+        <div class="card"><h4>Decidir bien desde el día 1</h4><p><strong>Formato de almacenamiento (Parquet)</strong> — cambiarlo después obliga a reprocesar todo el histórico acumulado. <strong>Representación temporal</strong> (UTC, ancla en el cierre de vela, no en la apertura) — un error de convención descubierto tarde invalida silenciosamente todos los experimentos hechos hasta ese punto. <strong>Esquema mínimo del grano</strong> (vela de 5m + sub-barras de 1m) — cambiar el grano después de 20 hipótesis construidas sobre él es empezar de nuevo. <strong>Definición del target y el feed de precio</strong> (spot/perp/feed real del bróker) — cambiarlo invalida cualquier cálculo de EV ya hecho.</p></div>
+        <div class="card"><h4>Se puede decidir después, sin miedo</h4><p>Organización interna de <code>lib/</code> (nombres de archivo). Motor de gráficas (matplotlib vs. plotly) — cosmético. Reporte como template HTML o notebook exportado — no afecta ningún resultado científico. Versionado más allá de git básico (DVC/hashing) — se añade después sin reprocesar nada, siempre que Parquet ya esté bien fijado. Sistema de logging. CLI vs. scripts directos.</p></div>
+      </div>
+    </section>
+
+    <section id="riesgos">
+      <div class="eyebrow">§12 · Riesgos del proyecto — sin cortesías</div>
+      <h2>Por qué esta investigación podría fracasar</h2>
+      <ul>
+        <li><strong>El riesgo dominante es que simplemente no hay edge.</strong> BTC/USDT en Binance a 5 minutos es uno de los mercados más arbitrados de todo el cripto: miles de bots, market makers profesionales, el propio exchange con incentivos de estabilidad. El prior razonable de encontrar un edge grande y persistente es bajo — esto no es un riesgo de ejecución, es un riesgo de la pregunta misma. Hay que estar dispuestos a que la respuesta correcta sea "no".</li>
+        <li><strong>Un p-valor significativo no es un edge operable.</strong> El umbral relevante es económico (EV neto de p*), no estadístico — un efecto real pero minúsculo puede no sobrevivir comisiones y spread del producto Up/Down real.</li>
+        <li><strong>Sesgo de selección y supervivencia de resultados.</strong> Con 5+ hipótesis y docenas de features, encontrar "algo" por puro azar es probable sin corrección por comparaciones múltiples. Reportar solo lo que "funcionó" es el sesgo más peligroso porque es invisible para el propio investigador — mitigación: este documento es el pre-registro; toda hipótesis probada se reporta, funcione o no.</li>
+        <li><strong>P-hacking por iteración, agravado por ser un equipo de una persona.</strong> Ajustar umbrales o ventanas hasta que "funcione" después de ver resultados es indistinguible, en la práctica, de inventar el hallazgo — y nadie más audita las decisiones de ajuste en un equipo de uno.</li>
+        <li><strong>No estacionariedad.</strong> BTC 2020-21 no es BTC 2023-24; seis meses de calendario pueden no cubrir régimen suficiente para distinguir edge real de artefacto de un periodo particular.</li>
+        <li><strong>Calidad de datos silenciosa.</strong> Un error en la reconstrucción de sub-barras de 1m o una convención de timestamp ligeramente incorrecta puede generar una señal falsa que en realidad es leakage — el bug más peligroso es el que hace que los resultados se vean demasiado buenos.</li>
+        <li><strong>Fatiga de rigor.</strong> Con presión de tiempo, existe riesgo conductual real de relajar la disciplina a mitad de camino ("no corrijo por comparaciones múltiples esta vez", "me salto el permutation test porque ya se ve claro"). Este documento lo trata como regla dura, no como sugerencia.</li>
+        <li><strong>Riesgo de que las reglas del producto cambien.</strong> El punto de equilibrio p* del bróker Up/Down puede moverse (comisión, payout) de forma que invalide un análisis de EV que era correcto cuando se hizo.</li>
+      </ul>
+    </section>
+
+    <section id="experimento1">
+      <div class="eyebrow">§13 · El experimento más importante</div>
+      <h2>Si solo hubiera un mes: supervivencia del color</h2>
+      <p>Es el que ya señalaban v0.2 y v0.3 como la línea de mayor valor esperado por unidad de esfuerzo, y el único que puede redefinir el problema de negocio (cuándo apostar dentro de la vela, no solo en qué dirección).</p>
+      <h3>Datos</h3>
+      <p>Histórico completo disponible, mínimo 2-3 años, klines de 1m del feed real del producto (spot/perp según lo fijado en §11), reconstruyendo cada vela de 5m como 5 sub-barras.</p>
+      <h3>Qué se calcula</h3>
+      <p>Para cada vela histórica, el lado del open en cada marca T∈{30,60,...,270}s, y si coincidió con el color final. De ahí: (a) tabla de frecuencia P(cierra en el mismo lado | lado en T) por cada T; (b) curvas de Kaplan-Meier del tiempo hasta que el color se fija, estratificadas por tercil de ATR; (c) modelo de Cox, solo si (a) y (b) ya muestran algo.</p>
+      <h3>Gráficos</h3>
+      <ul>
+        <li>P(cierra verde | verde en T) vs. T, con banda de confianza de Wilson.</li>
+        <li>Curvas Kaplan-Meier por tercil de volatilidad, superpuestas.</li>
+        <li>Histograma de <code>time_to_color_lock_sec</code>.</li>
+        <li>Heatmap T × régimen de volatilidad → probabilidad de supervivencia.</li>
+      </ul>
+      <h3>Estadísticos</h3>
+      <p>Diferencia entre P(verde|verde en T) y la frecuencia base incondicional, con IC de Wilson por T; log-rank test entre curvas KM de distintos regímenes; permutation test barajando la asignación de "lado en T" preservando estructura temporal; tamaño de muestra efectivo por T (los T cercanos al cierre tienen menos observaciones aún "indecisas").</p>
+      <div class="callout risk">
+        <span class="callout-label">El punto más sutil, y el más importante de todo el documento</span>
+        <p>Incluso un mercado puramente aleatorio (random walk sin ninguna estructura) produce una curva de "supervivencia" ascendente con T — simplemente porque queda menos tiempo para que algo cambie. <strong>El benchmark correcto no es 50% plano: es la curva que produciría un movimiento browniano puro con la misma volatilidad histórica, simulada explícitamente.</strong> Cualquier resultado positivo debe compararse contra ese benchmark simulado antes de interpretarse como información real, no contra una línea recta ingenua.</p>
+      </div>
+      <h3>Decisión según resultado</h3>
+      <ul>
+        <li><strong>P(verde|verde en T=240s) sustancialmente por encima del benchmark de random walk</strong> (no de 50%), con IC estrecho y significativo tras permutation test → señal fuerte, continuar con fuerza hacia <code>002_shape</code> y <code>003_microstructure</code>.</li>
+        <li><strong>Por encima del benchmark pero con margen modesto</strong> → evidencia débil; extender histórico y revisar si el efecto se concentra en algún régimen antes de decidir.</li>
+        <li><strong>Indistinguible del benchmark de random walk para todo T</strong> → evidencia fuerte para abandonar esta línea específica (no necesariamente el proyecto completo, hasta agotar 002 y 003).</li>
+      </ul>
+    </section>
+
+    <section id="tablero">
+      <div class="eyebrow">§14 · El tablero de decisión</div>
+      <h2>Cuatro estados, actualizado cada semana</h2>
+      <p>Vive como <code>board.md</code> en la raíz del repo, regenerado desde los <code>summary.json</code> de cada carpeta de <code>research/</code> — nunca editado a mano, para que no se desactualice ni se "maquille".</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Hipótesis</th><th>Estado</th><th>Evidencia clave</th><th>Próximo paso</th></tr></thead>
+        <tbody>
+          <tr><td>001_survival</td><td><span class="pill--state pill--moredata">Pendiente</span></td><td>—</td><td>Semanas 4-5</td></tr>
+          <tr><td>002_shape</td><td><span class="pill--state pill--moredata">Pendiente</span></td><td>—</td><td>Semanas 6-7</td></tr>
+          <tr><td>003_microstructure</td><td><span class="pill--state pill--moredata">Pendiente</span></td><td>—</td><td>Semanas 9-10</td></tr>
+          <tr><td>004_orderflow</td><td><span class="pill--state pill--moredata">Pendiente</span></td><td>—</td><td>Semanas 11-12</td></tr>
+          <tr><td>005_entropy</td><td><span class="pill--state pill--moredata">Pendiente</span></td><td>—</td><td>Semana 13</td></tr>
+        </tbody>
+      </table></div>
+      <div class="grid-2" style="margin-top:8px;">
+        <div class="card"><h4><span class="pill--state pill--confirmed">Confirmada</span></h4><p>Sobrevive permutation test con FDR (p&lt;0.01), efecto económicamente relevante, estable en ≥3 regímenes/años.</p></div>
+        <div class="card"><h4><span class="pill--state pill--weak">Evidencia débil</span></h4><p>p&lt;0.05 sin sobrevivir corrección estricta, o efecto pequeño, o inestable entre regímenes.</p></div>
+        <div class="card"><h4><span class="pill--state pill--moredata">Requiere más datos</span></h4><p>Muestra insuficiente en el subconjunto relevante para potencia estadística adecuada.</p></div>
+        <div class="card"><h4><span class="pill--state pill--rejected">Rechazada</span></h4><p>No sobrevive ni el test más permisivo; cae dentro de la distribución nula del permutation test.</p></div>
+      </div>
+      <p>En cualquier momento, leer <code>board.md</code> responde "¿cuánto hemos aprendido?" sin releer un solo reporte completo — es el cumplimiento literal de la regla más importante del documento (§04, §16).</p>
+    </section>
+
+    <section id="postmortem">
+      <div class="eyebrow">§15 · Postmortem — pregunta final</div>
+      <h2>Seis meses después: el proyecto fracasó. ¿Por qué?</h2>
+      <div class="postmortem">
+        <p><strong>Qué pasó.</strong> Ninguna de las cinco hipótesis centrales sobrevivió corrección por comparaciones múltiples con un tamaño de efecto económicamente relevante. La curva de supervivencia del color —la apuesta de mayor prioridad de todo el programa— resultó, una vez comparada contra el benchmark correcto de random walk simulado con la misma volatilidad (no contra 50% plano), indistinguible de lo que produce un movimiento browniano puro. La "señal" que entusiasmó al equipo en las primeras semanas era exactamente el artefacto mecánico que este mismo documento advertía en §13, y en el optimismo inicial se le dio más crédito del que merecía antes de construir el benchmark correcto.</p>
+        <p><strong>Qué señales ignoramos.</strong> El experimento cero (semana 2) ya daba una pista: ninguno de los tres tests de eficiencia rechazó la hipótesis de martingala con robustez, y se trató como un trámite protocolario en vez de como una actualización bayesiana fuerte hacia "esto va a ser difícil". La señal de order flow imbalance (semanas 11-12) mostraba un patrón real pero minúsculo — al pasarlo por la simulación de EV neto del payout real, el resultado ya era negativo en la semana 12, y aun así se dedicaron tres semanas más a "afinar" el modelo buscando que el número cambiara de signo: exactamente el patrón de p-hacking que §12 advertía evitar. Más de una vez el investigador notó que estaba comparando resultados después de ver datos de test, ajustando un umbral "solo un poco", sin documentarlo como lo que era: una violación de la disciplina de validación temporal que el propio proyecto se había impuesto.</p>
+        <p><strong>Qué haríamos distinto.</strong> Fijar el benchmark de random walk desde el diseño del experimento de supervivencia, no como corrección posterior a un resultado que ya emocionó a alguien. Dar al experimento cero de la semana 2 autoridad real para bajar el nivel de inversión del resto del programa, no tratarlo como paso protocolario. Congelar un lockbox técnico desde el día 1 (últimos 3 meses del histórico, con una barrera de código que niegue el acceso, no solo una promesa) — la disciplina que se sabía necesaria pero nunca se convirtió en un candado real terminó cediendo bajo presión de calendario. Y, sobre todo: aceptar desde el principio que "no hay edge" era el resultado más probable, y diseñar el proyecto genuinamente para intentar refutar esa corazonada lo más rápido posible — no para perseguir un número hasta que se volviera positivo.</p>
+      </div>
+    </section>
+
+    <section id="cierre">
+      <div class="eyebrow">§16 · Cierre</div>
+      <h2>La regla que gobierna todo lo anterior</h2>
+      <p>Cada semana de este roadmap termina con una pregunta científica respondida, registrada en <code>board.md</code>, con un veredicto entre cuatro estados. Ninguna semana existe solo para escribir infraestructura — la infraestructura de cada semana es exactamente la mínima necesaria para responder su pregunta, ni una línea más. Si en algún punto una decisión mejora la arquitectura pero no acelera una respuesta sobre el mercado, la decisión correcta, bajo este documento, es no tomarla.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>MVP científico · Fase 4 · Un ingeniero, seis meses · Optimiza para velocidad de aprendizaje, no para elegancia de software.</footer>
