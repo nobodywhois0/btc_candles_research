@@ -1,0 +1,758 @@
+<title>Predicción probabilística de la vela de 5 minutos — Diseño de investigación</title>
+<style>
+  :root{
+    --paper:#EEF0EC;
+    --paper-raised:#F7F8F5;
+    --ink:#14171A;
+    --ink-muted:#4B5259;
+    --ink-faint:#767D80;
+    --line:#D3D7D0;
+    --line-strong:#B7BCB4;
+    --accent:#B5792A;
+    --accent-ink:#7E5218;
+    --accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;
+    --green-wash:rgba(47,122,79,0.10);
+    --red:#B33A3A;
+    --red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{
+      --paper:#14161A;
+      --paper-raised:#1B1E23;
+      --ink:#E9E7DF;
+      --ink-muted:#A8AEA8;
+      --ink-faint:#767D78;
+      --line:#31352F;
+      --line-strong:#454A42;
+      --accent:#D9A354;
+      --accent-ink:#E9BE84;
+      --accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;
+      --green-wash:rgba(92,174,126,0.13);
+      --red:#D2726A;
+      --red-wash:rgba(210,114,106,0.12);
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#14161A;
+    --paper-raised:#1B1E23;
+    --ink:#E9E7DF;
+    --ink-muted:#A8AEA8;
+    --ink-faint:#767D78;
+    --line:#31352F;
+    --line-strong:#454A42;
+    --accent:#D9A354;
+    --accent-ink:#E9BE84;
+    --accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;
+    --green-wash:rgba(92,174,126,0.13);
+    --red:#D2726A;
+    --red-wash:rgba(210,114,106,0.12);
+  }
+  :root[data-theme="light"]{
+    --paper:#EEF0EC;
+    --paper-raised:#F7F8F5;
+    --ink:#14171A;
+    --ink-muted:#4B5259;
+    --ink-faint:#767D80;
+    --line:#D3D7D0;
+    --line-strong:#B7BCB4;
+    --accent:#B5792A;
+    --accent-ink:#7E5218;
+    --accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;
+    --green-wash:rgba(47,122,79,0.10);
+    --red:#B33A3A;
+    --red-wash:rgba(179,58,58,0.09);
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:var(--font-body);
+    font-size:16.5px;
+    line-height:1.62;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible, button:focus-visible, summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{
+    border-bottom:1px solid var(--line-strong);
+    padding:56px 32px 40px;
+  }
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{
+    font-family:var(--font-mono);
+    font-size:11.5px;
+    letter-spacing:.09em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+    display:flex;
+    gap:18px;
+    flex-wrap:wrap;
+    margin-bottom:22px;
+  }
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(30px,4.4vw,46px);
+    line-height:1.12;
+    letter-spacing:-.01em;
+    margin:0 0 14px;
+    text-wrap:balance;
+    max-width:16ch;
+  }
+  .doc-subtitle{
+    font-size:18px;
+    color:var(--ink-muted);
+    max-width:62ch;
+    margin:0 0 26px;
+    text-wrap:pretty;
+  }
+  .meta-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:28px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--ink-faint);
+    border-top:1px solid var(--line);
+    padding-top:18px;
+  }
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{
+    max-width:1120px;
+    margin:0 auto;
+    padding:0 32px 120px;
+    display:grid;
+    grid-template-columns:236px minmax(0,1fr);
+    gap:56px;
+    align-items:start;
+  }
+  nav.toc{
+    position:sticky;
+    top:32px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    line-height:1.9;
+    padding-top:44px;
+    max-height:calc(100vh - 64px);
+    overflow-y:auto;
+  }
+  nav.toc a{
+    display:block;
+    color:var(--ink-muted);
+    text-decoration:none;
+    padding:2px 0 2px 12px;
+    border-left:2px solid transparent;
+  }
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+  nav.toc .toc-group{margin-bottom:14px;}
+  nav.toc .toc-head{
+    color:var(--ink-faint);
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    font-size:10.5px;
+    padding-left:12px;
+    margin-bottom:2px;
+  }
+
+  main{min-width:0;padding-top:44px;}
+
+  section{padding:56px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:12px;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--accent-ink);
+    margin-bottom:10px;
+  }
+  h2{
+    font-family:var(--font-display);
+    font-size:clamp(24px,3vw,30px);
+    font-weight:700;
+    letter-spacing:-.005em;
+    margin:0 0 20px;
+    text-wrap:balance;
+    max-width:28ch;
+  }
+  h3{
+    font-family:var(--font-display);
+    font-size:20px;
+    font-weight:700;
+    margin:34px 0 12px;
+  }
+  h4{
+    font-family:var(--font-body);
+    font-size:15.5px;
+    font-weight:700;
+    font-style:italic;
+    margin:22px 0 8px;
+    color:var(--ink);
+  }
+  p{margin:0 0 15px;max-width:68ch;}
+  p.lead{font-size:18px;color:var(--ink-muted);max-width:60ch;}
+  ul,ol{margin:0 0 16px;padding-left:22px;max-width:66ch;}
+  li{margin-bottom:6px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code, .mono{font-family:var(--font-mono);font-size:.89em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .38em;border-radius:4px;}
+
+  .callout{
+    border-left:3px solid var(--accent);
+    background:var(--accent-wash);
+    padding:16px 20px;
+    border-radius:2px;
+    margin:20px 0;
+    max-width:66ch;
+  }
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{
+    font-family:var(--font-mono);
+    font-size:11px;
+    text-transform:uppercase;
+    letter-spacing:.07em;
+    color:var(--accent-ink);
+    margin-bottom:6px;
+    display:block;
+  }
+  .callout.risk{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.risk .callout-label{color:var(--red);}
+  .callout.stop{border-left-color:var(--red);background:var(--red-wash);}
+  .callout.stop .callout-label{color:var(--red);}
+
+  .table-wrap{overflow-x:auto;margin:18px 0 26px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:14.5px;}
+  thead th{
+    text-align:left;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.06em;
+    text-transform:uppercase;
+    color:var(--ink-faint);
+    background:var(--paper-raised);
+    padding:10px 14px;
+    border-bottom:1px solid var(--line-strong);
+    white-space:nowrap;
+  }
+  tbody td{
+    padding:11px 14px;
+    border-bottom:1px solid var(--line);
+    vertical-align:top;
+    color:var(--ink-muted);
+  }
+  tbody td:first-child{color:var(--ink);font-weight:600;}
+  tbody tr:last-child td{border-bottom:none;}
+  td.num, th.num{font-variant-numeric:tabular-nums;text-align:right;}
+
+  .pill{
+    font-family:var(--font-mono);
+    font-size:10.5px;
+    text-transform:uppercase;
+    letter-spacing:.05em;
+    padding:2px 9px;
+    border-radius:20px;
+    border:1px solid var(--line-strong);
+    white-space:nowrap;
+    display:inline-block;
+  }
+  .pill--high{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);}
+  .pill--med{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--low{color:var(--ink-faint);border-color:var(--line);}
+
+  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:1px;}
+  .dot.g{background:var(--green);}
+  .dot.r{background:var(--red);}
+  .seq{font-family:var(--font-mono);font-size:13px;color:var(--ink-muted);}
+
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin:20px 0;}
+  .card{border:1px solid var(--line);border-radius:8px;padding:18px 20px;background:var(--paper-raised);}
+  .card h4{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14.5px;}
+
+  .kicker-list{list-style:none;padding-left:0;margin:20px 0;}
+  .kicker-list li{
+    padding-left:0;
+    border-top:1px solid var(--line);
+    padding:14px 0;
+    display:grid;
+    grid-template-columns:120px 1fr;
+    gap:18px;
+    max-width:none;
+  }
+  .kicker-list li:first-child{border-top:none;}
+  .kicker-list .kicker{font-family:var(--font-mono);font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.04em;}
+
+  footer{
+    max-width:1120px;margin:0 auto;padding:40px 32px 80px;
+    font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);
+    border-top:1px solid var(--line);
+  }
+
+  details.toc-mobile{display:none;}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{
+      display:block;
+      margin:28px 32px 0;
+      border:1px solid var(--line);
+      border-radius:8px;
+      padding:14px 18px;
+      font-family:var(--font-mono);
+      font-size:12.5px;
+    }
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+    .grid-2{grid-template-columns:1fr;}
+    .kicker-list li{grid-template-columns:1fr;gap:4px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow">
+      <span>Nota de investigación</span> · <span>Quant Research</span> · <span>Fase 1 — Diseño experimental</span>
+    </div>
+    <h1 class="doc-title">¿Existe un edge estadístico en el color de la próxima vela de 5&nbsp;minutos de BTC/USDT?</h1>
+    <p class="doc-subtitle">Documento de diseño de investigación previo a cualquier implementación. Define hipótesis, riesgos, metodología de validación y criterios de decisión antes de tocar una sola línea de código de modelado.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fecha</dt><dd>2026-07-07</dd></div>
+      <div class="meta-item"><dt>Versión</dt><dd>v0.1 — pre-registro</dd></div>
+      <div class="meta-item"><dt>Universo</dt><dd>BTC/USDT, Binance</dd></div>
+      <div class="meta-item"><dt>Horizonte</dt><dd>Vela de 5m, cierre binario</dd></div>
+      <div class="meta-item"><dt>Estado</dt><dd>Sin código ejecutado</dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice del documento</summary>
+  <nav>
+    <a href="#resumen">00 · Resumen ejecutivo</a>
+    <a href="#critica">01 · Crítica y reformulación</a>
+    <a href="#riesgos">02 · Riesgos y sesgos</a>
+    <a href="#formalizacion">03 · Formalización</a>
+    <a href="#pipeline">04 · Pipeline de investigación</a>
+    <a href="#hipotesis">05 · Hipótesis detalladas</a>
+    <a href="#modelos">06 · Escalera de modelos</a>
+    <a href="#calibracion">07 · Calibración</a>
+    <a href="#validacion">08 · Validación temporal</a>
+    <a href="#metricas">09 · Métricas</a>
+    <a href="#robustez">10 · Robustez</a>
+    <a href="#importancia">11 · Importancia de variables</a>
+    <a href="#datos-externos">12 · Datos externos</a>
+    <a href="#creativos">13 · Experimentos originales</a>
+    <a href="#ranking">14 · Ranking de hipótesis</a>
+    <a href="#abandono">15 · Criterios de abandono</a>
+    <a href="#overfitting">16 · Anti-overfitting</a>
+    <a href="#roadmap">17 · Hoja de ruta</a>
+    <a href="#conclusion">18 · Conclusión</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <div class="toc-group">
+      <div class="toc-head">Marco</div>
+      <a href="#resumen">00 Resumen ejecutivo</a>
+      <a href="#critica">01 Crítica y reformulación</a>
+      <a href="#riesgos">02 Riesgos y sesgos</a>
+      <a href="#formalizacion">03 Formalización</a>
+      <a href="#pipeline">04 Pipeline</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-head">Ciencia</div>
+      <a href="#hipotesis">05 Hipótesis</a>
+      <a href="#modelos">06 Modelos</a>
+      <a href="#calibracion">07 Calibración</a>
+      <a href="#validacion">08 Validación</a>
+      <a href="#metricas">09 Métricas</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-head">Rigor</div>
+      <a href="#robustez">10 Robustez</a>
+      <a href="#importancia">11 Importancia var.</a>
+      <a href="#datos-externos">12 Datos externos</a>
+      <a href="#creativos">13 Experimentos propios</a>
+    </div>
+    <div class="toc-group">
+      <div class="toc-head">Decisión</div>
+      <a href="#ranking">14 Ranking</a>
+      <a href="#abandono">15 Criterios de stop</a>
+      <a href="#overfitting">16 Anti-overfitting</a>
+      <a href="#roadmap">17 Hoja de ruta</a>
+      <a href="#conclusion">18 Conclusión</a>
+    </div>
+  </nav>
+
+  <main>
+
+    <section id="resumen">
+      <div class="eyebrow">§00 · Resumen ejecutivo</div>
+      <h2>No se asume edge. Se diseña para encontrarlo o refutarlo.</h2>
+      <p class="lead">Este documento fija el diseño experimental completo antes de escribir modelos. El resultado válido de esta investigación puede ser "no existe ventaja explotable neta de costes" — y ese resultado se trata con el mismo rigor que un hallazgo positivo.</p>
+      <p>Tres decisiones estructurales se toman ya en esta fase, antes de cualquier experimento: (1) se cuestiona si "clasificar el color de la vela" es la formulación correcta del problema — no lo es, del todo, y se proponen alternativas en <a href="#critica">§01</a>; (2) se fija un protocolo de validación puramente temporal con purga y embargo, sin excepciones, para toda hipótesis futura; (3) se establece un test de eficiencia de mercado como <strong>experimento cero</strong>, antes de construir ningún feature — es la forma más barata de falsificar la premisa completa.</p>
+      <p>La investigación está organizada en 14 familias de hipótesis, una escalera de 12 modelos de complejidad creciente, y un conjunto de criterios explícitos de abandono y anti-overfitting, porque con cientos de features y docenas de hipótesis el riesgo dominante no es no encontrar señal — es encontrar señales falsas por pura combinatoria (data snooping).</p>
+    </section>
+
+    <section id="critica">
+      <div class="eyebrow">§01 · Crítica al planteamiento inicial</div>
+      <h2>Cuestionando el supuesto principal</h2>
+      <p>El enunciado original —estimar <code>P(vela<sub>t+1</sub> = verde | F<sub>t</sub>)</code>— es razonable como punto de partida, pero como formulación única tiene tres debilidades que conviene resolver antes de modelar, no después.</p>
+
+      <h3>Debilidad 1 — el umbral en cero descarta casi toda la información</h3>
+      <p>Una vela que cierra <code>+0.001%</code> se etiqueta idéntica a una que cierra <code>+2%</code>. En 5 minutos, una fracción importante de las velas de BTC cierra a menos de unos pocos puntos básicos del open — el signo de esas velas es esencialmente <strong>ruido de microestructura</strong> (última orden ejecutada, redondeo, timing del cierre de vela), no señal direccional. Etiquetar esas observaciones igual que un movimiento claro añade ruido al target que ningún modelo puede recuperar.</p>
+
+      <h3>Debilidad 2 — el objetivo económico real no es "verde vs. rojo"</h3>
+      <p>Los productos Up/Down suelen pagar menos que 2x el stake (house edge, similar a una opción binaria). Si el payout implica una probabilidad de equilibrio <code>p*</code> distinta de 0.5 (por ejemplo, si un acierto paga 1.85x, <code>p* ≈ 0.541</code>), entonces el objetivo correcto no es "vencer al 50%" sino <strong>vencer a <code>p*</code> de forma calibrada y sostenida</strong>. Esta investigación debe tratar <code>p*</code> como parámetro explícito, no implícito.</p>
+
+      <h3>Debilidad 3 — un horizonte de reloj fijo es arbitrario frente a la llegada de información</h3>
+      <p>La información (noticias, liquidaciones, flujo de órdenes grande) no llega en múltiplos exactos de 5 minutos. Forzar una predicción sobre <em>cada</em> vela, incluidas las que ocurren en ausencia total de información nueva, diluye cualquier señal real que exista solo en un subconjunto de velas "informativas".</p>
+
+      <div class="callout note">
+        <span class="callout-label">Reformulaciones propuestas</span>
+        <p><strong>(a) Modelo de distribución, no de clase.</strong> Estimar <code>μ̂</code> y <code>σ̂</code> del retorno del siguiente periodo (vía regresión / modelo de volatilidad condicional) y derivar <code>P(r &gt; 0) = 1 − Φ(0; μ̂, σ̂)</code> analíticamente. Usa la magnitud del retorno durante el entrenamiento en vez de colapsarla a un bit, lo cual típicamente mejora la eficiencia estadística del estimador de probabilidad.</p>
+        <p><strong>(b) Meta-labeling (López de Prado).</strong> Separar "¿debo predecir esta vela?" de "¿en qué dirección?". Un primer modelo estima si el momento actual pertenece al subconjunto de velas con información direccional suficiente (confianza/edge por encima de un umbral); solo sobre ese subconjunto se evalúa la dirección. Evita forzar apuestas en el régimen de "no hay nada que predecir".</p>
+        <p><strong>(c) Etiquetado por barrera triple (variable-horizon).</strong> Útil como herramienta exploratoria de descubrimiento de señal (no como producto final, dado que el Up/Down es de horizonte fijo): etiquetar según qué barrera se toca primero (superior, inferior, tiempo). Revela si el edge existe pero a un horizonte distinto de 5 minutos exactos.</p>
+        <p><strong>(d) Etiqueta ajustada por coste/payout.</strong> Redefinir "verde" como <code>r<sub>t+1</sub> &gt; c</code>, donde <code>c</code> incorpora spread, comisión y el punto de equilibrio <code>p*</code> del producto Up/Down específico — alinea el target con lo realmente monetizable, no con un cero matemático arbitrario.</p>
+        <p><strong>(e) Pronóstico distribucional completo.</strong> En vez de un clasificador binario, usar quantile regression / distributional forecasting para obtener toda la distribución predictiva de <code>r<sub>t+1</sub></code>, de la cual <code>P(verde)</code>, EV y cualquier funcional futuro se derivan sin re-entrenar.</p>
+      </div>
+
+      <p><strong>Consideración operativa crítica, no opcional:</strong> antes de fase de datos hay que fijar exactamente qué feed de precio liquida el producto Up/Down objetivo (spot BTCUSDT, perpetuo, o un índice propio del bróker). Entrenar sobre un feed y operar sobre otro introduce un sesgo sistemático de basis que ninguna validación estadística detecta a menos que se pruebe explícitamente.</p>
+
+      <div class="callout">
+        <span class="callout-label">Experimento cero, antes que cualquier feature</span>
+        <p>Probar la hipótesis nula de que la serie de colores es una <em>martingale difference sequence</em> (mercado eficiente al horizonte de 5 min): test de rachas (runs test), variance ratio test (Lo–MacKinlay) y test BDS para dependencia no lineal. Si ninguno rechaza H0 con corrección por múltiples comparaciones, es la señal más barata posible de que el resto del programa enfrenta un prior muy desfavorable — no cancela la investigación, pero recalibra las expectativas antes de invertir semanas en features.</p>
+      </div>
+    </section>
+
+    <section id="riesgos">
+      <div class="eyebrow">§02 · Riesgos metodológicos</div>
+      <h2>Dónde se rompe habitualmente este tipo de estudio</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Riesgo</th><th>Cómo aparece aquí específicamente</th><th>Mitigación</th></tr></thead>
+          <tbody>
+            <tr><td>Look-ahead / repintado</td><td>Indicadores calculados con la vela aún abierta; features de timeframe superior construidos con una vela de 15m/1h todavía no cerrada al momento de decisión.</td><td>Todo feature usa únicamente velas con <code>close_time &lt; t_decision</code>. Alinear MTF por timestamp de cierre real, no por índice de fila.</td></tr>
+            <tr><td>Data snooping / test múltiple</td><td>14 familias de hipótesis × docenas de features × varios modelos = cientos de pruebas implícitas; alta probabilidad de falsos positivos "significativos" por azar.</td><td>Pre-registro de hipótesis (este documento), corrección FDR (Benjamini–Hochberg), Deflated Sharpe Ratio al reportar cualquier métrica de performance.</td></tr>
+            <tr><td>No-estacionariedad / cambio de régimen</td><td>BTC 2020–21 (alcista, baja liquidez institucional) ≠ 2022 (bajista, deleveraging) ≠ 2023–24 (ETF, distinta microestructura).</td><td>Validación por régimen y por año (§10); modelos re-evaluados en ventana expansiva y rodante para medir sensibilidad temporal.</td></tr>
+            <tr><td>Costes de transacción ignorados</td><td>Un edge de 51.5% de accuracy puede ser negativo en EV neto si el payout del producto Up/Down implica <code>p* &gt; 51.5%</code>.</td><td>Toda métrica de performance final se reporta en EV neto de <code>p*</code> del producto, no en accuracy bruta.</td></tr>
+            <tr><td>Calidad de datos</td><td>Mantenimientos de Binance, velas sintéticas/gaps, cambios de reglas de tick size, posible reindexado de símbolos.</td><td>Capa de validación de datos como Fase 0 explícita (§04) antes de cualquier modelado.</td></tr>
+            <tr><td>Errores estándar mal calculados</td><td>Observaciones a 5 min están fuertemente autocorrelacionadas; tests de significancia "ingenuos" (i.i.d.) subestiman el error estándar y sobreestiman la significancia.</td><td>Newey–West (HAC) para inferencia, bootstrap por bloques que respeta la autocorrelación, nunca bootstrap i.i.d. sobre barras.</td></tr>
+            <tr><td>Desbalance sutil de clase</td><td>El drift positivo histórico de BTC hace que "verde" sea marginalmente más frecuente que 50% incluso sin ninguna señal — un modelo puede parecer &gt;50% de accuracy prediciendo siempre verde.</td><td>Baseline obligatorio: modelo nulo = frecuencia histórica incondicional (§06, rung 0). Toda mejora se mide contra ese baseline, no contra 50% teórico.</td></tr>
+            <tr><td>Reflexividad</td><td>Si un edge fuese públicamente explotable y de tamaño suficiente, el arbitraje tendería a comprimirlo — coherente con por qué edges persistentes y grandes a 5 min son a priori poco probables.</td><td>Tratar cualquier hallazgo positivo con escepticismo proporcional a su tamaño; un edge "demasiado bueno" es más probablemente una fuga de datos que un descubrimiento.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="formalizacion">
+      <div class="eyebrow">§03 · Formalización</div>
+      <h2>Definiciones precisas</h2>
+      <p>Vela 5m: <code>c_t = (o_t, h_t, l_t, cl_t, v_t)</code>, timestamps en UTC, alineadas al <code>close_time</code> reportado por Binance (no al <code>open_time</code>, para evitar ambigüedad de a qué instante corresponde la información "disponible").</p>
+      <p>Target base: <code>y_t = 1{cl_t &gt; o_t}</code>. Target ajustado por coste (preferido, ver §01): <code>y_t^c = 1{(cl_t − o_t)/o_t &gt; c}</code>, con <code>c</code> derivado del punto de equilibrio del producto Up/Down concreto.</p>
+      <p>Filtración lícita: <code>F_{t^-}</code> = toda información con timestamp estrictamente anterior al cierre de la vela <code>t</code> (o al instante de decisión, si el producto permite entrada tardía dentro de la vela — asunción operativa que debe fijarse explícitamente y documentarse).</p>
+      <p>Objetivo formal: hallar <code>p̂(F_{t^-})</code> tal que, entre todos los instantes donde <code>p̂ ≈ p</code>, la frecuencia empírica de <code>y_t=1</code> converja a <code>p</code> (calibración), y que <code>p̂</code> discrimine mejor que el modelo nulo de forma estadísticamente significativa tras corrección por comparaciones múltiples.</p>
+    </section>
+
+    <section id="pipeline">
+      <div class="eyebrow">§04 · Pipeline de investigación</div>
+      <h2>Fases, en orden estricto</h2>
+      <ol class="kicker-list">
+        <li><span class="kicker">Fase 0</span><div><strong>Datos y validación de calidad.</strong> Adquisición de velas 1m–4h de Binance, detección de gaps/mantenimientos, verificación de continuidad de timestamps, decisión spot vs. perpetuo, alineación con el feed real del producto Up/Down objetivo.</div></li>
+        <li><span class="kicker">Fase 0.5</span><div><strong>Test de eficiencia de mercado (experimento cero).</strong> Runs test, variance ratio test, BDS test sobre la serie de signos. Gate: si no hay ninguna desviación de martingala detectable, se documenta y se continúa con expectativas recalibradas, no se cancela el programa.</div></li>
+        <li><span class="kicker">Fase 1</span><div><strong>EDA univariante.</strong> Distribución de retornos, autocorrelación de signos y magnitudes (§05.13), persistencia orden 1–2 (§05.1), estacionalidad horaria descriptiva.</div></li>
+        <li><span class="kicker">Fase 2</span><div><strong>Feature engineering núcleo + baseline.</strong> Tendencia, volatilidad, volumen, hora del día. Primer modelo con capacidad predictiva real: regresión logística regularizada.</div></li>
+        <li><span class="kicker">Fase 3</span><div><strong>Regímenes y no linealidad.</strong> HMM para regímenes de mercado, probabilidades condicionales, árboles/GBM (XGBoost, LightGBM, CatBoost).</div></li>
+        <li><span class="kicker">Fase 4</span><div><strong>Microestructura y datos externos prioritarios.</strong> Order flow imbalance, funding rate, open interest, liquidaciones (§12).</div></li>
+        <li><span class="kicker">Fase 5</span><div><strong>Calibración + validación robusta.</strong> Walk-forward purgado con embargo, CPCV, bootstrap por bloques, permutation tests.</div></li>
+        <li><span class="kicker">Fase 6</span><div><strong>Deep learning — condicional.</strong> Solo si fases 2–5 muestran señal estadísticamente significativa y estable. LSTM/GRU/Transformer/TFT solo entran si superan a GBM con margen significativo.</div></li>
+        <li><span class="kicker">Fase 7</span><div><strong>Simulación económica.</strong> EV neto de costes y del payout real del producto Up/Down, Kelly fraccional, drawdown simulado.</div></li>
+        <li><span class="kicker">Fase 8</span><div><strong>Informe final go/no-go</strong>, con intervalo de confianza sobre el edge neto y recomendación explícita.</div></li>
+      </ol>
+      <p>Cada fase tiene una <strong>puerta de salida binaria</strong>: no se avanza a la siguiente fase si la anterior no produjo una mejora estadísticamente significativa (tras corrección) sobre el mejor resultado previo. Esto es lo que evita convertir el proyecto en una escalada automática hacia Transformers sin justificación.</p>
+    </section>
+
+    <section id="hipotesis">
+      <div class="eyebrow">§05 · Las 14 familias de hipótesis</div>
+      <h2>Mecanismo, test y prioridad</h2>
+      <p>Para cada familia: el mecanismo económico/estadístico que la sustenta (si no lo hay, se dice explícitamente), el test estadístico correspondiente, y el riesgo de sesgo dominante.</p>
+
+      <h3>05.1 — Persistencia (cadenas de Markov de orden 1–N y orden variable)</h3>
+      <p><span class="seq"><span class="dot g"></span><span class="dot g"></span><span class="dot g"></span> → ?</span> &nbsp; <span class="seq"><span class="dot g"></span><span class="dot g"></span><span class="dot r"></span><span class="dot r"></span> → ?</span></p>
+      <p>Mecanismo plausible: micro-momentum de order flow a muy corto plazo (agotamiento de liquidez en un lado del libro). Test: cadenas de Markov órdenes 1, 2, 3, 5 con test <code>χ²</code> de homogeneidad frente al modelo de orden 0; para orden variable, Context Tree Weighting o Prediction Suffix Trees, que penalizan automáticamente estados con poca evidencia.</p>
+      <div class="callout risk"><span class="callout-label">Riesgo dominante</span><p>A orden 5, el espacio de estados tiene <code>2⁵=32</code> combinaciones; con velas de 5 min hay ~105 000/año — la fragmentación por estado + hora + régimen agota rápidamente el tamaño de muestra por celda. Órdenes altos sin regularización casi garantizan sobreajuste. <strong>Prioridad: alta para orden 1–2, media-baja para orden ≥3 salvo con contracción bayesiana (shrinkage hacia el modelo de orden inferior).</strong></p></div>
+
+      <h3>05.2 — Tamaño de la vela (magnitud, no solo color)</h3>
+      <p>Clasificar por múltiplos de ATR (p.ej. doji &lt;0.15×ATR, pequeña &lt;0.5×ATR, media &lt;1.5×ATR, grande ≥1.5×ATR) en vez de umbrales absolutos en USD, para que la categorización sea estable a través de regímenes de volatilidad. Test: tabla de contingencia tamaño(t) × color(t+1), <code>χ²</code> y V de Cramér para tamaño del efecto (no solo p-valor).</p>
+
+      <h3>05.3 — Patrones de velas japonesas</h3>
+      <p>Definir cada patrón (Hammer, Engulfing, Morning/Evening Star, Shooting Star, Harami…) con reglas explícitas y fijas <em>antes</em> de medir su tasa de éxito — de lo contrario cualquier ajuste posterior de umbrales es data snooping retroactivo. Medir <code>P(verde | patrón)</code> con intervalo de Wilson (no normal, dada la baja frecuencia de algunos patrones) y comparar contra la frecuencia base del periodo.</p>
+      <div class="callout risk"><span class="callout-label">Riesgo dominante</span><p>Hay decenas de patrones definidos en la literatura popular, cada uno con variantes de umbral — probarlos todos es un test múltiple masivo. La literatura académica (Marshall, Young &amp; Rose 2006; Caginalp &amp; Laurent) generalmente <strong>no encuentra edge robusto neto de costes en patrones de velas individuales fuera de muestra</strong>. <strong>Prioridad: baja como señal aislada; posible valor solo como feature de entrada a un modelo no lineal junto con contexto de tendencia/volumen, nunca como regla standalone.</strong></p></div>
+
+      <h3>05.4 — Tendencia (EMA 20/50/100/200, pendiente, cruces, distancia)</h3>
+      <p>Mecanismo: contexto de régimen direccional de más largo plazo puede modular (no predecir directamente) la probabilidad de continuación a 5 min. Features: distancia normalizada por ATR a cada EMA, pendiente (regresión lineal rodante sobre N barras), señal de cruce reciente, alineación multi-EMA (todas ascendentes vs. mixtas). Tratar como <strong>variable condicionante</strong>, no como predictor aislado — se espera que su valor esté en interacción con volatilidad/volumen, no en efecto principal.</p>
+
+      <h3>05.5 — Volatilidad (ATR, True Range, realizada, Bollinger, compresión/expansión)</h3>
+      <p>Mecanismo con más soporte a priori que la tendencia: la volatilidad no predice bien la <em>dirección</em>, pero sí modula la <em>confianza</em> de cualquier otra señal (en regímenes de compresión, rupturas tienden a tener mayor persistencia direccional que en alta volatilidad donde domina el ruido). Tratar como variable de interacción/regimen, evaluada vía HMM (§05.10) además de como feature directo.</p>
+
+      <h3>05.6 — Volumen (relativo, VWAP, acumulado)</h3>
+      <p>Volumen relativo a su media móvil, distancia a VWAP de sesión, y sobre todo <strong>asimetría del volumen dentro de la vela</strong> (aproximable con volumen en velas de 1m dentro de la vela de 5m) son más informativos que el volumen absoluto. Combinar con precio: volumen alto + rango pequeño (absorción) tiene interpretación de microestructura distinta a volumen alto + rango grande (impulso).</p>
+
+      <h3>05.7 — Hora del día y calendario</h3>
+      <p>Testear estacionalidad horaria (UTC), solapamiento de sesiones (Asia/Europa/América), efecto de apertura de CME (BTC futures, 22:00 UTC / 23:00 UTC según DST — genera el "CME gap" documentado), fin de semana (menor participación institucional, distinta microestructura), y horario de funding settlement (00:00/08:00/16:00 UTC) como posibles puntos de discontinuidad de comportamiento.</p>
+
+      <h3>05.8 — Multi-timeframe (1m–4h)</h3>
+      <p>Usar únicamente velas <strong>completamente cerradas</strong> de cada timeframe superior al momento de decisión (riesgo de leakage máximo si no se respeta esto). Pregunta de investigación: ¿el estado del timeframe superior aporta información incremental sobre la vela de 5m una vez controlado por sus propios features de 5m, o es redundante? Testear con likelihood-ratio test anidado, no solo con importancia de variable aislada.</p>
+
+      <h3>05.9 — Microestructura (retornos log, velocidad, aceleración, asimetría, kurtosis)</h3>
+      <p>Retorno log de la vela, primera diferencia (velocidad), segunda diferencia (aceleración) sobre una ventana rodante de retornos de 1m dentro de la vela; asimetría y curtosis rodante como proxy de "forma" de la distribución reciente de retornos (colas gordas → mayor probabilidad de reversión mecánica). Rango vs. gap respecto al cierre anterior.</p>
+
+      <h3>05.10 — Regímenes de mercado (HMM)</h3>
+      <p>Ajustar un Hidden Markov Model (2–4 estados) sobre retornos y volatilidad realizada para inferir estados latentes (tendencia fuerte, lateral, alta/baja volatilidad, pánico/rally). Usar la <strong>probabilidad posterior de estado</strong>, no la asignación dura, como feature — evita perder información en la frontera entre regímenes. Validar número de estados por BIC, no por inspección visual.</p>
+
+      <h3>05.11 — Probabilidades condicionales (sin discretizar en reglas)</h3>
+      <p>En vez de reglas discretas ("si EMA20&gt;EMA50 y volumen&gt;media entonces…"), modelar directamente <code>P(verde | X)</code> vía regresión logística/GBM con esas mismas variables como continuas — las reglas discretas son un caso especial subóptimo de esto y se usan solo como paso exploratorio/interpretativo, no como modelo final.</p>
+
+      <h3>05.12 — Teoría de la información (entropía, información mutua, complejidad)</h3>
+      <p>Entropía de Shannon de la secuencia de signos en ventanas rodantes (mercado "predecible" = entropía &lt; log2(2)=1 bit); información mutua entre cada feature candidato y el target (capta relaciones no lineales que la correlación de Pearson no ve, y sirve como cribado inicial de features antes de modelar); complejidad de Lempel-Ziv de la secuencia binaria como medida de compresibilidad/estructura.</p>
+
+      <h3>05.13 — Autocorrelación</h3>
+      <p>ACF/PACF del signo y de la magnitud del retorno para lags 1–50 (hasta ~4 horas), con bandas de confianza Bartlett y corrección por test múltiple a través de lags. Ljung-Box para dependencia conjunta. Es la base cuantitativa directa de la hipótesis de persistencia (§05.1) y del experimento cero (§01).</p>
+
+      <h3>05.14 — Ingeniería de variables (propuestas propias)</h3>
+      <p>Más allá de indicadores clásicos: pendiente de la curva de volumen acumulado intra-vela; ratio rango-real/rango-esperado (True Range vs. su media móvil, como proxy de "sorpresa" de volatilidad); posición del cierre dentro del rango de la vela (<code>(cl−l)/(h−l)</code>, análogo al %K de Williams pero como feature continuo crudo); número de máximos/mínimos locales en la serie de 1m dentro de la vela (proxy de "ruido" intra-vela); distancia a niveles de número redondo (ver §13); desviación del funding rate respecto a su media móvil (crowding de posicionamiento). El resto de propuestas originales, con más profundidad, están en §13.</p>
+    </section>
+
+    <section id="modelos">
+      <div class="eyebrow">§06 · Escalera de modelos</div>
+      <h2>Complejidad creciente, con puerta de avance</h2>
+      <p>No se avanza al siguiente peldaño salvo que el actual supere al anterior con una diferencia estadísticamente significativa en log-loss/Brier fuera de muestra (bootstrap pareado), sostenida a través de folds temporales.</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Peldaño</th><th>Modelo</th><th>Rol</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>Modelo nulo</td><td>Frecuencia histórica incondicional — baseline obligatorio de todas las comparaciones.</td></tr>
+            <tr><td>1</td><td>Frecuencia condicional (lookup)</td><td>Tablas de contingencia por bucket (tamaño de vela, hora, régimen) — interpretación directa, sin caja negra.</td></tr>
+            <tr><td>2</td><td>Cadenas de Markov 1–5 / orden variable</td><td>Formaliza §05.1 con shrinkage bayesiano hacia órdenes inferiores.</td></tr>
+            <tr><td>3</td><td>Regresión logística (L1/L2/elastic-net)</td><td>Primer modelo multivariante; coeficientes interpretables; baseline "serio".</td></tr>
+            <tr><td>4</td><td>Naive Bayes</td><td>Referencia rápida bajo independencia condicional — útil como diagnóstico de interacción (si NB ≈ logística, las interacciones no aportan mucho).</td></tr>
+            <tr><td>5</td><td>Árboles de decisión</td><td>Interpretabilidad de reglas + detección automática de interacciones y no linealidad.</td></tr>
+            <tr><td>6</td><td>Random Forest</td><td>Reduce varianza de un solo árbol; primer punto para importancia por permutación robusta.</td></tr>
+            <tr><td>7</td><td>XGBoost / LightGBM / CatBoost</td><td>Estado del arte tabular; se comparan entre sí, no se asume ganador.</td></tr>
+            <tr><td>8</td><td>SVM (kernel RBF)</td><td>Contraste no basado en árboles; útil si se sospecha frontera de decisión suave no capturada por splits.</td></tr>
+            <tr><td>9</td><td>LSTM / GRU</td><td><strong>Condicional</strong>: solo si (7) supera a (3) con significancia — de lo contrario no hay base para esperar que RNN aporte más que ruido de más parámetros.</td></tr>
+            <tr><td>10</td><td>Transformer / TFT</td><td><strong>Condicional</strong> a que (9) muestre mejora real; requiere volumen de datos e infraestructura que debe justificarse frente al tamaño del posible edge.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="callout stop">
+        <span class="callout-label">Regla de parada de la escalera</span>
+        <p>Si el peldaño 3 (regresión logística) no supera al peldaño 0 (nulo) de forma significativa tras corrección por múltiples comparaciones, es altamente improbable que peldaños 9–10 lo hagan — la no linealidad rara vez rescata una señal que ni siquiera existe linealmente en este tipo de series financieras de alta eficiencia. Detenerse ahí y reportar el hallazgo negativo es una conclusión legítima, no un fracaso del proyecto.</p>
+      </div>
+    </section>
+
+    <section id="calibracion">
+      <div class="eyebrow">§07 · Calibración</div>
+      <h2>Una probabilidad útil, no solo una clase</h2>
+      <p>El objetivo del negocio requiere <code>p̂</code> calibrado: entre todas las velas donde el modelo dice "68%", debe cerrar verde ~68% de las veces. Evaluación: Brier Score (con su descomposición en reliability + resolution + uncertainty, no solo el número agregado), Log Loss, diagramas de fiabilidad por deciles de predicción, Expected Calibration Error (ECE).</p>
+      <p>Métodos de recalibración: Platt scaling (paramétrico, robusto con poca data) e Isotonic Regression (no paramétrico, más flexible pero con mayor riesgo de sobreajuste en bins con poca muestra — preferir Platt salvo con volumen de datos grande). <strong>El calibrador se ajusta siempre en un fold distinto al usado para evaluar</strong> — recalibrar y evaluar en los mismos datos es una forma sutil de leakage frecuentemente pasada por alto.</p>
+    </section>
+
+    <section id="validacion">
+      <div class="eyebrow">§08 · Validación temporal</div>
+      <h2>Walk-forward con purga y embargo — sin excepciones</h2>
+      <p>Prohibido cualquier <code>k-fold</code> aleatorio: mezclar barras temporalmente adyacentes entre train y test filtra información por la autocorrelación de features rodantes. Protocolo:</p>
+      <ul>
+        <li><strong>Purga:</strong> eliminar del set de entrenamiento cualquier observación cuya ventana de features se solape temporalmente con el periodo de test.</li>
+        <li><strong>Embargo:</strong> tras el corte train/test, excluir un margen adicional igual al lookback máximo de cualquier feature (p. ej., si se usa EMA200 en 5m, el embargo debe cubrir esa ventana) para evitar fuga residual por autocorrelación de features rodantes cerca de la frontera.</li>
+        <li><strong>Walk-forward expansivo y rodante</strong>, ambos: si los resultados difieren mucho entre ambos esquemas, es señal de no-estacionariedad que debe documentarse, no promediarse y ocultarse.</li>
+        <li><strong>Combinatorial Purged Cross-Validation (CPCV, López de Prado):</strong> genera múltiples trayectorias de backtest combinando bloques purgados, dando una distribución de la métrica de performance en vez de un único número — imprescindible para diferenciar "buena suerte de un split" de "edge real".</li>
+        <li><strong>Lockbox final:</strong> un tramo final del histórico (p. ej. los últimos 6 meses) queda completamente excluido de todo el ciclo de exploración/tuning, y se toca <strong>una única vez</strong>, al final, como validación confirmatoria.</li>
+      </ul>
+    </section>
+
+    <section id="metricas">
+      <div class="eyebrow">§09 · Métricas</div>
+      <h2>Ninguna métrica sola es suficiente</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Métrica</th><th>Qué mide</th><th>Advertencia</th></tr></thead>
+          <tbody>
+            <tr><td>Accuracy</td><td>Aciertos brutos</td><td>Engañosa con desbalance leve por drift; comparar siempre contra el modelo nulo, no contra 50%.</td></tr>
+            <tr><td>Precision / Recall</td><td>Calidad por clase</td><td>Relevante si el producto permite "no operar" (abstención) — conecta con meta-labeling (§01).</td></tr>
+            <tr><td>ROC-AUC</td><td>Ranking/discriminación global</td><td>Insensible a calibración; un modelo bien ordenado puede estar mal calibrado.</td></tr>
+            <tr><td>PR-AUC</td><td>Discriminación bajo desbalance</td><td>Más informativa que ROC-AUC si se usa la etiqueta ajustada por coste (§01), que suele ser rara.</td></tr>
+            <tr><td>Brier Score</td><td>Calidad probabilística global</td><td>Métrica primaria de este proyecto — combina discriminación y calibración.</td></tr>
+            <tr><td>Log Loss</td><td>Calidad probabilística, penaliza fuerte los errores confiados</td><td>Sensible a probabilidades extremas mal calibradas (0.01/0.99).</td></tr>
+            <tr><td>MCC</td><td>Correlación de clasificación balanceada</td><td>Más robusta que accuracy/F1 bajo desbalance; buena para comparar modelos entre sí.</td></tr>
+            <tr><td>Balanced Accuracy</td><td>Accuracy ajustada por clase</td><td>Complementaria a MCC.</td></tr>
+            <tr><td>Calibración (ECE)</td><td>Fiabilidad de la probabilidad</td><td>Ver §07 — condición necesaria para cualquier uso de sizing/Kelly.</td></tr>
+            <tr><td>EV neto</td><td>Valor esperado real del producto Up/Down</td><td><strong>Métrica de decisión final</strong> — incorpora <code>p*</code> del payout, no accuracy.</td></tr>
+            <tr><td>Sharpe / Max Drawdown</td><td>Si se simula una serie de operaciones</td><td>Solo con retornos simulados netos de coste; reportar junto a su intervalo de confianza bootstrap, nunca como punto único.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="robustez">
+      <div class="eyebrow">§10 · Robustez</div>
+      <h2>¿Sobrevive el hallazgo a ser molestado?</h2>
+      <ul>
+        <li><strong>Permutation test</strong> (el más importante de todos): barajar las etiquetas <code>y_t</code> preservando la estructura temporal de los features, reentrenar, y comparar la métrica real contra la distribución nula resultante. Si el resultado real no cae en el percentil superior (p. ej. &gt;95) de esa distribución nula, no hay evidencia de edge, independientemente de cuán "bueno" parezca el número en aislado.</li>
+        <li><strong>Bootstrap por bloques</strong> (no i.i.d.) sobre secuencias de operaciones para construir intervalos de confianza de EV/Sharpe que respeten la autocorrelación.</li>
+        <li><strong>Estabilidad temporal</strong>: performance por año y por régimen (alcista 2020-21, bajista 2022, lateral 2023, post-ETF 2024) — un edge que solo aparece en un régimen es una hipótesis de régimen, no un edge general, y debe reportarse como tal.</li>
+        <li><strong>Sensibilidad a hiperparámetros</strong>: barrer hiperparámetros razonables; un modelo cuyo resultado depende de una combinación muy específica de hiperparámetros es una bandera de sobreajuste, no de un modelo "afinado".</li>
+        <li><strong>Estabilidad de importancia de variables</strong> entre folds (§11) — una variable "importante" que cambia de signo/rango entre folds se trata como ruido.</li>
+      </ul>
+    </section>
+
+    <section id="importancia">
+      <div class="eyebrow">§11 · Importancia de variables</div>
+      <h2>Interpretar, no solo predecir</h2>
+      <p>SHAP para atribución local y global — con la advertencia de que features altamente correlacionados (p. ej. EMA20 y EMA50 en tendencias fuertes) diluyen/reparten artificialmente su importancia entre sí. Permutation importance como método más robusto a esa correlación que la importancia por impureza por defecto de los árboles. Partial Dependence / ICE plots para inspeccionar forma funcional (¿monótona? ¿en forma de U?) de las relaciones más fuertes. Adicionalmente: <strong>importancia por ablación de familia completa</strong> (remover todo el bloque "volumen" o todo el bloque "multi-timeframe" y remedir la métrica agregada) — más honesta que sumar importancias individuales cuando hay features redundantes dentro de una familia.</p>
+    </section>
+
+    <section id="datos-externos">
+      <div class="eyebrow">§12 · Datos externos</div>
+      <h2>¿Vale la pena la complejidad adicional?</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fuente</th><th>Valor informativo</th><th>Riesgo de leakage</th><th>Prioridad</th></tr></thead>
+          <tbody>
+            <tr><td>Funding rate (perp)</td><td>Proxy directo de posicionamiento/apalancamiento agregado; literatura de mean-reversion de funding extremo.</td><td>Bajo — settlement en horarios fijos (00/08/16 UTC), fácil de alinear sin fuga.</td><td><span class="pill pill--high">Alta</span></td></tr>
+            <tr><td>Open interest</td><td>Divergencia precio-OI como señal de convicción vs. cierre de posiciones.</td><td>Bajo-medio — verificar timestamp de snapshot del proveedor.</td><td><span class="pill pill--high">Alta</span></td></tr>
+            <tr><td>Liquidaciones (forceOrder)</td><td>Captura eventos de cascada/pánico; asociada a reversión o continuación según régimen de volatilidad.</td><td>Medio — depende de reconstrucción histórica fiable del stream; fácil de desalinear en agregación.</td><td><span class="pill pill--high">Alta</span></td></tr>
+            <tr><td>Profundidad de libro (L2)</td><td>Order Flow Imbalance con soporte académico sólido a horizontes muy cortos (Cont, Kukanov &amp; Stoikov).</td><td>Alto — requiere snapshot exacto en el cierre de vela; historial L2 de Binance es costoso/difícil de reconstruir con fidelidad retroactiva.</td><td><span class="pill pill--med">Media</span> (alto valor, alto coste)</td></tr>
+            <tr><td>Basis / premium index (perp-spot)</td><td>Proxy de sentimiento/apalancamiento direccional agregado.</td><td>Bajo.</td><td><span class="pill pill--med">Media</span></td></tr>
+            <tr><td>Volatilidad implícita (Deribit, DVOL/skew)</td><td>El mercado de opciones a veces lidera cambios de régimen de volatilidad en spot.</td><td>Medio-alto — venue distinto, riesgo de desalineación de timestamp entre exchanges.</td><td><span class="pill pill--med">Media</span></td></tr>
+            <tr><td>Macro (DXY, futuros SPX, tasas reales)</td><td>Relevante a timeframes de horas/días; señal débil y ruidosa a 5 minutos.</td><td>Bajo, pero la relación es probablemente demasiado lenta para este horizonte.</td><td><span class="pill pill--low">Baja</span></td></tr>
+            <tr><td>On-chain (flujos a exchanges, minteo de stablecoins)</td><td>Señal de régimen de días/semanas, no de 5 minutos.</td><td>Bajo, pero irrelevante a esta resolución temporal salvo como feature de contexto de bajísima frecuencia.</td><td><span class="pill pill--low">Baja</span></td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p>Regla general: incorporar primero las fuentes de <strong>bajo riesgo de leakage y alineación temporal simple</strong> (funding, OI, liquidaciones) antes que las de alto valor teórico pero alto coste/riesgo de implementación (L2 histórico, IV de otro venue) — el orden de la hoja de ruta (§17) refleja esto.</p>
+    </section>
+
+    <section id="creativos">
+      <div class="eyebrow">§13 · Experimentos originales</div>
+      <h2>Lo que probablemente no estaba en el planteamiento inicial</h2>
+      <div class="grid-2">
+        <div class="card"><h4>Order Flow Imbalance (OFI)</h4><p>Desequilibrio entre volumen agresor comprador y vendedor (aproximable desde <code>taker_buy_volume</code> que ya reporta Binance por vela, sin necesitar L2 completo) como predictor de continuación a muy corto plazo — literatura de microestructura lo respalda mejor que cualquier patrón de velas.</p></div>
+        <div class="card"><h4>Liderazgo cross-exchange</h4><p>Información share (Hasbrouck) entre Binance, Coinbase y OKX: ¿qué venue mueve primero el precio en ventanas de sub-minuto? Si Binance sistemáticamente sigue a otro venue, ese lag es información explotable dentro de la propia vela de 5m.</p></div>
+        <div class="card"><h4>Efecto "número redondo"</h4><p>Clustering de órdenes en niveles psicológicos (p. ej. múltiplos de 1000 USD) genera un "efecto imán/rebote" documentado en FX y también observable en cripto — feature: distancia normalizada al nivel redondo más cercano.</p></div>
+        <div class="card"><h4>Exponente de Hurst rodante</h4><p>Ventana rodante corta para distinguir régimen de memoria larga (H&gt;0.5, tendencial) vs. reversión a la media (H&lt;0.5) — más informativo como <em>selector de régimen</em> que como predictor directo.</p></div>
+        <div class="card"><h4>Diferenciación fraccional</h4><p>López de Prado: en vez de retornos simples (estacionarios pero sin memoria) o precios (con memoria pero no estacionarios), diferenciación fraccional busca el mínimo orden de diferenciación que logra estacionariedad conservando la máxima memoria posible — candidato interesante para la representación de entrada de los features de precio.</p></div>
+        <div class="card"><h4>CME gap / efecto de apertura</h4><p>Fenómeno documentado en BTC: gaps entre el cierre del viernes y la apertura del domingo/lunes de los futuros CME tienden a "cerrarse" — probar si genera sesgo direccional detectable en las velas de 5m de Binance alrededor de esas ventanas horarias.</p></div>
+        <div class="card"><h4>Reversión post-liquidación</h4><p>Ventanas inmediatamente posteriores a cascadas de liquidación grandes (vía stream <code>forceOrder</code>) como régimen distinto con probabilidad condicional propia — mecanismo: sobre-extensión por liquidaciones forzadas seguida de reversión mecánica.</p></div>
+        <div class="card"><h4>Entropía/complejidad de Lempel-Ziv</h4><p>Medir la "comprimibilidad" de la secuencia reciente de signos como feature de régimen: secuencias muy comprimibles (poco entrópicas) pueden indicar ventanas con más estructura explotable.</p></div>
+        <div class="card"><h4>Funding rate como señal de crowding</h4><p>Funding extremo (percentil alto histórico) como proxy de posicionamiento apalancado unidireccional — mecanismo de reversión por riesgo de "long/short squeeze".</p></div>
+        <div class="card"><h4>Meta-labeling como producto, no solo como técnica</h4><p>En vez de perseguir accuracy direccional agregada, modelar explícitamente <code>P(|edge| &gt; umbral)</code> — el hallazgo más valioso de todo el programa podría ser identificar el 10-15% de las velas donde sí hay señal explotable, no mejorar marginalmente el otro 85-90%.</p></div>
+      </div>
+    </section>
+
+    <section id="ranking">
+      <div class="eyebrow">§14 · Ranking de hipótesis</div>
+      <h2>Dónde mirar primero, dónde no perder tiempo</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Hipótesis</th><th>Prioridad</th><th>Justificación</th></tr></thead>
+          <tbody>
+            <tr><td>Order flow / volumen agresor (OFI)</td><td><span class="pill pill--high">Alta</span></td><td>Mecanismo de microestructura con soporte académico directo a horizontes cortos.</td></tr>
+            <tr><td>Regímenes (HMM) como condicionante</td><td><span class="pill pill--high">Alta</span></td><td>No predice dirección sola, pero modula todo lo demás — probable mayor ganancia marginal por unidad de esfuerzo.</td></tr>
+            <tr><td>Volatilidad como variable de interacción</td><td><span class="pill pill--high">Alta</span></td><td>Efecto de "confianza condicional" más plausible que efecto principal directo.</td></tr>
+            <tr><td>Funding / OI / liquidaciones</td><td><span class="pill pill--high">Alta</span></td><td>Bajo riesgo de leakage, mecanismo económico claro (posicionamiento/apalancamiento), fácil de obtener.</td></tr>
+            <tr><td>Persistencia orden 1–2</td><td><span class="pill pill--high">Alta</span></td><td>Barato de probar, base directa del experimento cero, punto de partida estándar en la literatura.</td></tr>
+            <tr><td>Multi-timeframe como contexto (no señal aislada)</td><td><span class="pill pill--med">Media</span></td><td>Plausible pero con riesgo real de redundancia frente a features ya calculados en 5m.</td></tr>
+            <tr><td>Persistencia orden ≥3–5</td><td><span class="pill pill--low">Baja</span></td><td>Sparsity de estados casi garantiza sobreajuste sin shrinkage fuerte.</td></tr>
+            <tr><td>Patrones de velas japonesas aislados</td><td><span class="pill pill--low">Baja</span></td><td>Literatura académica no encuentra edge robusto neto de costes; alto riesgo de test múltiple por número de patrones/variantes.</td></tr>
+            <tr><td>Macro / on-chain diario</td><td><span class="pill pill--low">Baja</span></td><td>Frecuencia de la señal (días) desalineada con el horizonte objetivo (5 min).</td></tr>
+            <tr><td>Deep learning como primer intento</td><td><span class="pill pill--low">Baja</span></td><td>Sin evidencia previa de no-linealidad recuperable, es la forma más cara de no encontrar nada.</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="abandono">
+      <div class="eyebrow">§15 · Criterios de abandono</div>
+      <h2>Cuándo cortar una línea de investigación</h2>
+      <div class="callout stop">
+        <span class="callout-label">Reglas de stop, fijadas de antemano</span>
+        <ul>
+          <li>El resultado real no cae en el percentil superior (≥95) de la distribución generada por el <strong>permutation test</strong> correspondiente → abandonar esa familia de features.</li>
+          <li>La performance OOS walk-forward cae al nivel del modelo nulo en más del 50% de los folds temporales → abandonar.</li>
+          <li>La importancia de una variable cambia de signo o de ranking en más del 30% de los folds → tratar como ruido, excluir sin importar su importancia promedio.</li>
+          <li>La brecha entre métrica in-sample y out-of-sample excede un umbral pre-registrado (p. ej. 2×) → sobreajuste; volver a un modelo más simple antes de seguir por esa línea.</li>
+          <li>Time-box explícito por hipótesis (p. ej. máximo 3 configuraciones de modelo probadas) para evitar p-hacking inconsciente por ajuste manual indefinido.</li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="overfitting">
+      <div class="eyebrow">§16 · Recomendaciones anti-overfitting</div>
+      <h2>El riesgo dominante de todo el programa</h2>
+      <ul>
+        <li><strong>Pre-registro</strong>: este documento fija las hipótesis antes de ver resultados OOS — cualquier hipótesis nueva que surja durante el análisis se marca explícitamente como exploratoria/post-hoc y se le exige una validación out-of-sample adicional e independiente, nunca se reporta con el mismo nivel de confianza que una hipótesis pre-registrada.</li>
+        <li><strong>Lockbox final</strong> (§08): nunca tocado hasta la validación confirmatoria única.</li>
+        <li><strong>CPCV</strong> en vez de un único split walk-forward, para obtener una distribución de la métrica, no un punto.</li>
+        <li><strong>Deflated Sharpe Ratio</strong> (Bailey &amp; López de Prado) al reportar cualquier resultado de performance, ajustando explícitamente por el número de configuraciones/hipótesis probadas.</li>
+        <li><strong>Corrección FDR (Benjamini–Hochberg)</strong> aplicada al conjunto completo de las 14 familias de hipótesis antes de declarar significativa a cualquiera de ellas individualmente.</li>
+        <li><strong>Preferencia por simplicidad</strong>: un modelo más complejo solo se adopta si su mejora es estadísticamente significativa sobre el más simple, nunca por "parece razonable que ayude".</li>
+        <li><strong>Límite de features relativo al tamaño de muestra</strong>, con selección de features hecha dentro de cada fold de validación (nunca sobre el dataset completo antes de particionar) para no filtrar información del test set a la selección misma.</li>
+      </ul>
+    </section>
+
+    <section id="roadmap">
+      <div class="eyebrow">§17 · Hoja de ruta priorizada</div>
+      <h2>De lo más simple a lo más avanzado</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Fase</th><th>Contenido</th><th class="num">Duración</th><th>Gate de salida</th></tr></thead>
+          <tbody>
+            <tr><td>0</td><td>Datos, calidad, decisión spot/perp/feed real</td><td class="num">~1 semana</td><td>Dataset validado sin gaps ni ambigüedad de feed</td></tr>
+            <tr><td>0.5</td><td>Test de eficiencia de mercado (experimento cero)</td><td class="num">2–3 días</td><td>Documentado, recalibra expectativas del resto del programa</td></tr>
+            <tr><td>1</td><td>EDA, autocorrelación, persistencia orden 1–2</td><td class="num">~1 semana</td><td>Evidencia mínima de dependencia temporal para justificar seguir</td></tr>
+            <tr><td>2</td><td>Features núcleo + regresión logística baseline</td><td class="num">1–2 semanas</td><td>Supera al modelo nulo, significativo tras corrección</td></tr>
+            <tr><td>3</td><td>HMM, condicionales, árboles/GBM</td><td class="num">~2 semanas</td><td>Mejora significativa sobre peldaño 3 de §06</td></tr>
+            <tr><td>4</td><td>Microestructura + funding/OI/liquidaciones</td><td class="num">2–3 semanas</td><td>Mejora incremental significativa y estable por régimen</td></tr>
+            <tr><td>5</td><td>Calibración + validación robusta (CPCV, bootstrap)</td><td class="num">~2 semanas</td><td>Brier/ECE aceptables y estables en lockbox parcial</td></tr>
+            <tr><td>6</td><td>Deep learning — condicional</td><td class="num">2–3 semanas</td><td>Solo si (3) muestra base para no-linealidad no capturada</td></tr>
+            <tr><td>7</td><td>Simulación económica con payout real</td><td class="num">1–2 semanas</td><td>EV neto positivo con intervalo de confianza que excluye cero</td></tr>
+            <tr><td>8</td><td>Informe final go/no-go</td><td class="num">~1 semana</td><td>Recomendación explícita, con o sin edge</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section id="conclusion">
+      <div class="eyebrow">§18 · Conclusión</div>
+      <h2>Estado actual: diseño cerrado, sin código ejecutado</h2>
+      <p>Este documento es el pre-registro completo de la investigación: hipótesis, riesgos, métricas y criterios de decisión quedan fijados antes de observar ningún resultado fuera de muestra. La formulación recomendada para avanzar no es la clasificación binaria pura del enunciado inicial, sino una combinación de <strong>modelo de distribución de retorno + meta-labeling</strong> (§01), evaluada bajo el protocolo de validación temporal purgada de §08 y contra el punto de equilibrio real del producto Up/Down, no contra 50%.</p>
+      <p>El siguiente paso, sujeto a aprobación, es la <strong>Fase 0</strong>: adquisición y validación de datos, seguida inmediatamente por el <strong>experimento cero</strong> de eficiencia de mercado (§04) — el punto de decisión más barato de todo el programa para saber si el resto del esfuerzo tiene un prior favorable o no.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>
+  Documento de diseño de investigación · Fase 1 · Sin implementación · Preparado para revisión antes de Fase 0.
+</footer>
