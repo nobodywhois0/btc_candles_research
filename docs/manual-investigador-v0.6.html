@@ -1,4 +1,5 @@
 <title>Manual del investigador cuantitativo — Fase 5</title>
+<script>(function(){var t=localStorage.getItem("theme");if(t)document.documentElement.setAttribute("data-theme",t);})();</script>
 <style>
   :root{
     --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
@@ -131,6 +132,9 @@
   }
 </style>
 <link rel="stylesheet" href="assets/site.css">
+<button class="theme-toggle" aria-label="Cambiar entre modo claro y oscuro" onclick="(function(b){var cur=document.documentElement.getAttribute('data-theme')||(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light');var next=cur==='dark'?'light':'dark';document.documentElement.setAttribute('data-theme',next);localStorage.setItem('theme',next);b.textContent=next==='dark'?'☀':'☾';})(this)">☾</button>
+<script>(function(){var b=document.currentScript.previousElementSibling;var saved=localStorage.getItem("theme");var eff=saved||(matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light");b.textContent=eff==="dark"?'☀':'☾';})();</script>
+
 
 <header class="masthead">
   <div class="masthead-inner">
