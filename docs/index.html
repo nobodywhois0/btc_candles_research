@@ -1,0 +1,199 @@
+<title>btc_candles_research — ¿existe un edge en la vela de 5 minutos?</title>
+<style>
+  :root{
+    --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+      --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  }
+  :root[data-theme="dark"]{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+    --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  :root[data-theme="light"]{--paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:64px 32px 44px;}
+  .masthead-inner{max-width:880px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(32px,5vw,50px);line-height:1.1;letter-spacing:-.01em;margin:0 0 16px;text-wrap:balance;max-width:18ch;}
+  .doc-subtitle{font-size:19px;color:var(--ink-muted);max-width:62ch;margin:0 0 28px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+  .meta-row a{color:var(--ink-muted);}
+
+  main{max-width:880px;margin:0 auto;padding:0 32px 100px;}
+  section{padding:52px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:52px;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(23px,2.8vw,28px);font-weight:700;letter-spacing:-.005em;margin:0 0 18px;text-wrap:balance;max-width:32ch;}
+  h3{font-family:var(--font-display);font-size:17px;font-weight:700;margin:0 0 6px;}
+  p{margin:0 0 14px;max-width:70ch;}
+  p.lead{font-size:17.5px;color:var(--ink-muted);max-width:64ch;}
+  ul,ol{margin:0 0 15px;padding-left:22px;max-width:68ch;}
+  li{margin-bottom:5px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code,.mono{font-family:var(--font-mono);font-size:.87em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .36em;border-radius:4px;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:18px 22px;border-radius:2px;margin:18px 0;max-width:none;}
+  .callout p:last-child{margin-bottom:0;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:6px;display:block;}
+
+  .table-wrap{overflow-x:auto;margin:16px 0 8px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:600px;font-size:13.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:9px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td:first-child{color:var(--ink);font-weight:600;}
+
+  .pill{font-family:var(--font-mono);font-size:10px;text-transform:uppercase;letter-spacing:.04em;padding:2px 8px;border-radius:20px;border:1px solid var(--line-strong);white-space:nowrap;display:inline-block;}
+  .pill--lvl1{color:var(--ink-muted);border-color:var(--line-strong);}
+  .pill--lvl2{color:var(--accent-ink);border-color:var(--accent);background:var(--accent-wash);font-weight:700;}
+  .pill--pending{color:var(--ink-faint);border-color:var(--line);border-style:dashed;}
+
+  .doc-grid{display:grid;grid-template-columns:1fr;gap:0;margin-top:8px;}
+  .doc-row{display:grid;grid-template-columns:64px 1fr;gap:20px;padding:20px 0;border-top:1px solid var(--line);text-decoration:none;color:inherit;}
+  .doc-row:first-child{border-top:none;}
+  .doc-row:hover .doc-row-title{color:var(--accent-ink);}
+  .doc-row-num{font-family:var(--font-mono);font-size:13px;color:var(--ink-faint);padding-top:3px;}
+  .doc-row-title{font-family:var(--font-display);font-size:18px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+  .doc-row-desc{font-size:14.5px;color:var(--ink-muted);max-width:60ch;}
+
+  .card-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:8px;}
+  .card{border:1px solid var(--line);border-radius:10px;padding:20px 22px;background:var(--paper-raised);text-decoration:none;color:inherit;display:block;}
+  .card:hover{border-color:var(--accent);}
+  .card h3{margin-top:0;}
+  .card p{margin-bottom:0;font-size:14.5px;color:var(--ink-muted);}
+  .card .card-tag{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.05em;color:var(--accent-ink);margin-bottom:8px;display:block;}
+
+  footer{max-width:880px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  footer a{color:var(--ink-faint);}
+
+  @media (max-width:640px){
+    .card-grid{grid-template-columns:1fr;}
+    .doc-row{grid-template-columns:1fr;gap:4px;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow"><span>Investigación cuantitativa</span> · <span>BTC/USDT · Binance</span></div>
+    <h1 class="doc-title">¿Existe un edge en la vela de 5 minutos?</h1>
+    <p class="doc-subtitle">Investigación abierta y en curso sobre si la dirección de la siguiente vela de 5 minutos de BTC/USDT es predecible más allá de lo que produce un mercado eficiente — diseñada para refutar esa hipótesis tan rápido y con tanto rigor como para confirmarla.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Repositorio</dt><dd><a href="https://github.com/nobodywhois0/btc_candles_research">github.com/nobodywhois0/btc_candles_research</a></dd></div>
+      <div class="meta-item"><dt>Estado</dt><dd>En curso — hipótesis 001 dividida, 002 pendiente</dd></div>
+      <div class="meta-item"><dt>Última actualización</dt><dd>2026-07-08</dd></div>
+    </dl>
+  </div>
+</header>
+
+<main>
+
+  <section id="estado">
+    <div class="eyebrow">Estado actual</div>
+    <h2>Lo que sabemos hasta ahora</h2>
+    <p class="lead">La hipótesis general de "supervivencia del color" no se confirma ni se descarta como un todo — el efecto agregado (+1.87 puntos porcentuales sobre el benchmark correcto) resultó estar concentrado, no distribuido uniformemente.</p>
+    <div class="table-wrap">
+      <table>
+        <thead><tr><th>Hipótesis</th><th>Estado</th><th>Nivel</th><th>Evidencia clave</th></tr></thead>
+        <tbody>
+          <tr><td>001 · supervivencia (general)</td><td>Evidencia débil</td><td><span class="pill pill--lvl1">Nivel 1</span></td><td>+1.87pp agregado; se divide tras profundizar</td></tr>
+          <tr><td>001E · trayectoria interna hasta T=240s</td><td><strong>Confirmada localmente</strong></td><td><span class="pill pill--lvl2">Nivel 2</span></td><td>Monótona +11.4pp, zigzag −13.1pp (q=0.0000)</td></tr>
+          <tr><td>002 · forma / shape</td><td>Pendiente</td><td><span class="pill pill--pending">—</span></td><td>Siguiente en la cola</td></tr>
+          <tr><td>003 · microestructura</td><td>Pendiente</td><td><span class="pill pill--pending">—</span></td><td>—</td></tr>
+          <tr><td>004 · order flow</td><td>Pendiente</td><td><span class="pill pill--pending">—</span></td><td>—</td></tr>
+          <tr><td>005 · entropía</td><td>Pendiente</td><td><span class="pill pill--pending">—</span></td><td>—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="callout">
+      <span class="callout-label">La lectura corta</span>
+      <p>Por calendario (hora, día) y por régimen de volatilidad agregado, el efecto se mantiene plano y por debajo del umbral en 39 de 43 comparaciones. Pero al segmentar por la <strong>forma interna de la propia vela</strong> hasta el punto de decisión (sin usar información posterior — sin fuga), aparece un gradiente fuerte y monótono: trayectoria en zigzag revierte, trayectoria limpia continúa. Ese hallazgo, no el agregado original, es el que pasa a ser candidato a hipótesis propia.</p>
+    </div>
+    <p style="margin-top:16px;"><a href="resultados/001-survival.html">Ver el reporte completo del experimento base →</a> · <a href="resultados/001-survival-profundizacion.html">Ver la profundización 001A-G completa →</a></p>
+  </section>
+
+  <section id="fases">
+    <div class="eyebrow">Diseño de la investigación</div>
+    <h2>Seis fases, cada una un documento independiente</h2>
+    <p>Nada se implementó sin documentar primero el diseño completo — hipótesis, riesgos, arquitectura y protocolo. Cada fase se construye sobre la anterior, y la Fase 1.5 existe específicamente para atacar a la Fase 1 antes de invertir tiempo de más.</p>
+    <div class="doc-grid">
+      <a class="doc-row" href="investigacion-velas-5m-diseno-v0.1.html">
+        <div class="doc-row-num">01</div>
+        <div><div class="doc-row-title">Diseño metodológico</div><div class="doc-row-desc">Hipótesis, metodología científica, sesgos, validación temporal y formulaciones alternativas del problema — antes de escribir una sola línea de código.</div></div>
+      </a>
+      <a class="doc-row" href="revision-critica-v0.2.html">
+        <div class="doc-row-num">02</div>
+        <div><div class="doc-row-title">Revisión crítica</div><div class="doc-row-desc">Auditoría adversarial del diseño original: qué se elimina (patrones de velas, indicadores clásicos), qué se prioriza (supervivencia, microestructura intra-vela).</div></div>
+      </a>
+      <a class="doc-row" href="dataset-diseno-v0.3.html">
+        <div class="doc-row-num">03</div>
+        <div><div class="doc-row-title">Diseño del dataset</div><div class="doc-row-desc">Diccionario de datos completo por familia de variables, arquitectura de tablas, priorización P0-P3, y las 30 variables de mayor valor esperado.</div></div>
+      </a>
+      <a class="doc-row" href="arquitectura-plataforma-v0.4.html">
+        <div class="doc-row-num">04</div>
+        <div><div class="doc-row-title">Arquitectura de la plataforma</div><div class="doc-row-desc">RFC de una plataforma de investigación completa — módulos, versionado, escalabilidad. Referencia a 2-3 años, no el punto de partida real.</div></div>
+      </a>
+      <a class="doc-row" href="mvp-cientifico-v0.5.html">
+        <div class="doc-row-num">05</div>
+        <div><div class="doc-row-title">MVP científico</div><div class="doc-row-desc">Reducción deliberada de la arquitectura completa a lo mínimo necesario para aprender rápido — el plan que realmente se ejecutó.</div></div>
+      </a>
+      <a class="doc-row" href="manual-investigador-v0.6.html">
+        <div class="doc-row-num">06</div>
+        <div><div class="doc-row-title">Manual del investigador</div><div class="doc-row-desc">Protocolo obligatorio: mandamientos, checklists, catálogo de sesgos, niveles de evidencia — para evitar que el investigador se engañe a sí mismo.</div></div>
+      </a>
+    </div>
+  </section>
+
+  <section id="metodologia-y-resultados">
+    <div class="eyebrow">Referencia técnica y hallazgos</div>
+    <h2>Metodología abstraída y resultados completos</h2>
+    <div class="card-grid">
+      <a class="card" href="metodologia.html">
+        <span class="card-tag">Referencia</span>
+        <h3>Metodología completa</h3>
+        <p>El protocolo destilado en una guía técnica reutilizable: diseño de benchmark (nunca contra 50% plano), prevención de fuga, corrección FDR, patrón de profundización de hipótesis, plantillas de código.</p>
+      </a>
+      <a class="card" href="resultados/001-survival.html">
+        <span class="card-tag">Experimento</span>
+        <h3>001 · Supervivencia del color</h3>
+        <p>2 años de klines reales de BTCUSDT spot. Curva de supervivencia contra un benchmark de random walk simulado por Monte Carlo, no contra una constante trivial.</p>
+      </a>
+      <a class="card" href="resultados/001-survival-profundizacion.html">
+        <span class="card-tag">Experimento</span>
+        <h3>001A-G · Profundización</h3>
+        <p>43 comparaciones adicionales (régimen, hora, día, tendencia, forma interna, interacciones) con corrección FDR, para localizar dónde se concentra el efecto.</p>
+      </a>
+      <a class="card" href="https://github.com/nobodywhois0/btc_candles_research">
+        <span class="card-tag">Código</span>
+        <h3>Repositorio completo</h3>
+        <p>Pipeline mínimo (<code>lib/</code>), una carpeta por hipótesis (<code>research/</code>), historial de commits legible fase por fase.</p>
+      </a>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  btc_candles_research — <a href="https://github.com/nobodywhois0/btc_candles_research">código fuente en GitHub</a>. Ningún resultado de esta página es asesoría financiera; es investigación exploratoria con datos históricos.
+</footer>

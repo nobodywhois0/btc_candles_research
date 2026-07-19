@@ -1,0 +1,500 @@
+<title>Metodología de investigación — btc_candles_research</title>
+<style>
+  :root{
+    --paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);
+    --font-display:"Cambria","Constantia","Iowan Old Style",Georgia,serif;
+    --font-body:"Charter","Athelas","Iowan Old Style",Georgia,"Noto Serif",serif;
+    --font-mono:ui-monospace,"SF Mono","Cascadia Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  }
+  @media (prefers-color-scheme: dark){
+    :root{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+      --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+      --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  }
+  :root[data-theme="dark"]{--paper:#14161A;--paper-raised:#1B1E23;--ink:#E9E7DF;--ink-muted:#A8AEA8;--ink-faint:#767D78;
+    --line:#31352F;--line-strong:#454A42;--accent:#D9A354;--accent-ink:#E9BE84;--accent-wash:rgba(217,163,84,0.13);
+    --green:#5CAE7E;--green-wash:rgba(92,174,126,0.13);--red:#D2726A;--red-wash:rgba(210,114,106,0.12);}
+  :root[data-theme="light"]{--paper:#EEF0EC;--paper-raised:#F7F8F5;--ink:#14171A;--ink-muted:#4B5259;--ink-faint:#767D80;
+    --line:#D3D7D0;--line-strong:#B7BCB4;--accent:#B5792A;--accent-ink:#7E5218;--accent-wash:rgba(181,121,42,0.10);
+    --green:#2F7A4F;--green-wash:rgba(47,122,79,0.10);--red:#B33A3A;--red-wash:rgba(179,58,58,0.09);}
+
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--font-body);font-size:16.5px;line-height:1.62;-webkit-font-smoothing:antialiased;}
+  ::selection{background:var(--accent-wash);}
+  a{color:var(--accent-ink);text-decoration-thickness:1px;}
+  a:focus-visible,button:focus-visible,summary:focus-visible{outline:2px solid var(--accent);outline-offset:2px;}
+
+  .masthead{border-bottom:1px solid var(--line-strong);padding:56px 32px 40px;}
+  .masthead-inner{max-width:1120px;margin:0 auto;}
+  .doc-eyebrow{font-family:var(--font-mono);font-size:11.5px;letter-spacing:.09em;text-transform:uppercase;color:var(--accent-ink);display:flex;gap:18px;flex-wrap:wrap;margin-bottom:22px;}
+  .doc-eyebrow span{color:var(--ink-faint);}
+  .doc-eyebrow a{color:var(--ink-faint);}
+  h1.doc-title{font-family:var(--font-display);font-weight:700;font-size:clamp(30px,4.4vw,44px);line-height:1.12;letter-spacing:-.01em;margin:0 0 14px;text-wrap:balance;max-width:22ch;}
+  .doc-subtitle{font-size:18px;color:var(--ink-muted);max-width:66ch;margin:0 0 26px;text-wrap:pretty;}
+  .meta-row{display:flex;flex-wrap:wrap;gap:28px;font-family:var(--font-mono);font-size:12.5px;color:var(--ink-faint);border-top:1px solid var(--line);padding-top:18px;}
+  .meta-row dt{display:inline;text-transform:uppercase;letter-spacing:.05em;}
+  .meta-row dd{display:inline;margin:0 0 0 6px;color:var(--ink-muted);}
+  .meta-item{display:flex;gap:0;}
+
+  .page{max-width:1180px;margin:0 auto;padding:0 32px 120px;display:grid;grid-template-columns:240px minmax(0,1fr);gap:56px;align-items:start;}
+  nav.toc{position:sticky;top:32px;font-family:var(--font-mono);font-size:11px;line-height:1.85;padding-top:44px;max-height:calc(100vh - 64px);overflow-y:auto;}
+  nav.toc a{display:block;color:var(--ink-muted);text-decoration:none;padding:2px 0 2px 12px;border-left:2px solid transparent;}
+  nav.toc a:hover{color:var(--ink);border-left-color:var(--line-strong);}
+
+  main{min-width:0;padding-top:44px;}
+  section{padding:44px 0;border-top:1px solid var(--line);}
+  section:first-of-type{padding-top:0;border-top:none;}
+
+  .eyebrow{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--accent-ink);margin-bottom:10px;}
+  h2{font-family:var(--font-display);font-size:clamp(22px,2.6vw,27px);font-weight:700;letter-spacing:-.005em;margin:0 0 16px;text-wrap:balance;max-width:36ch;}
+  h3{font-family:var(--font-display);font-size:18px;font-weight:700;margin:26px 0 10px;}
+  h4{font-family:var(--font-body);font-size:15px;font-weight:700;font-style:italic;margin:18px 0 6px;color:var(--ink);}
+  p{margin:0 0 14px;max-width:72ch;}
+  ul,ol{margin:0 0 15px;padding-left:22px;max-width:70ch;}
+  li{margin-bottom:6px;}
+  li::marker{color:var(--ink-faint);}
+  strong{color:var(--ink);font-weight:700;}
+  code,.mono{font-family:var(--font-mono);font-size:.87em;}
+  code{background:var(--paper-raised);border:1px solid var(--line);padding:.05em .36em;border-radius:4px;}
+  blockquote{margin:16px 0;padding:4px 0 4px 18px;border-left:3px solid var(--line-strong);color:var(--ink-muted);max-width:68ch;}
+
+  .callout{border-left:3px solid var(--accent);background:var(--accent-wash);padding:15px 19px;border-radius:2px;margin:18px 0;max-width:70ch;}
+  .callout .callout-label{font-family:var(--font-mono);font-size:10.5px;text-transform:uppercase;letter-spacing:.07em;color:var(--accent-ink);margin-bottom:5px;display:block;}
+
+  .table-wrap{overflow-x:auto;margin:16px 0 24px;border:1px solid var(--line);border-radius:6px;}
+  table{border-collapse:collapse;width:100%;min-width:560px;font-size:13.5px;}
+  thead th{text-align:left;font-family:var(--font-mono);font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-faint);background:var(--paper-raised);padding:9px 12px;border-bottom:1px solid var(--line-strong);white-space:nowrap;}
+  tbody td{padding:9px 12px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink-muted);}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody td:first-child{color:var(--ink);font-weight:600;}
+
+  .schema-block{border:1px solid var(--line);border-radius:8px;background:var(--paper-raised);padding:16px 20px;margin:14px 0;font-family:var(--font-mono);font-size:12.5px;line-height:1.65;overflow-x:auto;white-space:pre-wrap;color:var(--ink-muted);}
+
+  .checklist{list-style:none;padding-left:0;margin:16px 0;max-width:70ch;}
+  .checklist li{position:relative;padding-left:28px;margin-bottom:8px;color:var(--ink-muted);}
+  .checklist li::before{content:"☐";position:absolute;left:0;top:0;color:var(--accent);font-family:var(--font-mono);font-size:14px;}
+
+  details.toc-mobile{display:none;}
+  footer{max-width:1180px;margin:0 auto;padding:40px 32px 80px;font-family:var(--font-mono);font-size:12px;color:var(--ink-faint);border-top:1px solid var(--line);}
+  footer a{color:var(--ink-faint);}
+
+  @media (max-width:920px){
+    .page{grid-template-columns:1fr;gap:0;}
+    nav.toc{display:none;}
+    main{padding-top:0;}
+    details.toc-mobile{display:block;margin:28px 32px 0;border:1px solid var(--line);border-radius:8px;padding:14px 18px;font-family:var(--font-mono);font-size:12.5px;}
+    details.toc-mobile summary{cursor:pointer;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;font-size:11.5px;}
+    details.toc-mobile nav a{display:block;padding:6px 0;color:var(--ink-muted);text-decoration:none;}
+  }
+</style>
+
+<header class="masthead">
+  <div class="masthead-inner">
+    <div class="doc-eyebrow"><a href="index.html">← btc_candles_research</a> · <span>Referencia técnica</span></div>
+    <h1 class="doc-title">Metodología de investigación</h1>
+    <p class="doc-subtitle">Extraída y abstraída de las seis fases de diseño y de la ejecución real de la hipótesis 001. No narra lo que se hizo — define cómo se hace la hipótesis siguiente.</p>
+    <dl class="meta-row">
+      <div class="meta-item"><dt>Fuente</dt><dd><a href="https://github.com/nobodywhois0/btc_candles_research/blob/main/METODOLOGIA.md">METODOLOGIA.md</a></dd></div>
+      <div class="meta-item"><dt>Complementa</dt><dd><a href="manual-investigador-v0.6.html">Manual del investigador</a></dd></div>
+    </dl>
+  </div>
+</header>
+
+<details class="toc-mobile">
+  <summary>Índice</summary>
+  <nav>
+    <a href="#principio">0 · Principio rector</a><a href="#ciclo">1 · Ciclo de vida</a><a href="#preregistro">2 · Pre-registro</a>
+    <a href="#benchmark">3 · Diseño del benchmark</a><a href="#leakage">4 · Prevención de fuga</a><a href="#estadistica">5 · Motor estadístico</a>
+    <a href="#lockbox">6 · Lockbox</a><a href="#profundizacion">7 · Profundización</a><a href="#niveles">8 · Niveles de evidencia</a>
+    <a href="#checklists">9-10 · Checklists</a><a href="#registro">11 · Registro obligatorio</a><a href="#abogado">12 · Abogado del diablo</a>
+    <a href="#lenguaje">13 · Lenguaje</a><a href="#sesgos">14 · Sesgos</a><a href="#arboles">15 · Árboles de decisión</a>
+    <a href="#estructura">16 · Estructura de carpetas</a><a href="#plantillas">17 · Plantillas</a><a href="#resumen">18 · Resumen ejecutivo</a>
+  </nav>
+</details>
+
+<div class="page">
+  <nav class="toc">
+    <a href="#principio">0 Principio rector</a>
+    <a href="#ciclo">1 Ciclo de vida</a>
+    <a href="#preregistro">2 Pre-registro</a>
+    <a href="#benchmark">3 Diseño del benchmark</a>
+    <a href="#leakage">4 Prevención de fuga</a>
+    <a href="#estadistica">5 Motor estadístico</a>
+    <a href="#lockbox">6 Lockbox</a>
+    <a href="#profundizacion">7 Profundización</a>
+    <a href="#niveles">8 Niveles de evidencia</a>
+    <a href="#checklists">9-10 Checklists</a>
+    <a href="#registro">11 Registro obligatorio</a>
+    <a href="#abogado">12 Abogado del diablo</a>
+    <a href="#lenguaje">13 Lenguaje</a>
+    <a href="#sesgos">14 Sesgos</a>
+    <a href="#arboles">15 Árboles de decisión</a>
+    <a href="#estructura">16 Estructura de carpetas</a>
+    <a href="#plantillas">17 Plantillas</a>
+    <a href="#resumen">18 Resumen ejecutivo</a>
+  </nav>
+
+  <main>
+
+    <section id="principio">
+      <div class="eyebrow">§0</div>
+      <h2>Principio rector</h2>
+      <p>El objetivo no es confirmar que hay un edge. Es diseñar el proceso más rápido posible para <strong>refutar</strong> esa hipótesis, y solo aceptarla si sobrevive el intento serio de refutación. Un resultado negativo, documentado con el mismo rigor que uno positivo, es un resultado completo — no una investigación fallida.</p>
+      <p>Cada decisión metodológica de este documento existe para resolver una tensión concreta entre dos fuerzas: la que empuja a encontrar algo (porque se invirtió tiempo, porque un patrón que "casi" cruza el umbral se siente como un descubrimiento) y la que exige que un hallazgo sobreviva escrutinio antes de gastar un solo dólar operándolo.</p>
+    </section>
+
+    <section id="ciclo">
+      <div class="eyebrow">§1</div>
+      <h2>Ciclo de vida de un experimento</h2>
+      <div class="schema-block">1. Pre-registro         hypothesis.md — hipótesis, benchmark, criterios, ANTES de tocar datos
+2. Checklist previo      §9
+3. Ejecución             run.py — carga → valida → features → test → reporte
+4. Checklist posterior   §10
+5. Abogado del diablo    §12 — obligatorio antes de aceptar cualquier resultado positivo
+6. Registro obligatorio  formato fijo, §11 — se escribe funcione o no el experimento
+7. Nivel de evidencia    §8 — asignación por regla, no por impresión
+8. Actualizar board.md   nunca a mano — reflejar exactamente el resultado
+9. (Opcional) Profundizar §7 — el patrón "00XA-G" cuando el resultado agregado es ambiguo</div>
+      <p>Ninguna etapa se salta. Si el paso 1 no está completo, el paso 3 no se ejecuta.</p>
+    </section>
+
+    <section id="preregistro">
+      <div class="eyebrow">§2</div>
+      <h2>Pre-registro (<code>hypothesis.md</code>)</h2>
+      <p>Cada hipótesis nueva empieza con un archivo que no se edita después de ver resultados:</p>
+      <div class="schema-block"># 00X · &lt;nombre corto&gt;
+
+## Hipótesis
+Una frase falsable.
+
+## Mecanismo esperado
+Por qué, en términos de microestructura/estadística/economía, se
+esperaría que esto sea cierto si lo es.
+
+## Benchmark
+Contra qué se compara — nunca "cero" ni "50%" por defecto (§3).
+
+## Criterio de éxito (escrito antes de ver datos)
+Números exactos: estadístico, umbral, tamaño de efecto mínimo.
+
+## Criterio de abandono (escrito antes de ver datos)
+Igual de exacto que el de éxito.
+
+## Qué resultado refutaría la hipótesis
+Una frase.
+
+## Datos
+Universo, rango, resolución real disponible (declarar limitaciones).
+
+## Test estadístico
+Cuál, y por qué ese y no otro (§5).
+
+## Número de comparaciones
+Cuántas pruebas suma este experimento al conteo acumulado de FDR.
+
+## Lockbox
+Confirmar explícitamente que no se toca el lockbox reservado (§6).</div>
+      <p>Regla dura: si después de correr el experimento se quiere cambiar cualquier campo, el experimento se descarta y se vuelve a pre-registrar como uno nuevo. No se edita el original.</p>
+    </section>
+
+    <section id="benchmark">
+      <div class="eyebrow">§3</div>
+      <h2>Diseño del benchmark — la lección central del proyecto</h2>
+      <p><strong>El error más caro que se puede cometer en este proyecto es comparar contra un benchmark trivial.</strong></p>
+      <p>Precedente concreto: en <code>001_survival</code>, la probabilidad cruda de que una vela conserve su lado a T=240s es 0.8712. Comparado contra 50%, eso parece un edge enorme. Pero <strong>cualquier random walk puro produce una curva de "supervivencia" ascendente con T</strong> — simplemente porque queda menos tiempo para que algo cambie. El benchmark correcto no es una constante: es una simulación del proceso nulo más parecido posible a los datos reales en todo lo que no es la hipótesis que se está probando.</p>
+      <h3>Procedimiento general</h3>
+      <ol>
+        <li>Identificar qué parámetros de nulo (volatilidad, tendencia, autocorrelación de corto plazo) podrían por sí solos producir un patrón parecido, sin que exista información real.</li>
+        <li>Simular ese proceso nulo <strong>emparejado observación por observación</strong> con esos parámetros — no con un promedio global.</li>
+        <li>Repetir la simulación N veces (Monte Carlo, 200-300 réplicas en la práctica de este proyecto) para obtener una distribución del estadístico bajo el nulo.</li>
+        <li>Comparar el resultado real contra esa distribución completa (media + percentiles 2.5/97.5), nunca contra un solo número.</li>
+      </ol>
+      <div class="schema-block"># lib/stats.py — patrón reutilizable para cualquier hipótesis que
+# necesite un benchmark "¿esto es más de lo que el ruido produciría?"
+def simulate_random_walk_sides(sigma, rng, t_list):
+    steps = rng.normal(loc=0.0, scale=sigma.reshape(-1, 1),
+                        size=(len(sigma), len(t_list)))
+    cum_log_return = np.cumsum(steps, axis=1)
+    return np.sign(cum_log_return)</div>
+      <div class="callout">
+        <span class="callout-label">Regla de aplicación</span>
+        <p>Antes de escribir el test estadístico de cualquier hipótesis nueva: <strong>"¿qué produciría este mismo estadístico si la hipótesis fuera falsa pero todo lo demás sobre el mercado fuera idéntico?"</strong> Esa respuesta, simulada, es el benchmark. Si la respuesta es "50%" o "cero", probablemente se está subestimando el efecto trivial.</p>
+      </div>
+    </section>
+
+    <section id="leakage">
+      <div class="eyebrow">§4</div>
+      <h2>Prevención de fuga de información (leakage)</h2>
+      <div class="callout">
+        <span class="callout-label">Regla general</span>
+        <p>Antes de usar una variable X para explicar o segmentar una decisión tomada en el instante T, preguntar: <strong>¿el cálculo de X usa algún dato con timestamp posterior a T?</strong> Si sí, X puede describir la vela a posteriori (valor diagnóstico) pero no puede usarse como variable de condicionamiento en tiempo real.</p>
+      </div>
+      <h3>Caso real detectado y corregido en este proyecto</h3>
+      <p>Durante la profundización 001A-G se auditó el propio reporte base de 001_survival y se encontró que el heatmap de régimen de volatilidad usaba <code>realized_vol_1m_intracandle</code> — calculada con las 5 sub-velas completas, <strong>incluida la última, que coincide con el cierre</strong>. Usar esa variable para clasificar "régimen" en una decisión de T=240s es fuga.</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Necesidad</th><th>Variable con fuga</th><th>Variable corregida</th><th>Por qué no filtra</th></tr></thead>
+        <tbody>
+          <tr><td>Régimen de volatilidad</td><td><code>realized_vol_1m_intracandle</code></td><td><code>atr_14</code></td><td>Rolling de velas ya cerradas</td></tr>
+          <tr><td>Forma interna hasta T=240s</td><td><code>path_efficiency_ratio</code></td><td><code>path_efficiency_240</code> (solo sub-velas 1-4)</td><td>Nunca toca la sub-vela 5</td></tr>
+          <tr><td>Tendencia local</td><td>—</td><td><code>trend_return_20</code> con <code>close.shift(20)</code></td><td>Estrictamente anterior</td></tr>
+        </tbody>
+      </table></div>
+      <p>Nota: usar una variable "con fuga" <strong>dentro del motor de benchmark</strong> (como sigma de la simulación Monte Carlo) sigue siendo correcto — ahí no se usa como señal operable, se usa para emparejar volatilidad estadísticamente. La fuga solo importa cuando la variable se presenta implícitamente como algo conocible en tiempo real.</p>
+      <ul class="checklist">
+        <li>¿Se calcula con datos estrictamente anteriores al instante de decisión?</li>
+        <li>Si incluye la vela actual, ¿qué sub-parte exactamente, y ya ocurrió antes del punto de decisión?</li>
+        <li>¿Se usa como condicionamiento o como variable diagnóstica? Declararlo explícitamente.</li>
+      </ul>
+    </section>
+
+    <section id="estadistica">
+      <div class="eyebrow">§5</div>
+      <h2>Motor estadístico</h2>
+      <h3>5.1 — Intervalos de confianza: Wilson</h3>
+      <p>Para cualquier proporción, usar el intervalo de Wilson — más estable que el normal aproximado cerca de 0 o 1.</p>
+      <div class="schema-block">lo, hi = scipy_stats.binomtest(successes, n).proportion_ci(
+    confidence_level=1 - alpha, method="wilson"
+)</div>
+      <h3>5.2 — Por qué NO usar un permutation test de shuffle aquí</h3>
+      <p>Barajar la etiqueta final manteniendo la variable de "lado en T" rompería la continuidad del camino de precio que genera el artefacto mecánico del §3 — hasta datos de ruido puro parecerían "significativos" frente a ese null incorrecto. Por eso se usa Monte Carlo paramétrico (simular el proceso), no shuffle. La elección del test depende de qué mecanismo genera el patrón que se quiere descartar, nunca es genérica.</p>
+      <h3>5.3 — Corrección por comparaciones múltiples (FDR, Benjamini-Hochberg)</h3>
+      <div class="schema-block">def benjamini_hochberg(pvals):
+    n = len(pvals)
+    order = np.argsort(pvals)
+    ranked = pvals[order]
+    q_raw = ranked * n / (np.arange(n) + 1)
+    q_monotone = np.minimum.accumulate(q_raw[::-1])[::-1]
+    q = np.empty(n)
+    q[order] = np.clip(q_monotone, 0, 1)
+    return q</div>
+      <p>El conteo es <strong>acumulado por hipótesis</strong>, no por corrida. La decisión final usa el q-valor, nunca el p-valor crudo, salvo en la primerísima observación exploratoria (Nivel 1). Con 300 réplicas Monte Carlo, la resolución mínima del p-valor empírico es 1/300≈0.0033 — si un resultado queda cerca del umbral post-FDR, subir las réplicas antes de decidir.</p>
+      <h3>5.4 — Significancia vs. relevancia</h3>
+      <div class="schema-block">significativo = (q_valor < ALPHA) and (effect_size >= EFFECT_SIZE_MIN)</div>
+      <p><code>ALPHA</code> y <code>EFFECT_SIZE_MIN</code> se fijan en el pre-registro a partir de razonamiento económico, nunca copiados mecánicamente de otra hipótesis.</p>
+    </section>
+
+    <section id="lockbox">
+      <div class="eyebrow">§6</div>
+      <h2>Lockbox y validación temporal</h2>
+      <ul>
+        <li>Se reserva un tramo final del histórico (90 días en <code>001_survival</code>) antes de cualquier análisis exploratorio.</li>
+        <li>Prohibido leer, describir o graficar ese tramo hasta la validación final de una hipótesis en Nivel 3.</li>
+        <li>Todo desarrollo exploratorio (incluida la profundización §7) ocurre solo sobre el conjunto de desarrollo.</li>
+        <li>Mirarlo una sola vez lo quema — se reserva uno nuevo y se documenta el incidente.</li>
+      </ul>
+    </section>
+
+    <section id="profundizacion">
+      <div class="eyebrow">§7</div>
+      <h2>Profundización de una hipótesis (patrón "00XA-G")</h2>
+      <p>Cuando el resultado agregado es ambiguo (Nivel 1), antes de abandonar o subir de nivel: <strong>¿el efecto está distribuido uniformemente o concentrado en un contexto específico?</strong></p>
+      <h3>7.1 — Ejes de estratificación estándar</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Eje</th><th>Cómo se construye sin fuga</th><th>Ejemplo</th></tr></thead>
+        <tbody>
+          <tr><td>Régimen</td><td>Cuantiles de una variable conocida antes de la decisión</td><td><code>atr_14</code> en terciles (001A)</td></tr>
+          <tr><td>Calendario</td><td>Determinístico, nunca tiene fuga por construcción</td><td>Hora UTC, día de semana (001B/C)</td></tr>
+          <tr><td>Tendencia local</td><td>Retorno sobre ventana pasada, banda muerta = sigma×√lookback</td><td><code>trend_return_20</code> (001D)</td></tr>
+          <tr><td>Estructura interna parcial</td><td>Solo hasta el instante de decisión</td><td><code>path_efficiency_240</code> (001E)</td></tr>
+          <tr><td>Interacciones</td><td>2-4 celdas preespecificadas por teoría antes de ejecutar</td><td>001G: 3 celdas, no fuerza bruta</td></tr>
+        </tbody>
+      </table></div>
+      <h3>7.2 — Por qué las interacciones se preespecifican</h3>
+      <p>Elegir la celda "más prometedora" después de ver todos los resultados es el sesgo de Texas sharpshooter. La disciplina es escribir, antes de correr nada, la motivación teórica de cada celda que se va a probar.</p>
+      <h3>7.3 — Veredicto automático</h3>
+      <div class="schema-block">n_significativos = comparaciones que sobreviven FDR + umbral de efecto
+n_tested          = comparaciones totales evaluadas
+
+si n_significativos == 0                     → permanece en observación
+si 0 < n_significativos < 0.5 × n_tested      → dividir en hipótesis más específica
+si n_significativos >= 0.5 × n_tested          → sube de nivel (con reservas de §8)</div>
+      <p>El umbral 0.5 es un default razonable, no un dogma — pero debe fijarse antes de ver los resultados de la profundización.</p>
+    </section>
+
+    <section id="niveles">
+      <div class="eyebrow">§8</div>
+      <h2>Niveles de evidencia</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Nivel</th><th>Nombre</th><th>Criterio objetivo de entrada</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>Idea</td><td><code>hypothesis.md</code> completo, ningún dato tocado</td></tr>
+          <tr><td>1</td><td>Observación</td><td>Checklist previo completo, primera corrida documentada, sin FDR todavía</td></tr>
+          <tr><td>2</td><td>Hipótesis apoyada</td><td>Sobrevive test individual con FDR preliminar, en una ventana/régimen</td></tr>
+          <tr><td>3</td><td>Evidencia robusta</td><td>Estable en ≥3 regímenes/años independientes, sobrevive el abogado del diablo</td></tr>
+          <tr><td>4</td><td>Edge validado</td><td>Todo lo anterior + EV neto positivo, validado sobre el lockbox nunca tocado</td></tr>
+        </tbody>
+      </table></div>
+      <p>Subir de nivel exige el criterio objetivo del siguiente — nunca por consenso subjetivo. Bajar es inmediato ante cualquier violación en auditoría. <strong>Techo estructural</strong>: con ~21 meses continuos de historia, ningún resultado puede superar Nivel 2 — Nivel 3 exige 3 regímenes macro independientes que ese rango todavía no cubre.</p>
+    </section>
+
+    <section id="checklists">
+      <div class="eyebrow">§9-10</div>
+      <h2>Checklists previo y posterior</h2>
+      <h3>Antes de ejecutar</h3>
+      <ul class="checklist">
+        <li>Hipótesis falsable, con mecanismo esperado</li>
+        <li>Criterio de éxito exacto (número, no impresión)</li>
+        <li>Criterio de abandono exacto</li>
+        <li>Benchmark definido explícitamente (§3)</li>
+        <li>Test estadístico elegido y justificado antes de ver datos (§5.2)</li>
+        <li>Tamaño de efecto mínimo económicamente relevante</li>
+        <li>Número de comparaciones que suma al conteo FDR</li>
+        <li>Ventana de datos exacta, sin tocar el lockbox</li>
+        <li>Ruta de resultados fijada de antemano</li>
+        <li>Resultado que refutaría la hipótesis, en una frase</li>
+      </ul>
+      <h3>Después de ejecutar</h3>
+      <ul class="checklist">
+        <li>¿Hay leakage? (§4, sobre cada feature nueva)</li>
+        <li>¿Hay overfitting? (brecha in-sample vs. walk-forward)</li>
+        <li>¿Se recalculó el q-valor con el conteo FDR actualizado?</li>
+        <li>¿Hay estabilidad temporal, o se declaró el techo de nivel?</li>
+        <li>¿El efecto es económicamente relevante, no solo estadístico?</li>
+        <li>¿Se comparó contra el benchmark correcto, no uno trivial?</li>
+        <li>¿Sobrevive el abogado del diablo?</li>
+        <li>¿Se documentó en el registro obligatorio, funcione o no?</li>
+        <li>¿Se actualizó <code>board.md</code>?</li>
+      </ul>
+    </section>
+
+    <section id="registro">
+      <div class="eyebrow">§11</div>
+      <h2>Registro obligatorio — formato fijo</h2>
+      <div class="schema-block">hipotesis:              una frase falsable
+fecha_de_pre_registro:   antes de tocar datos de prueba
+fecha_de_ejecucion:      —
+resultado_esperado:      escrito ANTES de ver datos
+resultado_observado:     —
+benchmark_usado:         qué se simuló y por qué (§3)
+estadistico_y_p_valor:   con corrección FDR aplicada (§5.3)
+tamano_del_efecto:       en las unidades que importan económicamente
+interpretacion:          lenguaje de §13
+problemas_encontrados:   —
+limitaciones:            —
+nivel_de_evidencia:      0-4, por regla (§8)
+decision:                continuar / abandonar / requiere más datos / dividir
+proximo_paso:            concreto, accionable
+responsable:              fecha</div>
+    </section>
+
+    <section id="abogado">
+      <div class="eyebrow">§12</div>
+      <h2>El abogado del diablo</h2>
+      <p>Sección obligatoria antes de aceptar cualquier resultado positivo, titulada exactamente: <strong>"Las cinco mejores razones por las que este resultado probablemente sea falso."</strong> Específicas al resultado concreto, nunca genéricas.</p>
+      <ol>
+        <li>¿El benchmark pudo estar mal calibrado (supuestos que no se cumplen exactamente)?</li>
+        <li>¿La resolución de datos disponible es más gruesa que la ideal?</li>
+        <li>¿El periodo cubierto cruza suficientes regímenes?</li>
+        <li>¿La resolución del test (réplicas, tamaño de muestra) es suficiente para el umbral aplicado?</li>
+        <li>¿El número de comparaciones realizadas está correctamente contado en el FDR?</li>
+      </ol>
+    </section>
+
+    <section id="lenguaje">
+      <div class="eyebrow">§13</div>
+      <h2>Disciplina de lenguaje</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Prohibido</th><th>Obligatorio</th></tr></thead>
+        <tbody>
+          <tr><td>"El modelo descubrió X"</td><td>"La evidencia observada es consistente con X"</td></tr>
+          <tr><td>"Los datos demuestran X"</td><td>"Los datos disponibles no refutan X"</td></tr>
+          <tr><td>"Existe un patrón"</td><td>"Se observa una regularidad que no ha sido refutada"</td></tr>
+          <tr><td>"Esto prueba que hay un edge"</td><td>"La hipótesis no ha sido refutada; nivel de evidencia: X"</td></tr>
+          <tr><td>"Confirmamos que no hay memoria"</td><td>"No encontramos evidencia con el poder estadístico disponible"</td></tr>
+          <tr><td>"Esto es obvio en retrospectiva"</td><td>Prohibida sin excepción</td></tr>
+        </tbody>
+      </table></div>
+      <p>Ninguna hipótesis se "prueba". Solo se falla en refutarla.</p>
+    </section>
+
+    <section id="sesgos">
+      <div class="eyebrow">§14</div>
+      <h2>Catálogo de sesgos — versión operativa</h2>
+      <p>Lista completa con detección/mitigación/auditoría en el <a href="manual-investigador-v0.6.html">Manual del investigador</a>, Parte 5. Los más probables en este proyecto específicamente:</p>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Sesgo</th><th>Dónde aparece aquí</th></tr></thead>
+        <tbody>
+          <tr><td>Data snooping</td><td>Generar una hipótesis mirando un gráfico y probarla en la misma ventana</td></tr>
+          <tr><td>Texas sharpshooter</td><td>Elegir la celda de interacción ganadora después de ver el heatmap (§7.2)</td></tr>
+          <tr><td>HARKing</td><td>Ajustar el umbral de efecto después de ver que casi lo cruza</td></tr>
+          <tr><td>Optimizer's curse</td><td>Reportar la mejor configuración sin re-evaluarla en datos frescos</td></tr>
+          <tr><td>Leakage silencioso</td><td>Usar una feature de la vela completa para una decisión de mitad de vela (§4)</td></tr>
+          <tr><td>Regime blindness</td><td>Declarar Nivel 3-4 sin haber cruzado 3 regímenes independientes (§8)</td></tr>
+        </tbody>
+      </table></div>
+    </section>
+
+    <section id="arboles">
+      <div class="eyebrow">§15</div>
+      <h2>Árboles de decisión</h2>
+      <h4>Señal interesante aparece</h4>
+      <p>¿Pre-registrada antes de verla? No: re-registrar y probar en datos frescos. Sí → ¿sobrevive checklist posterior? No: "evidencia débil", no se borra. Sí → ¿sobrevive abogado del diablo? No: degradar un nivel. Sí → ¿económicamente relevante? No: tope Nivel 2. Sí → subir de nivel y actualizar <code>board.md</code>.</p>
+      <h4>Señal desaparece</h4>
+      <p>¿Fue en el lockbox o en validación regular? Lockbox: aceptar y degradar a "rechazada" sin excepción. Regular → ¿cambió el régimen? Sí: "evidencia condicionada a régimen", tope Nivel 3. No: sospechar leakage, re-auditar §4 y §10.</p>
+      <h4>Señal inestable entre folds</h4>
+      <p>¿Muestra suficiente por fold? No: "requiere más datos" (Nivel 2). Sí → ¿correlaciona con régimen? Sí: reformular como hipótesis condicional. No: tratar como ruido, degradar con fecha de revisión futura.</p>
+      <h4>Contradice otra hipótesis aceptada</h4>
+      <p>¿Mismo periodo/definición de datos? No: diferencia de muestra, documentar sin forzar reconciliación. Sí → ¿alguna no pasó el checklist completo? Sí: esa es la sospechosa. No (ambas limpias): tratar la contradicción como información real sobre un régimen no identificado.</p>
+    </section>
+
+    <section id="estructura">
+      <div class="eyebrow">§16</div>
+      <h2>Estructura de una hipótesis nueva</h2>
+      <div class="schema-block">research/00X_&lt;nombre&gt;/
+├── hypothesis.md      # plantilla de §2
+├── run.py              # carga → valida → features → test → reporte
+├── results/
+│   ├── report.html        # generado por lib/report.py::make_report
+│   ├── figures/
+│   └── summary.json         # estado, nivel, métricas clave — alimenta board.md
+└── README.md                # notas del investigador, actualizadas cada corrida</div>
+      <p>Regla de independencia: ninguna carpeta de <code>research/</code> importa de otra. Solo de <code>lib/</code> (funciones puras) y de <code>data/</code> (solo lectura).</p>
+    </section>
+
+    <section id="plantillas">
+      <div class="eyebrow">§17</div>
+      <h2>Plantillas listas para copiar</h2>
+      <h3>Umbral de tendencia sin fuga (banda muerta basada en ruido)</h3>
+      <div class="schema-block">log_close = np.log(df["close"].to_numpy())
+lookback = 20  # ajustar por hipótesis
+trend_return = log_close - np.concatenate([np.full(lookback, np.nan), log_close[:-lookback]])
+r1 = np.diff(log_close, prepend=np.nan)
+sigma_1bar = np.nanstd(r1)
+deadband = sigma_1bar * np.sqrt(lookback)
+trend = np.where(np.isnan(trend_return), "sin_dato",
+         np.where(trend_return > deadband, "alcista",
+         np.where(trend_return < -deadband, "bajista", "lateral")))</div>
+      <h3>Prueba de un subgrupo contra su propio benchmark Monte Carlo</h3>
+      <div class="schema-block">def run_group_test(df_subset, label, n_reps=300, seed=42, decision_t=240):
+    if len(df_subset) < 300:
+        return {"label": label, "potencia_insuficiente": True}
+    curve = survival_curve(df_subset)
+    bench, p_values = random_walk_benchmark(df_subset, n_reps=n_reps, seed=seed)
+    real = curve.set_index("T_seconds").loc[decision_t, "p_same_side_at_close"]
+    bmk = bench.set_index("T_seconds").loc[decision_t, "p_same_side_benchmark_mean"]
+    return {"label": label, "n": len(df_subset), "effect_size": real - bmk,
+            "p_empirico": p_values[decision_t]}</div>
+    </section>
+
+    <section id="resumen">
+      <div class="eyebrow">§18</div>
+      <h2>Checklist definitivo — resumen ejecutivo</h2>
+      <p>Antes de declarar cualquier hipótesis confirmada, verificar las siete preguntas que resumen todo este documento:</p>
+      <ol>
+        <li>¿El benchmark es una simulación del proceso nulo correcto, no una constante trivial?</li>
+        <li>¿Ninguna variable de condicionamiento usa datos posteriores al punto de decisión?</li>
+        <li>¿El p-valor está corregido por el conteo total de comparaciones del proyecto?</li>
+        <li>¿El efecto es económicamente relevante, no solo estadísticamente distinguible de cero?</li>
+        <li>¿Es estable en ≥3 regímenes/años, o se declaró el techo de nivel por falta de cobertura?</li>
+        <li>¿Sobrevivió un intento serio y específico de encontrar por qué es falso?</li>
+        <li>¿Está documentado en el formato fijo, con el lenguaje correcto, funcione o no?</li>
+      </ol>
+      <p>Si alguna respuesta es no, el nivel de evidencia se limita en consecuencia — no se fuerza una conclusión.</p>
+    </section>
+
+  </main>
+</div>
+
+<footer>btc_candles_research · <a href="index.html">← volver al inicio</a> · <a href="https://github.com/nobodywhois0/btc_candles_research/blob/main/METODOLOGIA.md">ver METODOLOGIA.md en GitHub</a></footer>
