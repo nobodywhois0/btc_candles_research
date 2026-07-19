@@ -46,6 +46,11 @@ Benjamini-Hochberg), y una sección obligatoria de "por qué este
 resultado podría ser falso" antes de aceptar cualquier hallazgo
 positivo.
 
+Ese protocolo, ya abstraído y con los patrones técnicos concretos
+(diseño del benchmark, prevención de fuga, plantillas de código) está
+en [`METODOLOGIA.md`](METODOLOGIA.md) — es la referencia a seguir para
+abrir cualquier hipótesis nueva, sin tener que releer las seis fases.
+
 ## Estructura del repositorio
 
 ```
