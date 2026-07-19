@@ -1,0 +1,103 @@
+/* Sistema tipográfico y de componentes compartido — cargado DESPUÉS del
+   <style> propio de cada página para poder sobreescribir por orden de
+   cascada sin tocar el marcado de cada documento. */
+
+@font-face{
+  font-family:"Source Serif Site";
+  font-style:normal;
+  font-weight:400 700;
+  font-display:swap;
+  src:url("fonts/source-serif-4-variable.woff2") format("woff2");
+}
+@font-face{
+  font-family:"IBM Plex Mono Site";
+  font-style:normal;
+  font-weight:400;
+  font-display:swap;
+  src:url("fonts/ibm-plex-mono-400.woff2") format("woff2");
+}
+@font-face{
+  font-family:"IBM Plex Mono Site";
+  font-style:normal;
+  font-weight:600;
+  font-display:swap;
+  src:url("fonts/ibm-plex-mono-600.woff2") format("woff2");
+}
+
+:root{
+  --font-display:"Source Serif Site",Georgia,"Iowan Old Style",serif;
+  --font-body:"Source Serif Site",Georgia,"Iowan Old Style",serif;
+  --font-mono:"IBM Plex Mono Site",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+
+/* ===== Chips / niveles / verdictos: subrayado, sin caja ni relleno ===== */
+.pill,.pill--state{
+  font-family:var(--font-mono);
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.05em;
+  padding:0 0 2px;
+  border-radius:0;
+  border:none;
+  border-bottom:2px solid var(--line-strong);
+  background:none;
+  white-space:nowrap;
+  display:inline-block;
+}
+.pill--lvl0,.pill--low,.pill--p2,.pill--med,.pill--moredata{color:var(--ink-muted);border-bottom-color:var(--line-strong);}
+.pill--lvl1{color:var(--ink-muted);border-bottom-color:var(--line-strong);}
+.pill--lvl2,.pill--lvl3,.pill--high,.pill--cond,.pill--weak,.pill--p1{color:var(--accent-ink);font-weight:700;border-bottom-color:var(--accent);}
+.pill--lvl4,.pill--fund,.pill--confirmed{color:var(--green);font-weight:700;border-bottom-color:var(--green);}
+.pill--kill,.pill--reject,.pill--rejected{color:var(--red);font-weight:700;border-bottom-color:var(--red);}
+.pill--p0{color:var(--accent-ink);font-weight:700;border-bottom:3px solid var(--accent);}
+.pill--p3,.pill--pending{color:var(--ink-faint);border-bottom-color:var(--line);border-bottom-style:dashed;}
+
+/* ===== Tablas: estilo terminal, mono, sin encabezado sombreado con caja redondeada ===== */
+.table-wrap{
+  overflow-x:auto;
+  margin:16px 0 24px;
+  border:1px solid var(--line-strong);
+  border-radius:0;
+  background:var(--paper-raised);
+}
+.table-wrap table{font-family:var(--font-mono);font-size:12.5px;}
+.table-wrap thead th{
+  background:none;
+  font-weight:400;
+  border-bottom:1px solid var(--line-strong);
+}
+.table-wrap tbody tr:hover{background:var(--accent-wash);}
+.table-wrap tbody td:first-child,
+.table-wrap .vartable tbody td:first-child{
+  color:var(--accent-ink);
+  font-weight:400;
+  font-family:var(--font-mono);
+}
+
+/* ===== Cards neutras (module-card, rule-card, tree-card): sin relleno,
+   radio mínimo. Los callouts con color semántico — riesgo/éxito/veredicto
+   — se dejan intactos, ese color sí comunica algo. ===== */
+.module-card,.rule-card,.tree-card{
+  background:none;
+  border-radius:3px;
+}
+
+/* ===== Card-grid de index.html: columnas de periódico, regla vertical
+   entre ítems en vez de caja alrededor de cada uno ===== */
+.card-grid{gap:30px 32px;}
+.card{
+  border:none;
+  border-radius:0;
+  background:none;
+  padding:0 28px 0 0;
+}
+.card:hover{border-color:transparent;}
+.card:hover h3{color:var(--accent-ink);}
+@media (min-width:641px){
+  .card-grid a.card:nth-child(odd){border-right:1px solid var(--line-strong);}
+  .card-grid a.card:nth-child(even){padding-left:28px;padding-right:0;}
+}
+@media (max-width:640px){
+  .card{padding:0 0 24px;border-bottom:1px solid var(--line-strong);}
+  .card:last-child{border-bottom:none;padding-bottom:0;}
+}
